@@ -8,5 +8,8 @@
     <session-factory>
         <mapping class="com.mengruojun.model.User"/>
         <mapping class="com.mengruojun.model.Role"/>
+        <mapping class="com.historydatacenter.model.HistoryDataKBar"/>
+        <mapping class="com.historydatacenter.model.HistoryDataKBarAttribute"/><!--
+        <mapping class="com.historydatacenter.model.GeneratedIdBaseEntity"/>-->
     </session-factory>
 </hibernate-configuration>

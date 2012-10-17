@@ -29,6 +29,10 @@
     
     <!-- Activates scanning of @Service -->
     <context:component-scan base-package="com.mengruojun.service"/>
+    <!-- Activates scanning of @Service -->
+    <context:component-scan base-package="com.historydatacenter.service"/>
+
+    <bean id="schemaToolService" class="com.historydatacenter.service.processor.SchemaToolService" />
     
     <tx:advice id="txAdvice">
         <tx:attributes>

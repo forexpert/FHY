@@ -6,7 +6,41 @@
        default-lazy-init="true">
 
     <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+    <!-- For mail settings and future properties files -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+                <value>classpath:mail.properties</value>
+            </list>
+        </property>
+    </bean>
 
+    <!-- JNDI DataSource for J2EE environments -->
+    <!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/appfuse"/>-->
+
+    <bean id="dataSource" class="com.mengruojun.util.routingdatasource.RoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="com.mengruojun.util.routingdatasource.DataSourceType">
+                <entry key="PRODUCTION" value-ref="productiondataSource"/>
+                <entry key="TEST" value-ref="testdataSource"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="productiondataSource"/>
+    </bean>
+
+
+    <bean id="productiondataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <bean id="testdataSource" parent="productiondataSource">
+        <property name="url" value="${jdbc.testurl}"/>
+    </bean>
     <!-- Hibernate SessionFactory -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
@@ -17,6 +51,9 @@
                 hibernate.query.substitutions=true 'Y', false 'N'
                 hibernate.cache.use_second_level_cache=true
                 hibernate.cache.provider_class=org.hibernate.cache.EhCacheProvider
+                <!--hibernate.show_sql=true
+                hibernate.show_sql=true
+                hibernate.format_sql=true  -->
             </value>
             <!-- Turn batching off for better error messages under PostgreSQL -->
             <!-- hibernate.jdbc.batch_size=0 -->
@@ -27,7 +64,7 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
-    
+
     <!-- Activates scanning of @Autowired -->
     <context:annotation-config/>
 
@@ -40,34 +77,34 @@
     <!-- Hooks into Spring transaction management and stores the index on the file system -->
     <bean id="compass" class="org.compass.spring.LocalCompassBean">
         <property name="mappingScan" value="com.mengruojun"/>
-        <property name="transactionManager" ref="transactionManager" />
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="settings">
             <map>
-                <entry key="compass.engine.connection" value="target/test-index" />
+                <entry key="compass.engine.connection" value="target/test-index"/>
             </map>
         </property>
     </bean>
 
     <!-- Compass Template allowing to automatically join/start exising transactions when performing operations -->
     <bean id="compassTemplate" class="org.compass.core.CompassTemplate">
-        <property name="compass" ref="compass" />
+        <property name="compass" ref="compass"/>
     </bean>
 
     <!-- Compass Search Helper allowing to perform search operations in a simpler manner -->
     <bean id="compassSearchHelper" class="org.compass.core.support.search.CompassSearchHelper">
-        <constructor-arg ref="compass" />
-        <property name="pageSize" value="10" />
+        <constructor-arg ref="compass"/>
+        <property name="pageSize" value="10"/>
     </bean>
 
     <!-- CompassGps will automatically mirror any changes done thorugh Hibernate to searchable classes to the index -->
     <!-- It will also provide the index operation allowing to reindex the database -->
     <bean id="compassGps" class="org.compass.gps.impl.SingleCompassGps" init-method="start" destroy-method="stop">
-        <property name="compass" ref="compass" />
+        <property name="compass" ref="compass"/>
         <property name="gpsDevices">
             <list>
                 <bean class="org.compass.gps.device.hibernate.HibernateGpsDevice">
-                    <property name="name" value="hibernate" />
-                    <property name="sessionFactory" ref="sessionFactory" />
+                    <property name="name" value="hibernate"/>
+                    <property name="sessionFactory" ref="sessionFactory"/>
                 </bean>
             </list>
         </property>

@@ -16,7 +16,7 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>dbunit-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
@@ -41,7 +41,7 @@
                         </goals>
                     </execution>
                     <execution>
-                        <!-- Runs before integration tests and jetty:run-war -->
+                        &lt;!&ndash; Runs before integration tests and jetty:run-war &ndash;&gt;
                         <id>test</id>
                         <phase>test</phase>
                         <goals>
@@ -56,7 +56,7 @@
                         <version>${jdbc.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
@@ -306,6 +306,11 @@
             <artifactId>standard</artifactId>
             <version>${jstl.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -318,7 +323,7 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
                         <version>${cargo.version}</version>
@@ -356,7 +361,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin>-->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>1.3</version>
@@ -372,12 +377,12 @@
                                 <property name="test" value="run-all-tests" />
                                 <property name="i18n.classpath" value="${basedir}/target/classes" />
                                 <echo level="info">Testing '${project.build.finalName}' with locale '${user.language}'</echo>
-                                <ant antfile="src/test/resources/web-tests.xml" target="${test}">
+                                <!--<ant antfile="src/test/resources/web-tests.xml" target="${test}">
                                     <property name="user.language" value="${user.language}" />
                                     <property name="webapp.name" value="${project.build.finalName}" />
                                     <property name="host" value="${cargo.host}" />
                                     <property name="port" value="${cargo.port}" />
-                                </ant>
+                                </ant>-->
                             </tasks>
                         </configuration>
                         <executions>
@@ -407,13 +412,13 @@
             <build>
                 <plugins>
                     <!-- Override location of data file for DbUnit to load (doesn't have negative keys) -->
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>dbunit-maven-plugin</artifactId>
                         <configuration>
                             <src>src/main/resources/default-data.xml</src>
                         </configuration>
-                    </plugin>
+                    </plugin>-->
                 </plugins>
             </build>
         </profile>
