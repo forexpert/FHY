@@ -28,6 +28,16 @@
     <!-- Dependencies calculated by AppFuse when running full-source plugin -->
     <dependencies>
         <dependency>
+            <groupId>ta-lib</groupId>
+            <artifactId>ta-lib</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.1</version>

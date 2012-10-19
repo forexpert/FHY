@@ -1,6 +1,7 @@
 package com.historydatacenter.tools;
 
 import com.historydatacenter.service.processor.HistoryDataInitProcessor;
+import com.historydatacenter.service.processor.Processor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -19,9 +20,12 @@ public class Main {
   }
 
   private void run() {
-    context = new ClassPathXmlApplicationContext(contextFiles);
-    HistoryDataInitProcessor processor = getBean("historyDataInitProcessor", HistoryDataInitProcessor.class);
-    processor.run();
+    if (args.length > 0 ) {
+      context = new ClassPathXmlApplicationContext(contextFiles);
+      Processor processor = getBean(args[0], Processor.class);
+      processor.run();
+    }
+
 
   }
 

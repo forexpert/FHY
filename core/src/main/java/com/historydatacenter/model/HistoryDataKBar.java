@@ -1,7 +1,7 @@
 package com.historydatacenter.model;
 
 
-import com.historydatacenter.model.enumerate.Instrument;
+import com.historydatacenter.model.Instrument;
 import com.historydatacenter.model.enumerate.TimeWindowType;
 import com.mengruojun.model.BaseObject;
 import org.hibernate.annotations.Cascade;
@@ -26,6 +26,7 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
   /**
    * Like EUR/USD, USD/JPY and etc
    */
+  @Embedded
   private Instrument instrument;
 
   @Enumerated (EnumType.STRING)
@@ -41,7 +42,12 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
   @Embedded
   private OHLC ohlc;
 
+  /**
+   * Default constructor
+   */
+  public HistoryDataKBar(){
 
+  }
   public HistoryDataKBar(Instrument instrument, TimeWindowType timeWindowType, Long openTime, Long closeTime, OHLC ohlc) {
     this.instrument = instrument;
     this.timeWindowType = timeWindowType;
