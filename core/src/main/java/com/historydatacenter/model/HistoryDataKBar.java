@@ -29,14 +29,14 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
   @Embedded
   private Instrument instrument;
 
-  @Enumerated (EnumType.STRING)
+  @Enumerated(EnumType.STRING)
   private TimeWindowType timeWindowType;
 
   private Long openTime;
   private Long closeTime;
 
-  @OneToMany(mappedBy = "historyDataKBar", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-  @Cascade({org.hibernate.annotations.CascadeType.DELETE_ORPHAN,org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+  @OneToMany(mappedBy = "historyDataKBar", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+  @Cascade({org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
   private final Set<HistoryDataKBarAttribute> historyDataKBarAttribute = new HashSet<HistoryDataKBarAttribute>();
 
   @Embedded
@@ -45,9 +45,10 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
   /**
    * Default constructor
    */
-  public HistoryDataKBar(){
+  public HistoryDataKBar() {
 
   }
+
   public HistoryDataKBar(Instrument instrument, TimeWindowType timeWindowType, Long openTime, Long closeTime, OHLC ohlc) {
     this.instrument = instrument;
     this.timeWindowType = timeWindowType;

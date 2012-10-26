@@ -3,10 +3,16 @@ package com.historydatacenter.service.processor;
 import au.com.bytecode.opencsv.CSVReader;
 import com.historydatacenter.dao.HistoryDataKBarDao;
 import com.historydatacenter.model.HistoryDataKBar;
+import com.historydatacenter.model.HistoryDataKBarAttribute;
 import com.historydatacenter.model.Instrument;
 import com.historydatacenter.model.OHLC;
 import com.historydatacenter.model.enumerate.Currency;
+import com.historydatacenter.model.enumerate.IndicatorType;
 import com.historydatacenter.model.enumerate.TimeWindowType;
+import com.historydatacenter.utils.HistoryDataKBarUtils;
+import com.tictactec.ta.lib.Core;
+import com.tictactec.ta.lib.MInteger;
+import com.tictactec.ta.lib.RetCode;
 import org.apache.log4j.Logger;
 import org.compass.core.converter.extended.DataTimeConverter;
 import org.joda.time.DateTime;
@@ -17,6 +23,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -35,7 +42,7 @@ public class HistoryDataInitProcessor implements Processor, ApplicationContextAw
 
 
   public void run() {
-    // loadHistoryData();   // this task has been down. There is no need to repeat it when each run
+    //loadHistoryData();   // this task has been done. There is no need to repeat it when each run
     generateDataAttribute();
 
   }
@@ -58,8 +65,8 @@ public class HistoryDataInitProcessor implements Processor, ApplicationContextAw
       List<String[]> ask_data = reader_ask.readAll();
       List<String[]> bid_data = reader_bid.readAll();
 
-      for(int i = 1 ; i < ask_data.size(); i++){
-      //for (int i = 1; i < 5; i++) {
+      for (int i = 1; i < ask_data.size(); i++) {
+        //for (int i = 1; i < 5; i++) {
         //Time Open High Low Close Volume
         String[] ask = ask_data.get(i);
         String[] bid = bid_data.get(i);
@@ -82,6 +89,8 @@ public class HistoryDataInitProcessor implements Processor, ApplicationContextAw
         ohlc.setBidHigh(Double.valueOf(bid[3]));
         ohlc.setBidLow(Double.valueOf(bid[4]));
         ohlc.setBidClose(Double.valueOf(bid[5]));
+        ohlc.setAskVolume(Double.valueOf(ask[6]));
+        ohlc.setBidVolume(Double.valueOf(bid[6]));
 
         DateTime openTime = new DateTime(sdf.parse(ask[0] + " " + ask[1]));
         DateTime closeTime = openTime.plusMinutes(5);
@@ -106,6 +115,96 @@ public class HistoryDataInitProcessor implements Processor, ApplicationContextAw
    * generate indicates
    */
   private void generateDataAttribute() {
+
+    try {
+      //insertEMAAttribute(IndicatorType.EMA_5, 5);
+      //insertEMAAttribute(IndicatorType.EMA_20, 20);
+      //insertEMAAttribute(IndicatorType.EMA_40, 40);
+
+      insertMACDAttribute();
+    } catch (Exception e) {
+      log.error("", e);
+    }
+    // MACD
+
+  }
+
+
+  /**
+   * // Simple, we only calculate ask side prices indicators.
+   *
+   * @param indicatorType
+   * @param optInTimePeriod
+   * @throws Exception
+   */
+  private void insertEMAAttribute(IndicatorType indicatorType, int optInTimePeriod) throws Exception {
+    List<HistoryDataKBar> list = dao.getAll();
+
+    Core core = new Core();
+    double[] askCloseInput = HistoryDataKBarUtils.getPropertyArray(list, "getAskClose");
+    RetCode retCode;
+    MInteger outBegIdx = new MInteger();
+    MInteger outNbElement = new MInteger();
+
+    // calculate EMA
+    double emaSomePeriod[] = new double[askCloseInput.length];
+    retCode = core.ema(0, askCloseInput.length - 1, askCloseInput, optInTimePeriod, outBegIdx, outNbElement, emaSomePeriod);
+    assert (retCode == RetCode.Success);
+    int emaSomePeriodBegIdx = outBegIdx.value;
+    for (int i = 0; i < askCloseInput.length; i++) {
+      Double emaSomePeriodValue = null;
+      if (i >= emaSomePeriodBegIdx) {
+        emaSomePeriodValue = emaSomePeriod[i - emaSomePeriodBegIdx];
+      }
+      HistoryDataKBarAttribute attribute = new HistoryDataKBarAttribute(indicatorType.toString(), emaSomePeriodValue == null ? "N/A" : Double.toString(emaSomePeriodValue));
+      attribute.setOwner(list.get(i));
+      list.get(i).getHistoryDataKBarAttribute().add(attribute);
+      dao.save(list.get(i));
+    }
+
+  }
+
+  /**
+   * http://en.wikipedia.org/wiki/MACD
+   * http://wiki.mbalib.com/wiki/平滑异同移动平均线
+   */
+  private void insertMACDAttribute() throws Exception {
+    List<HistoryDataKBar> list = dao.getAll();
+
+    Core core = new Core();
+    double[] askCloseInput = HistoryDataKBarUtils.getPropertyArray(list, "getAskClose");
+    RetCode retCode;
+    MInteger outBegIdx = new MInteger();
+    MInteger outNbElement = new MInteger();
+
+    double macd[] = new double[askCloseInput.length];
+    double signal[] = new double[askCloseInput.length];
+    double hist[] = new double[askCloseInput.length];
+
+    retCode = core.macd(0, askCloseInput.length - 1, askCloseInput, 12, 26, 9, outBegIdx, outNbElement, macd, signal, hist);
+    assert (retCode == RetCode.Success);
+    int begIdx = outBegIdx.value;
+    for (int i = 0; i < askCloseInput.length; i++) {
+      Double _macd = null;
+      Double _signal = null;
+      Double _hist = null;
+      if (i >= begIdx) {
+        _macd = macd[i - begIdx];
+        _signal = signal[i - begIdx];
+        _hist = hist[i - begIdx];
+      }
+      HistoryDataKBarAttribute macdAttribute = new HistoryDataKBarAttribute(IndicatorType.MACD_12_26_9_macd.toString(), _macd == null ? "N/A" : Double.toString(_macd));
+      macdAttribute.setOwner(list.get(i));
+      HistoryDataKBarAttribute signalAttribute = new HistoryDataKBarAttribute(IndicatorType.MACD_12_26_9_signal.toString(), _signal == null ? "N/A" : Double.toString(_signal));
+      signalAttribute.setOwner(list.get(i));
+      HistoryDataKBarAttribute histAttribute = new HistoryDataKBarAttribute(IndicatorType.MACD_12_26_9_hist.toString(), _hist == null ? "N/A" : Double.toString(_hist));
+      histAttribute.setOwner(list.get(i));
+
+      list.get(i).getHistoryDataKBarAttribute().add(macdAttribute);
+      list.get(i).getHistoryDataKBarAttribute().add(signalAttribute);
+      list.get(i).getHistoryDataKBarAttribute().add(histAttribute);
+      dao.save(list.get(i));
+    }
 
   }
 

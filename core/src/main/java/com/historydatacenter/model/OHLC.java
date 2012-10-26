@@ -15,6 +15,8 @@ public class OHLC{
   private double bidHigh;
   private double bidLow;
   private double bidClose;
+  private double askVolume;
+  private double bidVolume;
 
   public double getAskOpen() {
     return askOpen;
@@ -78,5 +80,21 @@ public class OHLC{
 
   public void setBidClose(double bidClose) {
     this.bidClose = bidClose;
+  }
+
+  public double getAskVolume() {
+    return askVolume;
+  }
+
+  public void setAskVolume(double askVolume) {
+    this.askVolume = askVolume;
+  }
+
+  public double getBidVolume() {
+    return bidVolume;
+  }
+
+  public void setBidVolume(double bidVolume) {
+    this.bidVolume = bidVolume;
   }
 }

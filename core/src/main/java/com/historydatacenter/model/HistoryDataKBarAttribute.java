@@ -18,8 +18,15 @@ public class HistoryDataKBarAttribute extends PersistentAttribute<HistoryDataKBa
   private HistoryDataKBar historyDataKBar;
 
   @Override
-  protected void setOwner(HistoryDataKBar owner) {
+  public void setOwner(HistoryDataKBar owner) {
     historyDataKBar =  owner;
+  }
+
+  /**
+   * Default constructor
+   */
+  public HistoryDataKBarAttribute(){
+
   }
 
   public HistoryDataKBarAttribute(String name, String value)
