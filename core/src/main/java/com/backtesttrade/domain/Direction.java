@@ -3,9 +3,11 @@ package com.backtesttrade.domain;
 /**
  * Created with IntelliJ IDEA.
  * User: clyde
- * Date: 10/21/12
- * Time: 10:12 PM
+ * Date: 11/25/12
+ * Time: 8:46 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractStrategy {
+
+public enum Direction {
+  Short, Long
 }
