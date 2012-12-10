@@ -1,5 +1,6 @@
 package com.backtesttrade;
 
+import com.backtesttrade.domain.Position;
 import com.backtesttrade.strategy.AbstractStrategy;
 import com.backtesttrade.domain.Account;
 import com.backtesttrade.domain.StrategyAction;
@@ -49,7 +50,7 @@ public class TradingProcessor {
    */
   private void CTSS(List<HistoryDataKBar> kBars, Account account, AbstractStrategy strategy) {
     for (HistoryDataKBar bar : kBars) {
-      STSS(bar, account, strategy);
+      STSS(bar, bar, account, strategy);
     }
 
     //todo out put some performance data by looking into account
@@ -59,18 +60,19 @@ public class TradingProcessor {
   /**
    * Single Time Serial System.
    *
-   * @param bar      Input only Single Time Serial Bar
+   * @param lastBar
+   * @param nextBar
    * @param account  input account
    * @param strategy input strategy
    */
-  private void STSS(HistoryDataKBar bar, Account account, AbstractStrategy strategy) {
+  private void STSS(HistoryDataKBar lastBar, HistoryDataKBar nextBar, Account account, AbstractStrategy strategy) {
+    // 0. execute Orders
+    marketExecutor.executeOrders(account, lastBar);
     // 1. compute actions by strategy. Strategy doesn't need to consider if account is able(has enough money,
     // or marget is closed or ant other special situation, which will be consider during executing actions
-    List<StrategyAction> actions = strategy.computeActions(account, bar);
-
+    List<StrategyAction> actions = strategy.computeActions(account, lastBar);
     // 2. execute actions
-
-    marketExecutor.executeActions(account, actions, bar);
+    marketExecutor.executeActions(account, actions, lastBar, nextBar);
   }
 
   //setter and getter
@@ -116,22 +118,50 @@ class MarketExecutor {
    *
    * @param account
    * @param actions
-   * @param bar
+   * @param currentBar
    */
-  public void executeActions(Account account, List<StrategyAction> actions, HistoryDataKBar bar) {
+  public void executeActions(Account account, List<StrategyAction> actions, HistoryDataKBar lastBar, HistoryDataKBar currentBar) {
     for (StrategyAction action : actions) {
       switch (action.getOperationType()){
         case Open:
+          // try to add an open position to account
+          switch (action.getPriceType()){
+           case atMarket:
+             //todo
+           case setManually:
+             //todo
 
+          }
+
+          double openPositionMarginRequire = action.getActionPrice();
 
 
           break;
         case Close:
+          //todo
           break;
       }
     }
   }
 
+  /**
+   * execute orders.
+   * it will be called before strategy analysis.
+   * Consider pending orders, SL, TP
+   * @param account
+   * @param lastBar
+   */
+  public void executeOrders(Account account, HistoryDataKBar lastBar) {
+    //1. deal with pending orders
+    List<Position> pendingPositions = account.getPendingPositions();
+    for(Position position: pendingPositions) {
 
+    }
+    //2. deal with SL, TP
+    List<Position> openPositions = account.getOpenPositions();
+    for(Position position: openPositions) {
 
+    }
+
+  }
 }
