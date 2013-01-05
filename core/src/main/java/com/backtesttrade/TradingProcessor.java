@@ -1,20 +1,16 @@
 package com.backtesttrade;
 
-import com.backtesttrade.domain.Position;
+import com.backtesttrade.domain.*;
 import com.backtesttrade.strategy.AbstractStrategy;
-import com.backtesttrade.domain.Account;
-import com.backtesttrade.domain.StrategyAction;
 import com.historydatacenter.model.HistoryDataKBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: clyde
- * Date: 10/21/12
- * Time: 10:09 PM
- * To change this template use File | Settings | File Templates.
+ * TradingProcessor
+ * Time Line
+ * ---- LastBar ----Current Analysis Time Point ----- nextBar ----
  */
 public class TradingProcessor {
 
@@ -44,7 +40,7 @@ public class TradingProcessor {
   /**
    * Continual Time Serial System.
    *
-   * @param kBars     Data list with Continual Time Serial
+   * @param kBars    Data list with Continual Time Serial
    * @param account  input account
    * @param strategy input strategy
    */
@@ -104,64 +100,3 @@ public class TradingProcessor {
 }
 
 
-/**
- * MarketExecutor is responsible for trying to execute action.
- * rules:
- * 1. if the account doesn't have enough margin, this executor will return failure if a open position action is requested.
- * 2. if the actionPriceType is setManually, and it isn't in the price range of the next bar, the action result is failed.
- * ...
- */
-class MarketExecutor {
-  /**
-   * execute actions computed by strategy
-   * which can be replaced in real trading system.
-   *
-   * @param account
-   * @param actions
-   * @param currentBar
-   */
-  public void executeActions(Account account, List<StrategyAction> actions, HistoryDataKBar lastBar, HistoryDataKBar currentBar) {
-    for (StrategyAction action : actions) {
-      switch (action.getOperationType()){
-        case Open:
-          // try to add an open position to account
-          switch (action.getPriceType()){
-           case atMarket:
-             //todo
-           case setManually:
-             //todo
-
-          }
-
-          double openPositionMarginRequire = action.getActionPrice();
-
-
-          break;
-        case Close:
-          //todo
-          break;
-      }
-    }
-  }
-
-  /**
-   * execute orders.
-   * it will be called before strategy analysis.
-   * Consider pending orders, SL, TP
-   * @param account
-   * @param lastBar
-   */
-  public void executeOrders(Account account, HistoryDataKBar lastBar) {
-    //1. deal with pending orders
-    List<Position> pendingPositions = account.getPendingPositions();
-    for(Position position: pendingPositions) {
-
-    }
-    //2. deal with SL, TP
-    List<Position> openPositions = account.getOpenPositions();
-    for(Position position: openPositions) {
-
-    }
-
-  }
-}

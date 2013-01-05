@@ -28,7 +28,7 @@ public class Account {
    * Portfolio
    */
   private List<Position> openPositions = new ArrayList<Position>(); //todo init position list
-  private List<Position> pendingPositions = new ArrayList<Position>(); //todo init position list
+  private List<Order> orders = new ArrayList<Order>(); //todo init position list
   private List<Position> closedPositions = new ArrayList<Position>(); //todo init position list
 
   /**
@@ -44,13 +44,13 @@ public class Account {
   }
 
   public Account(Double accountLeverage, Currency baseCurrency, Double startMoney, Double currentMoney,
-                 List<Position> openPositions, List<Position> pendingPositions, List<Position> closedPositions) {
+                 List<Position> openPositions, List<Order> orders, List<Position> closedPositions) {
     this.accountLeverage = accountLeverage;
     this.baseCurrency = baseCurrency;
     this.startMoney = startMoney;
     this.currentMoney = currentMoney;
     this.openPositions = openPositions;
-    this.pendingPositions = pendingPositions;
+    this.orders = orders;
     this.closedPositions = closedPositions;
   }
 
@@ -73,12 +73,12 @@ public class Account {
     this.openPositions = openPositions;
   }
 
-  public List<Position> getPendingPositions() {
-    return pendingPositions;
+  public List<Order> getOrders() {
+    return orders;
   }
 
-  public void setPendingPositions(List<Position> pendingPositions) {
-    this.pendingPositions = pendingPositions;
+  public void setOrders(List<Order> orders) {
+    this.orders = orders;
   }
 
   public List<Position> getClosedPositions() {
