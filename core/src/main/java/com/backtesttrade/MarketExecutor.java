@@ -78,9 +78,9 @@ public class MarketExecutor {
           } else if (dir == Direction.Short) { // case Short, we should look at bid price
             if (orderPrice <= lastBar.getOhlc().getBidHigh() && orderPrice >= lastBar.getOhlc().getBidLow()) {
               //the pending order should be executed
-              pendingPosition.setOpenTime(lastBar.getOpenTime() + 1000);
-              pendingPosition.setStatus(Position.PositionStatus.Open);
-              executedPositions.add(pendingPosition);
+              //pendingPosition.setOpenTime(lastBar.getOpenTime() + 1000);
+              //pendingPosition.setStatus(Position.PositionStatus.Open);
+              //executedPositions.add(pendingPosition);
             }
           } else {
             //do nothing
@@ -114,7 +114,7 @@ public class MarketExecutor {
   private boolean moneyCheck(Account account, Order order, HistoryDataKBar lastBar) {
     double orderPrice = order.getOrderPrice();
     Direction dir = order.getDirection();
-    Double leftMargin = account.getLeftMargin();
+    //Double leftMargin = account.getLeftMargin();
 
     return false;
   }

@@ -75,6 +75,7 @@
     <modules>
         <module>core</module>
         <module>web</module>
+        <module>webConsole</module>
     </modules>
 
     <repositories>

@@ -112,4 +112,8 @@ public class Account {
   public void setCurrentMoney(Double currentMoney) {
     this.currentMoney = currentMoney;
   }
+
+    public void addNewOpenPosition(Position newPosition) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
 }
