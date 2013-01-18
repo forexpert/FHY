@@ -1,0 +1,61 @@
+/*global */
+
+.clear{
+    clear:both;
+}
+html {
+    background-color: #000;
+    color: #FFF;
+}
+.yui3-skin-night {
+    background-color: #000;
+}
+fieldset {
+    border: 2px solid #AAAAAA;
+    margin: 5px 5px;
+    padding: 10px;
+}
+fieldset legend {
+    bottom: 0.4em;
+    color: #888888;
+    font-size: 1.3em;
+    position: relative;
+}
+fieldset ul {
+    margin: 0 0 1em;
+    padding-left: 0;
+}
+fieldset li {
+    clear: right;
+    margin-left: 25px;
+    margin-right: 30px;
+    padding: 0;
+}
+
+/*.main-container*/
+
+.main-container {
+}
+
+/*.clients-widget*/
+
+.clients-widget{
+  width: auto;
+    margin: 10px 0 ;
+}
+
+.clients-widget .client{
+    float: left;
+    width: 200px;
+    margin: 0 10px;
+}
+
+
+
+/* .system-monitor */
+.system-monitor{
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+
