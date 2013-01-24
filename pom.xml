@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mengruojun</groupId>
-    <artifactId>ForexInvest</artifactId>
+    <artifactId>ForexInvest-pom</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>AppFuse Modular Application</name>
@@ -76,6 +76,7 @@
         <module>core</module>
         <module>web</module>
         <module>webConsole</module>
+        <module>forex</module>
     </modules>
 
     <repositories>
