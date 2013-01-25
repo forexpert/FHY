@@ -34,6 +34,7 @@ import com.dukascopy.api.LoadingProgressListener;
 import com.dukascopy.api.system.ISystemListener;
 import com.dukascopy.api.system.ITesterClient;
 import com.dukascopy.api.system.TesterFactory;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,7 @@ import java.util.concurrent.Future;
 /**
  * This small program demonstrates how to initialize Dukascopy tester and start a strategy
  */
+@Ignore
 public class TesterMain {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 

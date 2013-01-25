@@ -46,6 +46,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,7 @@ import com.dukascopy.api.system.tester.ITesterUserInterface;
  * This small program demonstrates how to initialize Dukascopy tester and start a strategy in GUI mode
  */
 @SuppressWarnings("serial")
+@Ignore
 public class TesterMainGUIMode extends JFrame implements ITesterUserInterface, ITesterExecution {
     private static final Logger LOGGER = LoggerFactory.getLogger(TesterMainGUIMode.class);
 

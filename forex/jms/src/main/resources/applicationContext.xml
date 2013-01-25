@@ -51,16 +51,6 @@
         <constructor-arg index="0" value="${topic.tradeaction}"/>
     </bean>
 
-    <bean id="marketDataSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
-        <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicMarketBarData" />
-    </bean>
-
-    <bean id="accountInfoSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
-        <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicAccountInfo" />
-    </bean>
-
     <!-- Add new DAOs here -->
 
     <!-- Add new Managers here -->

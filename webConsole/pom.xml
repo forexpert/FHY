@@ -307,6 +307,8 @@
             <artifactId>cglib</artifactId>
             <version>${cglib.version}</version>
         </dependency>
+
+
     </dependencies>
 
 </project>

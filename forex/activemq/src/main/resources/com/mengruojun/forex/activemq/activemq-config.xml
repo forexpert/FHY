@@ -32,6 +32,7 @@
         <property name="locations">
             <list>
                 <value>classpath:/com/mengruojun/common/global.properties</value>
+                <value>classpath:/com/mengruojun/jms/jms.properties</value>
                 <value>classpath:/com/mengruojun/forex/activemq/activemq.properties</value>
                 <value>classpath:/com/mengruojun/forex/activemq/jms-config.properties</value>
             </list>

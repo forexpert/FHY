@@ -1,5 +1,7 @@
 package com.mengruojun.forex.activemq;
 
+import org.apache.activemq.xbean.BrokerFactoryBean;
+import org.apache.activemq.xbean.XBeanBrokerService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.mengruojun.common.Test;
 
@@ -16,13 +18,18 @@ public class ActivemqServer {
   private ClassPathXmlApplicationContext context;
   private String[] contextFiles = new String[]{"applicationContext.xml"};
 
-  public void start() throws InterruptedException {
+  public void start() throws Exception {
     context = new ClassPathXmlApplicationContext(contextFiles);
+    context.getBean("broker");
     while (true) Thread.sleep(10000);
   }
 
   public static void main(String[] args) throws InterruptedException {
     ActivemqServer as = new ActivemqServer();
-    as.start();
+    try {
+      as.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

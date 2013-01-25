@@ -15,11 +15,11 @@
 
     <!-- Child Project Modules -->
     <modules>
-        <module>main</module>
         <module>broker-server</module>
         <module>broker-client</module>
         <module>activemq</module>
         <module>common</module>
+        <module>jms</module>
     </modules>
 
 

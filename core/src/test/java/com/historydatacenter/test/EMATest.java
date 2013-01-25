@@ -65,7 +65,7 @@ public class EMATest extends AbstractTransactionalJUnit4SpringContextTests {
     lookback = -1;
   }
 
-  //@Ignore
+  @Ignore
   @org.junit.Test
   /**
    * Already verified by using manually algorithm and Excel tool.
