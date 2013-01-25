@@ -27,7 +27,7 @@
  * OF LIABILITY, ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, 
  * EVEN IF DUKASCOPY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  */
-package com.mengruojun.forex.brokerclient.singlejartest;
+package com.mengruojun.forex.brokerclient.dukascopy;
 
 import com.dukascopy.api.system.ISystemListener;
 import com.dukascopy.api.system.IClient;
