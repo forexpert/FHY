@@ -73,7 +73,7 @@
 
         <dependency>
             <groupId>com.mengruojun.forex</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>common-pom</artifactId>
             <version>${project.version}</version>
            <!-- <scope>runtime</scope>-->
         </dependency>
@@ -85,4 +85,20 @@
         </dependency>
 
     </dependencies>
+
+
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
