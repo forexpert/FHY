@@ -9,12 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mengruojun.forex</groupId>
-    <name>jms topics and domain classes</name>
-    <artifactId>jms-pom</artifactId>
-
-    <description>
-        In this module, we define some JMS topics which used by everywhere in the system.
-    </description>
+    <artifactId>strategy-center-pom</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>strategy-center-pom</name>
 
     <dependencies>
         <dependency>
@@ -70,8 +67,10 @@
             <version>${project.version}</version>
             <!-- <scope>runtime</scope>-->
         </dependency>
-
+        <dependency>
+            <groupId>com.mengruojun.forex</groupId>
+            <artifactId>jms-pom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
-
-
 </project>

@@ -21,18 +21,15 @@
     <!-- Activates scanning of @Repository and @Service -->
     <context:component-scan base-package="com.mengruojun"/>
 
+
     <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
 
-    <bean id="marketDataSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
-        <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicMarketBarData" />
+    <!-- Add JMS listener here -->
+    <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="jmsTopicMarketBarData"/>
+        <property name="messageListener" ref="marketDataReceiver" />
     </bean>
-
-    <bean id="accountInfoSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
-        <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicAccountInfo" />
-    </bean>
-
     <!-- Add new DAOs here -->
 
     <!-- Add new Managers here -->

@@ -20,7 +20,7 @@
     <packaging>jar</packaging>
 
     <description>
-        The top level application startup for backend.
+        In this module, there is a mock broker-server coming, which helps strategy testing
     </description>
 
 </project>

@@ -15,11 +15,12 @@
 
     <!-- Child Project Modules -->
     <modules>
+        <module>common</module>
+        <module>jms</module>
         <module>broker-server</module>
         <module>broker-client</module>
         <module>activemq</module>
-        <module>common</module>
-        <module>jms</module>
+        <module>strategycenter</module>
     </modules>
 
 
