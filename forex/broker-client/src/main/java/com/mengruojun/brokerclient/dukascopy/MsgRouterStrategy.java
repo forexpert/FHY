@@ -12,10 +12,15 @@ import com.dukascopy.api.IStrategy;
 import com.dukascopy.api.ITick;
 import com.dukascopy.api.Instrument;
 import com.dukascopy.api.JFException;
-import com.dukascopy.api.OfferSide;
 import com.dukascopy.api.Period;
+import com.mengruojun.jms.domain.MarketDataMessage;
+import com.mengruojun.jms.domain.enumerate.TimeWindowType;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is a Dukascopy Strategy, which plays a msg sender and receiver roles.
@@ -24,10 +29,13 @@ import org.springframework.stereotype.Service;
 @Service("msgRouterStrategy")
 public class MsgRouterStrategy implements IStrategy {
   private IEngine engine = null;
+  private IContext context = null;
   private IIndicators indicators = null;
   private int tagCounter = 0;
   private double[] ma1 = new double[Instrument.values().length];
   private IConsole console;
+  Logger logger = Logger.getLogger(this.getClass());
+  private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
 
   @Autowired
   private JMSSender marketDataSender;
@@ -35,11 +43,31 @@ public class MsgRouterStrategy implements IStrategy {
   private JMSSender accountInfoSender;
 
 
-  public void onStart(IContext context) throws JFException {
+  public void onStart(final IContext context) throws JFException {
+    this.context = context;
     engine = context.getEngine();
     indicators = context.getIndicators();
     this.console = context.getConsole();
     console.getOut().println("Started");
+    new Thread(){
+      public void run(){
+
+        try {
+          context.getAccount();
+          //todo cmeng send account info
+          engine.getOrders();  //open and pending order
+          //context.getHistory().getOrdersHistory();     // closed orders
+        } catch (JFException e) {
+          logger.error("", e);
+        }
+        //todo cmeng send account information
+        try {
+          Thread.sleep(1000*60L);       // sync account info every minutes
+        } catch (InterruptedException e) {
+          logger.error("", e);
+        }
+      }
+    }.start();
   }
 
   public void onStop() throws JFException {
@@ -75,8 +103,16 @@ public class MsgRouterStrategy implements IStrategy {
   }
 
   public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-    marketDataSender.createMessage(askBar.getTime() + " askEnd is " + askBar.getClose());
+    if(period.equals(Period.TEN_SECS)){
+      TimeWindowType twt = TimeWindowType.S10;
+      MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
+              askBar.getOpen(),askBar.getHigh(),askBar.getLow(),askBar.getClose(),
+              bidBar.getOpen(),bidBar.getHigh(),bidBar.getLow(),bidBar.getClose(),
+              askBar.getVolume(),bidBar.getVolume(),instrument.getPrimaryCurrency(),
+              instrument.getSecondaryCurrency(),twt);
 
+      marketDataSender.sendObjectMessage(mdm);
+    }
   }
 
   //count open positions
@@ -102,6 +138,6 @@ public class MsgRouterStrategy implements IStrategy {
   }
 
   public void onAccount(IAccount account) throws JFException {
-    accountInfoSender.createMessage("AccountState is " + account.getAccountState());
+    accountInfoSender.sendTextMessage("AccountState is " + account.getAccountState());
   }
 }

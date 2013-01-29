@@ -25,10 +25,16 @@
     <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
 
     <!-- Add JMS listener here -->
-    <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <bean id="marketDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="destination" ref="jmsTopicMarketBarData"/>
         <property name="messageListener" ref="marketDataReceiver" />
+    </bean>
+
+    <bean id="clientDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="jmsTopicAccountInfo"/>
+        <property name="messageListener" ref="clientDataReceiver" />
     </bean>
     <!-- Add new DAOs here -->
 
