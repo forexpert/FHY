@@ -1,6 +1,9 @@
 package com.mengruojun.strategycenter.domain;
 
-import com.mengruojun.strategycenter.domain.enumerate.Currency;
+
+
+import com.mengruojun.common.domain.Position;
+import com.mengruojun.common.domain.enumerate.Currency;
 
 import java.util.ArrayList;
 import java.util.List;

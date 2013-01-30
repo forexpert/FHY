@@ -1,4 +1,4 @@
-package com.mengruojun.strategycenter.domain.enumerate;
+package com.mengruojun.common.domain.enumerate;
 
 /**
  *  Enumerates the currencies we deal with. When embedding this enum's values in other objects

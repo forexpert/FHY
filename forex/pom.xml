@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mengruojun.forex</groupId>
     <artifactId>forex-pom</artifactId>
-
+    <name>forex</name>
     <packaging>pom</packaging>
 
     <!-- Child Project Modules -->

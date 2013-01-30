@@ -1,4 +1,4 @@
-package com.mengruojun.strategycenter.domain.enumerate;
+package com.mengruojun.common.domain.enumerate;
 
 /**
  * Created with IntelliJ IDEA.

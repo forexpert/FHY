@@ -1,4 +1,4 @@
-package com.mengruojun.jms.domain.enumerate;
+package com.mengruojun.common.domain;
 
 public enum TimeWindowType {
   S10,

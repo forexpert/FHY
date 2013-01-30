@@ -1,8 +1,7 @@
-package com.mengruojun.strategycenter.domain;
+package com.mengruojun.common.domain;
 
-import com.historydatacenter.model.Instrument;
-import com.historydatacenter.model.enumerate.Currency;
-import com.mengruojun.strategycenter.domain.enumerate.Direction;
+import com.mengruojun.common.domain.enumerate.Currency;
+import com.mengruojun.common.domain.enumerate.Direction;
 
 import java.util.UUID;
 

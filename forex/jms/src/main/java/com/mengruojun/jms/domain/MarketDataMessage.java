@@ -1,6 +1,6 @@
 package com.mengruojun.jms.domain;
 
-import com.mengruojun.jms.domain.enumerate.TimeWindowType;
+import com.mengruojun.common.domain.TimeWindowType;
 
 import java.io.Serializable;
 import java.util.Currency;

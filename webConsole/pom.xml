@@ -3,14 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ForexInvest</artifactId>
+        <artifactId>ForexInvest-pom</artifactId>
         <groupId>com.mengruojun</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>webConsole</artifactId>
-
+    <groupId>com.mengruojun.webconsole</groupId>
+    <artifactId>webConsole-pom</artifactId>
+    <name>webConsole</name>
     <build>
         <plugins>
             <!--<plugin>
@@ -151,11 +151,6 @@
             <groupId>${jdbc.groupId}</groupId>
             <artifactId>${jdbc.artifactId}</artifactId>
             <version>${jdbc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>core</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
