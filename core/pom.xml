@@ -12,7 +12,7 @@
     
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
-    <name>AppFuse Modular Application - Core</name>
+    <name>AppFuse Modular Application - Sample Core</name>
     
     <build>
         <plugins>
