@@ -56,6 +56,10 @@ public class TestMultipleClient  extends TestCase {
       i--;
     }
     assertEquals(true, client1.isConnected());
+
+    client1.startStrategy(new MA_Play());
+    //client1..context.getAccount().getLeverage()
+
     //set the listener that will receive system events
     client2.setSystemListener(new DefaultSystemListenerImpl(client2, jnlpUrl, userName2, password2));
 
@@ -68,6 +72,7 @@ public class TestMultipleClient  extends TestCase {
       i--;
     }
     assertEquals(true, client2.isConnected());
+    client2.startStrategy(new MA_Play());
 
   }
 

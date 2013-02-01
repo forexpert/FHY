@@ -2,21 +2,18 @@ package com.mengruojun.common.domain;
 
 import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
+import com.mengruojun.common.domain.enumerate.PositionStatus;
 
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
- * User: clyde
- * Date: 10/26/12
- * Time: 12:05 PM
- * To change this template use File | Settings | File Templates.
+ * Position object. including pending position(orders), open position and closed positions
  */
 public class Position {
-  String positionId = UUID.randomUUID().toString();
+  String positionId;// = UUID.randomUUID().toString();
   Long openTime;
   Long closeTime;
-  Instrument instrument = new Instrument(Currency.EUR, Currency.USD);
+  Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
   PositionStatus status;
   Direction direction;
   Double openPrice;
@@ -24,10 +21,6 @@ public class Position {
   Double stopLossInPips;
   Double takeProfitInPips;
 
-  public static Position createOpenPositionInstance() {
-    Position position = null;
-    return position;
-  }
 
   // close action should be executed by trading processor
 
@@ -110,9 +103,5 @@ public class Position {
 
   public void setPositionId(String positionId) {
     this.positionId = positionId;
-  }
-
-  public enum PositionStatus {
-    Open, closed
   }
 }

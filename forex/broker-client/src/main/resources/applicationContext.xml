@@ -28,9 +28,9 @@
         <property name="destination" ref="jmsTopicMarketBarData" />
     </bean>
 
-    <bean id="accountInfoSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
+    <bean id="clientInfoSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
         <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicAccountInfo" />
+        <property name="destination" ref="jmsTopicClientInfo" />
     </bean>
 
     <!-- Add new DAOs here -->

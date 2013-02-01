@@ -30,8 +30,10 @@
 package com.mengruojun.forex.brokerclient.dukascopy;
 
 import com.dukascopy.api.*;
+import org.apache.log4j.Logger;
 
 public class MA_Play implements IStrategy {
+  Logger logger = Logger.getLogger(this.getClass());
     private IEngine engine = null;
     private IIndicators indicators = null;
     private int tagCounter = 0;
@@ -104,5 +106,20 @@ public class MA_Play implements IStrategy {
     }
 
     public void onAccount(IAccount account) throws JFException {
+      logger.info("getCurrency is " + account.getCurrency());
+      logger.info("getLeverage is " + account.getLeverage());
+      logger.info("getBalance is " + account.getBalance());
+      logger.info("getEquity is " + account.getEquity());
+      logger.info("getBaseEquity is " + account.getBaseEquity());
+      logger.info("getAccountId is " + account.getAccountId());
+      logger.info("getAccountState is " + account.getAccountState());
+      logger.info("getMarginCutLevel is " + account.getMarginCutLevel());
+      logger.info("getOverWeekEndLeverage is " + account.getOverWeekEndLeverage());
+      logger.info("getStopLossLevel is " + account.getStopLossLevel());
+      logger.info("getUseOfLeverage is " + account.getUseOfLeverage());
+      logger.info("getCreditLine is " + account.getCreditLine());
+      logger.info("");
+      logger.info("");
+      logger.info("");
     }
 }

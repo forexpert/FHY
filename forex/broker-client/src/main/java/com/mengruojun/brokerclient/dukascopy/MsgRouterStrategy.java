@@ -14,6 +14,8 @@ import com.dukascopy.api.Instrument;
 import com.dukascopy.api.JFException;
 import com.dukascopy.api.Period;
 import com.mengruojun.common.domain.TimeWindowType;
+import com.mengruojun.common.domain.enumerate.BrokerType;
+import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ public class MsgRouterStrategy implements IStrategy {
   @Autowired
   private JMSSender marketDataSender;
   @Autowired
-  private JMSSender accountInfoSender;
+  private JMSSender clientInfoSender;
 
 
   public void onStart(final IContext context) throws JFException {
@@ -49,25 +51,23 @@ public class MsgRouterStrategy implements IStrategy {
     indicators = context.getIndicators();
     this.console = context.getConsole();
     console.getOut().println("Started");
-    new Thread(){
-      public void run(){
 
-        try {
-          context.getAccount();
-          //todo cmeng send account info
-          engine.getOrders();  //open and pending order
-          //context.getHistory().getOrdersHistory();     // closed orders
-        } catch (JFException e) {
-          logger.error("", e);
-        }
-        //todo cmeng send account information
-        try {
-          Thread.sleep(1000*60L);       // sync account info every minutes
-        } catch (InterruptedException e) {
-          logger.error("", e);
-        }
-      }
-    }.start();
+    registerClient();
+  }
+
+  /**
+   * register client by JMS to the Client Manager
+   */
+  private void registerClient() {
+    ClientInfoMessage cim = new ClientInfoMessage();
+    cim.setBrokerType(BrokerType.Dukascopy);
+    cim.setClientId(this.context.getAccount().getAccountId());
+    cim.setStrategyId("TBD");// to be determined by client manager
+    cim.setBaseCurrency(this.context.getAccount().getCurrency());
+    cim.setCurrentBalance(this.context.getAccount().getBalance());
+    cim.setCurrentEquity(this.context.getAccount().getEquity());
+    cim.setLeverage(this.context.getAccount().getLeverage());
+
   }
 
   public void onStop() throws JFException {
@@ -103,13 +103,13 @@ public class MsgRouterStrategy implements IStrategy {
   }
 
   public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-    if(period.equals(Period.TEN_SECS)){
+    if (period.equals(Period.TEN_SECS)) {
       TimeWindowType twt = TimeWindowType.S10;
       MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
-              askBar.getOpen(),askBar.getHigh(),askBar.getLow(),askBar.getClose(),
-              bidBar.getOpen(),bidBar.getHigh(),bidBar.getLow(),bidBar.getClose(),
-              askBar.getVolume(),bidBar.getVolume(),instrument.getPrimaryCurrency(),
-              instrument.getSecondaryCurrency(),twt);
+              askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
+              bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
+              askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
+              instrument.getSecondaryCurrency(), twt);
 
       marketDataSender.sendObjectMessage(mdm);
     }
@@ -138,6 +138,34 @@ public class MsgRouterStrategy implements IStrategy {
   }
 
   public void onAccount(IAccount account) throws JFException {
-    accountInfoSender.sendTextMessage("AccountState is " + account.getAccountState());
+    clientInfoSender.sendTextMessage("AccountState is " + account.getAccountState());
   }
+}
+
+class ClientInfoSenderThread extends Thread {
+  IContext context;
+  ClientInfoSenderThread(IContext context){
+    this.context = context;
+  }
+  Logger logger = Logger.getLogger(this.getClass());
+
+  @Override
+  public void run() {
+    try {
+      context.getAccount();
+      //todo cmeng send account info
+      context.getEngine().getOrders();  //open and pending order
+      //context.getHistory().getOrdersHistory();     // closed orders
+    } catch (JFException e) {
+      logger.error("", e);
+    }
+    //todo cmeng send account information
+    try {
+      Thread.sleep(1000 * 60L);       // sync account info every minutes
+    } catch (InterruptedException e) {
+      logger.error("", e);
+    }
+
+  }
+
 }
