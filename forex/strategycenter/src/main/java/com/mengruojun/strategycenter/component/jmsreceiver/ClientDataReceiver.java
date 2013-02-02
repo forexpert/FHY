@@ -2,7 +2,11 @@ package com.mengruojun.strategycenter.component.jmsreceiver;
 
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
+import com.mengruojun.strategycenter.springevent.ClientRegisterEvent;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
@@ -19,13 +23,27 @@ import java.util.TimeZone;
  * specifying a strategy name
  * Client Type/name
  * Account Info Portfolio
+ *
+
  */
+
+
 @Service("clientDataReceiver")
-public class ClientDataReceiver implements MessageListener {
+public class ClientDataReceiver implements MessageListener, ApplicationContextAware {
     Logger logger = Logger.getLogger(this.getClass());
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+
+    private ApplicationContext applicationContext;
+
+    /**
+     * @param applicationContext the applicationContext to set
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -50,9 +68,7 @@ public class ClientDataReceiver implements MessageListener {
                     logger.info("");
                     logger.info("");
                     logger.info("");
-                    //todo cmeng 1. save into DB and memory
-                    //todo cmeng 2. computing indicators
-                    //todo cmeng 3. notify client manager
+                    applicationContext.publishEvent(new ClientRegisterEvent(cim));
 
                 }
             } catch (JMSException ex) {
