@@ -190,5 +190,13 @@ public enum Currency
     }
 
     public int precedence()    { return precedence; }
-    
+
+    public static Currency fromJDKCurrency(java.util.Currency jdkCurrency){
+        for(Currency c1 : Currency.values()){
+            if(jdkCurrency.getCurrencyCode().equals(c1.toString())) {
+                return c1;
+            }
+        }
+        return null;
+    }
 }

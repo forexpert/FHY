@@ -46,9 +46,9 @@
         <constructor-arg index="0" value="${topic.clientinfo}"/>
     </bean>
     <!-- 发送消息的目的地（一个主题） -->
-    <bean id="jmsTopicTradeAction" class="org.apache.activemq.command.ActiveMQTopic">
+    <bean id="jmsTopicTradeCommand" class="org.apache.activemq.command.ActiveMQTopic">
         <!-- 设置消息主题的名字 -->
-        <constructor-arg index="0" value="${topic.tradeaction}"/>
+        <constructor-arg index="0" value="${topic.tradecommand}"/>
     </bean>
 
     <!-- Add new DAOs here -->

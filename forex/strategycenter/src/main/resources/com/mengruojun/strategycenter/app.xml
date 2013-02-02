@@ -33,7 +33,7 @@
 
     <bean id="clientDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="jmsTopicAccountInfo"/>
+        <property name="destination" ref="jmsTopicClientInfo"/>
         <property name="messageListener" ref="clientDataReceiver" />
     </bean>
     <!-- Add new DAOs here -->

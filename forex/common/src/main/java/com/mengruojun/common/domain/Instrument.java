@@ -18,7 +18,7 @@ import static com.mengruojun.common.utils.ValidationUtils.validateNotNull;
  * Trade Instrument, like EUR/USD
  */
 @Embeddable
-public class Instrument {
+public class Instrument  extends GeneratedIdBaseEntity {
   private static final long serialVersionUID = 1L;
 
   @Enumerated(EnumType.STRING)

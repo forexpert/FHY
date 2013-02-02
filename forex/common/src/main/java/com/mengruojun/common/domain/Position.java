@@ -4,104 +4,117 @@ import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.common.domain.enumerate.PositionStatus;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * Position object. including pending position(orders), open position and closed positions
  */
-public class Position {
-  String positionId;// = UUID.randomUUID().toString();
-  Long openTime;
-  Long closeTime;
-  Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
-  PositionStatus status;
-  Direction direction;
-  Double openPrice;
-  Double closePrice;
-  Double stopLossInPips;
-  Double takeProfitInPips;
+public class Position extends GeneratedIdBaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    String positionId;// = UUID.randomUUID().toString();
+    Long openTime;
+    Long closeTime;
+    Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
+    PositionStatus status;
+    Direction direction;
+    Double amount;
+    Double openPrice;
+    Double closePrice;
+    Double stopLossInPips;
+    Double takeProfitInPips;
 
 
-  // close action should be executed by trading processor
+    // close action should be executed by trading processor
 
 
-  public Long getOpenTime() {
-    return openTime;
-  }
+    public Double getAmount() {
+        return amount;
+    }
 
-  public void setOpenTime(Long openTime) {
-    this.openTime = openTime;
-  }
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
 
-  public Long getCloseTime() {
-    return closeTime;
-  }
+    public Long getOpenTime() {
+        return openTime;
+    }
 
-  public void setCloseTime(Long closeTime) {
-    this.closeTime = closeTime;
-  }
+    public void setOpenTime(Long openTime) {
+        this.openTime = openTime;
+    }
 
-  public Instrument getInstrument() {
-    return instrument;
-  }
+    public Long getCloseTime() {
+        return closeTime;
+    }
 
-  public void setInstrument(Instrument instrument) {
-    this.instrument = instrument;
-  }
+    public void setCloseTime(Long closeTime) {
+        this.closeTime = closeTime;
+    }
 
-  public PositionStatus getStatus() {
-    return status;
-  }
+    public Instrument getInstrument() {
+        return instrument;
+    }
 
-  public void setStatus(PositionStatus status) {
-    this.status = status;
-  }
+    public void setInstrument(Instrument instrument) {
+        this.instrument = instrument;
+    }
 
-  public Direction getDirection() {
-    return direction;
-  }
+    public PositionStatus getStatus() {
+        return status;
+    }
 
-  public void setDirection(Direction direction) {
-    this.direction = direction;
-  }
+    public void setStatus(PositionStatus status) {
+        this.status = status;
+    }
 
-  public Double getOpenPrice() {
-    return openPrice;
-  }
+    public Direction getDirection() {
+        return direction;
+    }
 
-  public void setOpenPrice(Double openPrice) {
-    this.openPrice = openPrice;
-  }
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
 
-  public Double getClosePrice() {
-    return closePrice;
-  }
+    public Double getOpenPrice() {
+        return openPrice;
+    }
 
-  public void setClosePrice(Double closePrice) {
-    this.closePrice = closePrice;
-  }
+    public void setOpenPrice(Double openPrice) {
+        this.openPrice = openPrice;
+    }
 
-  public Double getStopLossInPips() {
-    return stopLossInPips;
-  }
+    public Double getClosePrice() {
+        return closePrice;
+    }
 
-  public void setStopLossInPips(Double stopLossInPips) {
-    this.stopLossInPips = stopLossInPips;
-  }
+    public void setClosePrice(Double closePrice) {
+        this.closePrice = closePrice;
+    }
 
-  public Double getTakeProfitInPips() {
-    return takeProfitInPips;
-  }
+    public Double getStopLossInPips() {
+        return stopLossInPips;
+    }
 
-  public void setTakeProfitInPips(Double takeProfitInPips) {
-    this.takeProfitInPips = takeProfitInPips;
-  }
+    public void setStopLossInPips(Double stopLossInPips) {
+        this.stopLossInPips = stopLossInPips;
+    }
 
-  public String getPositionId() {
-    return positionId;
-  }
+    public Double getTakeProfitInPips() {
+        return takeProfitInPips;
+    }
 
-  public void setPositionId(String positionId) {
-    this.positionId = positionId;
-  }
+    public void setTakeProfitInPips(Double takeProfitInPips) {
+        this.takeProfitInPips = takeProfitInPips;
+    }
+
+    public String getPositionId() {
+        return positionId;
+    }
+
+    public void setPositionId(String positionId) {
+        this.positionId = positionId;
+    }
 }

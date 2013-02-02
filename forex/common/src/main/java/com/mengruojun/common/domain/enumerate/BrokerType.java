@@ -9,7 +9,9 @@ package com.mengruojun.common.domain.enumerate;
  */
 public enum BrokerType {
   MockBroker,
-  Dukascopy,
+  DukascopyLive,
+  DukascopyDemo,
+  DukascopyMarketDataFeeder,
   BI,  /*not support yet*/
   FXCM /*not support yet*/
 

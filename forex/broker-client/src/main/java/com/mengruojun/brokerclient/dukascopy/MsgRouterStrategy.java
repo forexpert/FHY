@@ -1,26 +1,22 @@
 package com.mengruojun.brokerclient.dukascopy;
 
-import com.dukascopy.api.IAccount;
-import com.dukascopy.api.IBar;
-import com.dukascopy.api.IConsole;
-import com.dukascopy.api.IContext;
-import com.dukascopy.api.IEngine;
-import com.dukascopy.api.IIndicators;
-import com.dukascopy.api.IMessage;
-import com.dukascopy.api.IOrder;
-import com.dukascopy.api.IStrategy;
-import com.dukascopy.api.ITick;
-import com.dukascopy.api.Instrument;
-import com.dukascopy.api.JFException;
-import com.dukascopy.api.Period;
+import com.dukascopy.api.*;
+import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
+import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
+import com.mengruojun.common.domain.enumerate.Direction;
+import com.mengruojun.common.domain.enumerate.PositionStatus;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
+import javax.jms.Destination;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,54 +26,69 @@ import java.util.List;
  */
 @Service("msgRouterStrategy")
 public class MsgRouterStrategy implements IStrategy {
-  private IEngine engine = null;
-  private IContext context = null;
-  private IIndicators indicators = null;
-  private int tagCounter = 0;
-  private double[] ma1 = new double[Instrument.values().length];
-  private IConsole console;
-  Logger logger = Logger.getLogger(this.getClass());
-  private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
-
-  @Autowired
-  private JMSSender marketDataSender;
-  @Autowired
-  private JMSSender clientInfoSender;
+    private IEngine engine = null;
+    private IContext context = null;
+    private IIndicators indicators = null;
+    private int tagCounter = 0;
+    private double[] ma1 = new double[Instrument.values().length];
+    private IConsole console;
+    Logger logger = Logger.getLogger(this.getClass());
+    private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
 
 
-  public void onStart(final IContext context) throws JFException {
-    this.context = context;
-    engine = context.getEngine();
-    indicators = context.getIndicators();
-    this.console = context.getConsole();
-    console.getOut().println("Started");
+    private TradeCommandReceiver tradeCommandReceiver;
 
-    registerClient();
-  }
+    @Autowired
+    private JMSSender clientInfoSender;
 
-  /**
-   * register client by JMS to the Client Manager
-   */
-  private void registerClient() {
-    ClientInfoMessage cim = new ClientInfoMessage();
-    cim.setBrokerType(BrokerType.Dukascopy);
-    cim.setClientId(this.context.getAccount().getAccountId());
-    cim.setStrategyId("TBD");// to be determined by client manager
-    cim.setBaseCurrency(this.context.getAccount().getCurrency());
-    cim.setCurrentBalance(this.context.getAccount().getBalance());
-    cim.setCurrentEquity(this.context.getAccount().getEquity());
-    cim.setLeverage(this.context.getAccount().getLeverage());
 
-  }
+    @Autowired
+    private JmsTemplate jsmTemplate;
+    @Autowired
+    private Destination jmsTopicTradeCommand;
 
-  public void onStop() throws JFException {
-    for (IOrder order : engine.getOrders()) {
-      order.close();
+    public void onStart(final IContext context) throws JFException {
+        this.context = context;
+        engine = context.getEngine();
+        indicators = context.getIndicators();
+        this.console = context.getConsole();
+        console.getOut().println("Started");
+        startTradeCommandListener();
     }
-    console.getOut().println("Stopped");
-  }
 
-  public void onTick(Instrument instrument, ITick tick) throws JFException {
+    /**
+     * here we start the trade command listener to listen any trade command sent by client manager, then send these
+     * command to dukascopy server by Dukascopy JForex API
+     */
+    private void startTradeCommandListener() {
+        tradeCommandReceiver = new TradeCommandReceiver(context, jsmTemplate, jmsTopicTradeCommand);
+        new Thread(){
+            public void run(){
+                try {
+                    tradeCommandReceiver.receive();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * register client by JMS to the Client Manager
+     */
+    private void registerClient() throws JFException {
+        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context);
+        clientInfoSender.sendObjectMessage(cim);
+    }
+
+    public void onStop() throws JFException {
+        for (IOrder order : engine.getOrders()) {
+            order.close();
+        }
+        console.getOut().println("Stopped");
+    }
+
+    public void onTick(Instrument instrument, ITick tick) throws JFException {
     /*if (ma1[instrument.ordinal()] == -1) {
       ma1[instrument.ordinal()] = indicators.ema(instrument, Period.TEN_SECS, OfferSide.BID, IIndicators.AppliedPrice.MEDIAN_PRICE, 14, 1);
     }
@@ -100,72 +111,16 @@ public class MsgRouterStrategy implements IStrategy {
       }
     }
     ma1[instrument.ordinal()] = ma0;*/
-  }
-
-  public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-    if (period.equals(Period.TEN_SECS)) {
-      TimeWindowType twt = TimeWindowType.S10;
-      MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
-              askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
-              bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
-              askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
-              instrument.getSecondaryCurrency(), twt);
-
-      marketDataSender.sendObjectMessage(mdm);
-    }
-  }
-
-  //count open positions
-  protected int positionsTotal(Instrument instrument) throws JFException {
-    int counter = 0;
-    for (IOrder order : engine.getOrders(instrument)) {
-      if (order.getState() == IOrder.State.FILLED) {
-        counter++;
-      }
-    }
-    return counter;
-  }
-
-  protected String getLabel(Instrument instrument) {
-    String label = instrument.name();
-    label = label.substring(0, 2) + label.substring(3, 5);
-    label = label + (tagCounter++);
-    label = label.toLowerCase();
-    return label;
-  }
-
-  public void onMessage(IMessage message) throws JFException {
-  }
-
-  public void onAccount(IAccount account) throws JFException {
-    clientInfoSender.sendTextMessage("AccountState is " + account.getAccountState());
-  }
-}
-
-class ClientInfoSenderThread extends Thread {
-  IContext context;
-  ClientInfoSenderThread(IContext context){
-    this.context = context;
-  }
-  Logger logger = Logger.getLogger(this.getClass());
-
-  @Override
-  public void run() {
-    try {
-      context.getAccount();
-      //todo cmeng send account info
-      context.getEngine().getOrders();  //open and pending order
-      //context.getHistory().getOrdersHistory();     // closed orders
-    } catch (JFException e) {
-      logger.error("", e);
-    }
-    //todo cmeng send account information
-    try {
-      Thread.sleep(1000 * 60L);       // sync account info every minutes
-    } catch (InterruptedException e) {
-      logger.error("", e);
     }
 
-  }
+    public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
 
+    }
+
+    public void onMessage(IMessage message) throws JFException {
+    }
+
+    public void onAccount(IAccount account) throws JFException {
+        registerClient();
+    }
 }

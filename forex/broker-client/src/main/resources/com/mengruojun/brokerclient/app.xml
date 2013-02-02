@@ -11,6 +11,7 @@
             <list>
                 <value>classpath:/com/mengruojun/common/global.properties</value>
                 <value>classpath:/com/mengruojun/jms/jms.properties</value>
+                <value>classpath:/com/mengruojun/brokerclient/dukascopy/dukascopy.properties</value>
             </list>
         </property>
     </bean>
@@ -22,6 +23,32 @@
     <context:component-scan base-package="com.mengruojun"/>
 
     <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
+
+
+    <bean id="dukascopyMarketDataFeedClient" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+        <property name="brokerType" value="DukascopyMarketDataFeeder"/>
+        <property name="clientId" value="dukascopyMarketDataFeedClient"/>
+        <property name="strategy" ref="marketDataFeedStrategy"/>
+        <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
+        <property name="userName" value="${brokerclient.dukascopy.markertdatafeeder.username}"/>
+        <property name="password" value="${brokerclient.dukascopy.markertdatafeeder.password}"/>
+    </bean>
+
+    <!--<bean id="dukascopyClient1" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+        <property name="brokerType" value="DukascopyDemo"/>
+        <property name="clientId" value="dukascopyClient1"/>
+        <property name="strategy" ref="msgRouterStrategy"/>
+        <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
+        <property name="userName" value="${brokerclient.dukascopy.client1.username}"/>
+        <property name="password" value="${brokerclient.dukascopy.client1.password}"/>
+    </bean>-->
+
+    <!-- Add JMS listener here -->
+    <!--<bean id="tradeCommandJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer" lazy-init="true">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="jmsTopicTradeCommand"/>
+        <property name="messageListener" ref="tradeCommandReceiver" />
+    </bean>-->
 
     <bean id="marketDataSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
         <property name="template" ref="jmsTemplate" />

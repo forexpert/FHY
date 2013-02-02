@@ -3,7 +3,6 @@ package com.mengruojun.forex.activemq;
 import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.apache.activemq.xbean.XBeanBrokerService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.mengruojun.common.Test;
 
 /**
  * Created with IntelliJ IDEA.
