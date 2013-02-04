@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jsp:root xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:jsp="http://java.sun.com/JSP/Page"
+          xmlns:c="http://java.sun.com/jsp/jstl/core"
+          xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+          xmlns:form="http://www.springframework.org/tags/form"
+          version="2.0">
+  <jsp:directive.page contentType="text/html" pageEncoding="UTF-8"/>
+  <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+
+
+  <div class="main-container">
+    <div class="header">
+
+    </div>
+
+    <div class="clients-widget">
+
+      <div class="client">
+        <fieldset>
+          <legend>client 1</legend>
+          <ul>
+            <li>CPU : 10%</li>
+            <li>Memory: 100M/16G</li>
+            <li>Dukascopy Real Server : running</li>
+            <li>Dukascopy Demo Server : running</li>
+            <li>Mock Server : stop</li>
+          </ul>
+        </fieldset>
+      </div>
+
+      <div class="client">
+        <fieldset>
+          <legend>client 2</legend>
+          <ul>
+            <li>CPU : 10%</li>
+            <li>Memory: 100M/16G</li>
+            <li>Dukascopy Real Server : running</li>
+            <li>Dukascopy Demo Server : running</li>
+            <li>Mock Server : stop</li>
+          </ul>
+        </fieldset>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div class="clients-table">
+
+    </div>
+
+    <div class="system-monitor">
+      <fieldset>
+        <legend>System Monitor</legend>
+        <ul>
+          <li>CPU : 10%</li>
+          <li>Memory: 100M/16G</li>
+          <li>Dukascopy Real Server : running</li>
+          <li>Dukascopy Demo Server : running</li>
+          <li>Mock Server : stop</li>
+        </ul>
+      </fieldset>
+    </div>
+  </div>
+</jsp:root>

@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Forex Web Console</title>
+    <link rel="stylesheet" type="text/css" href="common/js/yui2/build/assets/skins/sam/skin.css"/>
+    <link rel="stylesheet" type="text/css" href="common/js/yui2/build/grids/grids.css"/>
+    <link rel="stylesheet" type="text/css" href="common/js/yui2/build/reset-fonts-grids/reset-fonts-grids.css"/>
+    <link rel="stylesheet" href="main/css/main.css"/>
+
+    <!-- YUI javascript dependencies -->
+    <script type="text/javascript" src="common/js/yui2/build/utilities/utilities.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/container/container-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/menu/menu-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/button/button-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/datasource/datasource-debug.js">//</script>
+    <!-- OPTIONAL: Drag Drop (enables resizeable or reorderable columns) -->
+    <script type="text/javascript" src="common/js/yui2/build/dragdrop/dragdrop-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/calendar/calendar-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/paginator/paginator-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/datatable/datatable-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/imageloader/imageloader-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/json/json-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/logger/logger-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/resize/resize-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/selector/selector-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/tabview/tabview-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/layout/layout-debug.js">//</script>
+    <script type="text/javascript" src="common/js/yui2/build/logger/logger-debug.js">//</script>
+    <script type="text/javascript" src="main/js/main.js"></script>
+</head>
+<body class="yui-skin-sam">
+<div id="main">
+    <div id="top1">
+        <div id="top_wrap">
+            <div id="logo"></div>
+            <div id="info">
+                加油加油！
+            </div>
+        </div>
+    </div>
+    <div id="left1">
+        <div id="folder_top">
+            <div class="wrap">
+                <div id="check_buttons"></div>
+            </div>
+        </div>
+        <div id="folder_list">
+            <div class="wrap">
+                <ul>
+                    <li class="inbox selected"><em></em><a href="#">Inbox</a></li>
+                </ul>
+                <ul>
+                    <li class="contacts"><em></em><a href="http://addressbook.yahoo.com/" target="_blank">Contacts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="right1">
+
+    </div>
+</div>
+<script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function () {
+        YAHOO.ForexInvest.Main.init();
+    });
+</script>
+
+</body>
+</html>

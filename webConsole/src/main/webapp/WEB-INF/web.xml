@@ -1,27 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-    <display-name>Forex Web Console</display-name>
+    <!-- web container application display names -->
+    <display-name>
+        Forex Invest Web Console
+    </display-name>
+
+    <!-- web container and application container description  -->
+    <description>
+        Console for Forex Invest Components
+    </description>
+
     <distributable/>
 
-    <!-- precompiled jsp mappings -->
+    <servlet>
+        <servlet-name>webConsole</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <!--servlet-specific context file location -->
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:/com/mengruojun/webconsole/webconsole-servlet.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-   <!--
-    &lt;!&ndash; Context Configuration locations for Spring XML files &ndash;&gt;
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>
-            classpath:/applicationContext-resources.xml
-            classpath:/applicationContext-dao.xml
-            classpath:/applicationContext-service.xml
-            classpath*:/applicationContext.xml
-            /WEB-INF/applicationContext*.xml
-            /WEB-INF/cxf-servlet.xml
-            /WEB-INF/security.xml
-        </param-value>
-    </context-param>-->
-    <!--<filter-mapping>
+    <servlet>
+        <servlet-name>dwr-invoker</servlet-name>
+        <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>dwr-invoker</servlet-name>
+        <url-pattern>/dwr/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webConsole</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+
+    <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
@@ -44,10 +68,9 @@
     <filter>
         <filter-name>exportFilter</filter-name>
         <filter-class>org.displaytag.filter.ResponseOverrideFilter</filter-class>
-    </filter>-->
+    </filter>
 
-
-    <!--<listener>
+    <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <listener>
@@ -57,79 +80,7 @@
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
 
-    <listener>
-        <listener-class>net.sf.navigator.menu.MenuContextListener</listener-class>
-    </listener>
 
-    <servlet>
-        <servlet-name>dispatcher</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>dwr-invoker</servlet-name>
-        <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
-        <init-param>
-            <param-name>debug</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet>
-        <servlet-name>CXFServlet</servlet-name>
-        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>dwr-invoker</servlet-name>
-        <url-pattern>/dwr/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>CXFServlet</servlet-name>
-        <url-pattern>/services/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>dispatcher</servlet-name>
-        <url-pattern>/app/*</url-pattern>
-    </servlet-mapping>
-
-    <session-config>
-        <session-timeout>10</session-timeout>
-    </session-config>-->
-
-    <!-- ==================================================================== -->
-    <!-- The default servlet.                                                 -->
-    <!-- This servlet, normally mapped to /, provides the handling for static -->
-    <!-- content, OPTIONS and TRACE methods for the context.                  -->
-    <!-- The following initParameters are supported:                          -->
-    <!--                                                                      -->
-    <!--   acceptRanges     If true, range requests and responses are         -->
-    <!--                    supported                                         -->
-    <!--                                                                      -->
-    <!--   dirAllowed       If true, directory listings are returned if no    -->
-    <!--                    welcome file is found. Else 403 Forbidden.        -->
-    <!--                                                                      -->
-    <!--   redirectWelcome  If true, redirect welcome file requests           -->
-    <!--                    else use request dispatcher forwards              -->
-    <!--                                                                      -->
-    <!--   resoureBase      Can be set to replace the context resource base   -->
-    <!--                                                                      -->
-    <!--   relativeResourceBase                                               -->
-    <!--                    Set with a pathname relative to the base of the   -->
-    <!--                    servlet context root. Useful for only serving     -->
-    <!--                    static content from only specific subdirectories. -->
-    <!--                                                                      -->
-    <!--   useFileMappedBuffer                                                -->
-    <!--                    If set to true (the default), a  memory mapped    -->
-    <!--                    file buffer will be used to serve static content  -->
-    <!--                    when using an NIO connector. Setting this value   -->
-    <!--                    to false means that a direct buffer will be used  -->
-    <!--                    instead. If you are having trouble with Windows   -->
-    <!--                    file locking, set this to false.                  -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <servlet>
         <servlet-name>default</servlet-name>
         <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
@@ -169,7 +120,7 @@
     </servlet>
 
     <welcome-file-list>
-        <welcome-file>WebConsoleMain.xhtml</welcome-file>
+        <welcome-file>main.xhtml</welcome-file>
     </welcome-file-list>
     <!--
     <error-page>

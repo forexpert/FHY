@@ -2,60 +2,309 @@
 
 .clear{
     clear:both;
+}body {
+     background-color: #EDF5FF;
+     visibility: hidden;
+ }
+
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-bd {
+    border: none;
 }
-html {
-    background-color: #000;
-    color: #FFF;
+
+a {
+    text-decoration: none;
+    color: #0066CC;
 }
-.yui3-skin-night {
-    background-color: #000;
+#logo {
+    background-image: url( logo.png );
+    height: 35px;
+    width: 177px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
 }
-fieldset {
-    border: 2px solid #AAAAAA;
-    margin: 5px 5px;
-    padding: 10px;
+#info {
+    width: 193px;
+    position: absolute;
+    top: 7px;
+    left: 200px;
+    font-size: 85%;
+    text-align: left;
 }
-fieldset legend {
-    bottom: 0.4em;
-    color: #888888;
-    font-size: 1.3em;
+
+#info strong {
+    font-weight: bold;
+}
+
+#info span.links {
+    display: block;
+}
+
+#left1 {
+    text-align: left;
+}
+
+#folder_top {
+    height: 35px;
+    border: 1px solid #808080;
+    position: relative;
+    background: #7D98B8 url(sprite.png) repeat-x 0 -1700px;
+}
+#folder_top .wrap {
+    width: 100%;
+    height: 35px;
+}
+#folder_list {
+    height: 100%;
+    border: 1px solid #808080;
+    position: relative;
+    top: 9px;
+    background-color: #fff;
+}
+#folder_list .wrap {
+    width: 100%;
+    height: 100%;
+}
+
+#folder_list ul {
+    padding: 5px;
+}
+#folder_list ul li {
+    margin-left: 6px;
+    position: relative;
+    clear: both;
+}
+#folder_list ul li a {
+    padding: 2px;
+    color: #000;
+}
+#folder_list ul li.selected a {
+    background-color: #B3D4FF;
+    color: #000;
+}
+#folder_list ul li em {
+    background-image: url( example.png);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    height: 20px;
+    width: 17px;
+    display: block;
+    float: left;
+    margin: 0 3px;
+    overflow: hidden;
+}
+#folder_list ul li.inbox em {
+    background-position: -60px 0;
+}
+
+#folder_list ul li.drafts em {
+    background-position: -80px 0;
+}
+
+#folder_list ul li.sent em {
+    background-position: -460px 0;
+}
+
+#folder_list ul li.spam em {
+    background-position: -40px 0;
+}
+
+#folder_list ul li.trash em {
+    background-position: -20px 0;
+}
+
+#folder_list ul li.contacts em {
+    background-position: -100px 0;
+}
+
+#folder_list ul li.calendar em {
+    background-position: -120px 0;
+}
+
+#folder_list ul li.notepad em {
+    background-position: -160px 0;
+}
+
+#folder_list ul li.ydn-delicious em {
+    background-image: url( http://del.icio.us/favicon.ico );
+}
+#folder_list ul li.yws-flickr em {
+    background-image: url( http://flickr.com/favicon.ico );
+}
+
+.yui-skin-sam .yui-navset .yui-nav, .yui-skin-sam .yui-navset .yui-navset-top .yui-nav {
+    text-align: left;
+}
+.yui-skin-sam .yui-navset .loading {
+    background-image: url( http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif );
+    background-repeat: no-repeat;
+    background-position: top right;
+}
+.yui-layout .yui-layout-unit .yui-content {
+    padding: 0;
+    background-color: #fff;
+    text-align: left;
     position: relative;
 }
-fieldset ul {
-    margin: 0 0 1em;
-    padding-left: 0;
+.yui-layout .yui-layout-unit .yui-content p {
+    margin: 2em;
 }
-fieldset li {
-    clear: right;
-    margin-left: 25px;
-    margin-right: 30px;
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-bd {
+    background-color: #EDF5FF;
+}
+.yui-skin-sam .yui-navset .yui-nav .selected a, .yui-skin-sam .yui-navset .yui-nav .selected a em {
+    border-color:#808080;
+}
+
+.yui-skin-sam .yui-navset .yui-nav .selected a, .yui-skin-sam .yui-navset .yui-nav .selected a:focus, .yui-skin-sam .yui-navset .yui-nav .selected a:hover {
+    background: #B3D4FF url(sprite.png) repeat-x scroll left -1300px;
+    color:#000;
+}
+.yui-skin-sam .yui-navset .yui-nav, .yui-skin-sam .yui-navset .yui-navset-top .yui-nav {
+    border-width: 0;
+}
+.yui-skin-sam .yui-navset .yui-nav .selected a em {
+    padding: 0.25em 0.75em;
+}
+
+#systemMonitor,
+#clientManager {
+    position: relative;
+}
+
+#systemMonitor em,
+#clientManager em {
+    font-weight: normal;
+    color: #808080;
+}
+
+#systemMonitor.selected em,
+#clientManager.selected em {
+    font-weight: bold;
+    color: #000;
+}
+
+#systemMonitor a:hover,
+#clientManager a:hover {
+    background:#BFDAFF url(sprite.png) repeat-x scroll left -1700px;
+}
+
+#systemMonitor em {
+    padding-left: 20px;
+}
+
+#systemMonitor span {
+    display: block;
+    position: absolute;
+    top: 4px;
+    left: 3px;
+    _left: -18px;
+    height: 14px;
+    width: 17px;
+    background-image: url( example.png);
+    background-position: -480px 0;
+}
+#systemMonitor.selected span {
+    background-position: -140px 0;
+}
+
+
+.yui-skin-sam .yui-layout-unit .yui-resize-handle-b {
+    background-color: #f2f2f2;
+    border-top: 1px solid #808080;
+}
+
+
+.yui-skin-sam .yui-layout-unit .yui-resize-handle-r {
+    background-color: transparent;
+}
+
+.yui-skin-sam .yui-toolbar-container {
+    background-color: #EDF5FF;
+}
+.yui-skin-sam .yui-toolbar-container .yui-push-button,
+.yui-skin-sam .yui-toolbar-container .yui-color-button,
+.yui-skin-sam .yui-toolbar-container .yui-menu-button {
+    background:transparent url(sprite.png) repeat-x scroll 0 -1300px;
+}
+
+.yui-skin-sam .yui-toolbar-container .yui-button-hover {
+    background:transparent url(sprite.png) repeat-x scroll 0 -1700px;
+}
+.yui-skin-sam .yui-toolbar-container .yui-push-button span.yui-toolbar-icon,
+.yui-skin-sam .yui-toolbar-container .yui-color-button span.yui-toolbar-icon,
+.yui-skin-sam .yui-toolbar-container .yui-menu-button span.yui-toolbar-icon {
+    /*background-image: url(editor-sprite-active.gif);*/
+}
+
+/* Swap out the image to an active image */
+.yui-skin-sam .yui-toolbar-container .yui-button-selected span.yui-toolbar-icon, .yui-skin-sam .yui-toolbar-container .yui-button-hover span.yui-toolbar-icon {
+    /*background-image: url(editor-sprite.gif);*/
+}
+.yui-skin-sam .yui-dt-scrollable .yui-dt-hd,
+.yui-skin-sam .yui-dt-scrollable .yui-dt-bd {
+    border: none;
+}
+
+.yui-skin-sam .yui-dt-scrollable .yui-dt-hd {
+    border-top: 1px solid #808080;
+}
+.yui-skin-sam .yui-editor-panel .bd {
+    background-color: #EDF5FF;
+}
+.yui-skin-sam .yui-editor-panel .hd h3 {
+    background:transparent url(sprite.png) repeat-x scroll 0pt -1300px;
+}
+.yui-skin-sam .yui-dt th {
+    background:transparent url(sprite.png) repeat-x scroll 0 -1300px;
+}
+
+.yui-skin-sam .yui-panel .hd {
+    background:transparent url(sprite.png) repeat-x scroll 0pt -1300px;
+}
+.yui-skin-sam .yui-dialog .ft span.default {
+    background:transparent url(sprite.png) repeat-x scroll 0pt -1300px;
+}
+.yui-skin-sam .yui-dialog .ft span.default button {
+    color: #000;
+}
+.yui-skin-sam .yui-ac-content li.yui-ac-highlight {
+    background: #EDF5FF none repeat scroll 0%;
+    color: #000;
+}
+
+
+
+.yui-skin-sam .yui-log {
+    margin: 0;
     padding: 0;
 }
-
-/*.main-container*/
-
-.main-container {
+.yui-skin-sam .yui-log .yui-log-bd {
+    border: none;
 }
 
-/*.clients-widget*/
-
-.clients-widget{
-  width: auto;
-    margin: 10px 0 ;
+.yui-skin-sam .yui-log .yui-log-btns,
+.yui-skin-sam .yui-log .yui-log-hd,
+.yui-skin-sam .yui-log .yui-log-ft {
+    display: none;
+}
+.yui-skin-sam .yui-log .info {
+    background-color: #B3D4FF;
+    color: #000;
 }
 
-.clients-widget .client{
-    float: left;
-    width: 200px;
-    margin: 0 10px;
+.yui-skin-sam .yui-log pre.yui-log-verbose {
+    font-family: arial,helvetica,clean,sans-serif;
 }
-
-
-
-/* .system-monitor */
-.system-monitor{
-    bottom: 0;
-    position: absolute;
-    width: 100%;
+.yui-skin-sam .yui-layout .yui-layout-unit-right div.yui-layout-bd {
+    border-left: 1px solid #808080;
+    border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080;
+}
+.yui-skin-sam .yui-layout .yui-layout-hd {
+    background: #EDF5FF url(sprite.png) repeat-x scroll 0pt -1300px;
+}
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-hd h2 {
+    color: #000;
 }
 
