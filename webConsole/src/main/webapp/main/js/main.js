@@ -1,12 +1,4 @@
-/**
- * Created with IntelliJ IDEA.
- * User: Clyde
- * Date: 1/14/13
- * Time: 2:10 PM
- * To change this template use File | Settings | File Templates.
- */
 YAHOO.namespace('ForexInvest.Main');
-YAHOO.namespace('example.app.layout');
 (function () {
     //define a few shortcuts
     var Dom = YAHOO.util.Dom,
@@ -62,7 +54,7 @@ YAHOO.namespace('example.app.layout');
                 //Inject a span for the icon
                 label : '<span></span>System Monitor',
                 id : systemMonitorTabId,
-                content : '<div id="systemMonitorTabContainer" >Loading System Status...</div>'
+                content : '<div id="' + systemMonitorTabId +'-tabContainer"></div>'
             }));
             //Create the Client - Manager tab
             mainComp.tabView.addTab(new YAHOO.widget.Tab({
@@ -94,8 +86,9 @@ YAHOO.namespace('example.app.layout');
 
 
         initSystemMonitorTab : function () {  //systemMonitorTabId
-            //Dom.get("systemMonitorTabContainer").innerHTML += " Test";
-            //todo cmeng
+            var tabContainer = Dom.get(systemMonitorTabId +'-tabContainer');
+            tabContainer.innerHTML = '';
+            new YAHOO.ForexInvest.SystemMonitor(tabContainer).init();
         },
         initClientManagerTab : function () {  //clientManagerTabId
             //Dom.get("systemMonitorTabContainer").innerHTML += " Test";
