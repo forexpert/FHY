@@ -17,7 +17,7 @@ YAHOO.namespace('ForexInvest.Main');
                 units : [
                     { position : 'top', height : 45, resize : false, body : 'top1' },
                     { position : 'right', width : 300, body : 'right1', header : 'Logger Console', gutter : '0 5 0 5px', minWidth : 190 },
-                    { position : 'left', width : 190, resize : true, body : 'left1', gutter : '0 5 0 5px', minWidth : 190 },
+                    { position : 'left', width : 0, resize : true, body : 'left1', gutter : '0 5 0 5px', minWidth : 0 },
                     { position : 'center', gutter : '0 5px 0 2' }
                 ]
             });
@@ -88,7 +88,7 @@ YAHOO.namespace('ForexInvest.Main');
         initSystemMonitorTab : function () {  //systemMonitorTabId
             var tabContainer = Dom.get(systemMonitorTabId +'-tabContainer');
             tabContainer.innerHTML = '';
-            new YAHOO.ForexInvest.SystemMonitor(tabContainer).init();
+            new YAHOO.ForexInvest.SystemConsole(tabContainer).init();
         },
         initClientManagerTab : function () {  //clientManagerTabId
             //Dom.get("systemMonitorTabContainer").innerHTML += " Test";

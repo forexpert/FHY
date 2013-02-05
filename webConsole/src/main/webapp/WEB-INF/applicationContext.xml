@@ -5,6 +5,20 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
        default-lazy-init="true">
 
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/com/mengruojun/common/global.properties</value>
+                <value>classpath:/com/mengruojun/jms/jms.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置JMS连接工厂 -->
+    <bean id="systemMonitorService" class="com.mengruojun.webconsole.service.SystemMonitorService">
+        <property name="jmsPort" value="${activemq.port}" />
+    </bean>
     <!-- Activates scanning of @Autowired -->
    <!-- <context:annotation-config/>
 

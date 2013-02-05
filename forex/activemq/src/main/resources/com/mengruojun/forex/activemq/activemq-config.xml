@@ -40,7 +40,7 @@
     </bean>
 
     <broker xmlns="http://activemq.apache.org/schema/core" useJmx="true" brokerName="localhost"
-            dataDirectory="${activemq.base}/data" advisorySupport="false" useShutdownHook="true" >
+            dataDirectory="${activemq.base}/data" advisorySupport="false" useShutdownHook="true" start="false">
 
         <!-- Destination specific policies using destination names or wildcards -->
         <destinationPolicy>

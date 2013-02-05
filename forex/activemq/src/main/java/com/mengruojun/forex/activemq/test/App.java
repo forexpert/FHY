@@ -10,7 +10,7 @@ public class App {
 
   // the loaded context
   private ClassPathXmlApplicationContext context;
-  private String[] contextFiles = new String[]{"applicationContext.xml"};
+  private String[] contextFiles = new String[]{"com/mengruojun/forex/activemq/applicationContext.xml"};
   public App(){
     context = new ClassPathXmlApplicationContext(contextFiles);
   }

@@ -1,0 +1,33 @@
+#systemMonitor-tabContainer .system-panel{
+    float: left;
+    width: 33%;
+}
+
+#systemMonitor-tabContainer .system-panel.robot-client-info{
+    float: none;
+    width: auto;
+}
+
+
+
+fieldset {
+    border: 2px solid #AAAAAA;
+    margin: 5px 5px;
+    padding: 10px;
+}
+fieldset legend {
+    bottom: 0.4em;
+    color: #888888;
+    font-size: 1.3em;
+    position: relative;
+}
+fieldset ul {
+    margin: 0 0 1em;
+    padding-left: 0;
+}
+fieldset li {
+    clear: right;
+    margin-left: 25px;
+    margin-right: 30px;
+    padding: 0;
+}

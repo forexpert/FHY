@@ -15,8 +15,50 @@
 
     <div class="system-console">
 
-      <div class="system-panel computer">${dump}</div>
-      <div class="system-panel jms-server">${dump}</div>
+      <div class="system-panel component">
+        <fieldset>
+          <legend>Component Info</legend>
+          <div class="panel-content">
+            <ul>
+              <li>CPU : 10%</li>
+              <li>Memory: 100M/16G</li>
+              <li>Dukascopy Real Server : running</li>
+              <li>Dukascopy Demo Server : running</li>
+              <li>Mock Server : stop</li>
+            </ul>
+          </div>
+        </fieldset>
+      </div>
+      <div class="system-panel watch-client-info">
+        <fieldset>
+          <legend>Watch Client Info</legend>
+          <ul>
+            <li>total Return: 30%</li>
+            <li>Open Position number: 3</li>
+            <li>Chart in one year</li>
+            <li>Strategy: smart-strategy</li>
+            <li>Balance: 12345 USD</li>
+          </ul>
+        </fieldset>
+      </div>
+
+      <div class="system-panel market-data-info">
+        <fieldset>
+          <legend>Market Data Info</legend>
+          <ul>
+            <li>EUR/USD:   Ask 1.3500  Bid 1.3490</li>
+            <li>GBP/USD:   Ask 1.3500  Bid 1.3490</li>
+            <li>USD/JPY:   Ask 1.3500  Bid 1.3490</li>
+          </ul>
+        </fieldset>
+      </div>
+      <div class="clear"></div>
+      <div class="system-panel robot-client-info">
+        <fieldset>
+          <legend>Robot Client Info</legend>
+          table
+        </fieldset>
+      </div>
 
     </div>
 
