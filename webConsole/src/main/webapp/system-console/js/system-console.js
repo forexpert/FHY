@@ -5,13 +5,13 @@ YAHOO.namespace('ForexInvest.SystemConsole');
         Event = YAHOO.util.Event,
         Selector = YAHOO.util.Selector,
         Connect = YAHOO.util.Connect;
+    var jsonHelper = YAHOO.lang.JSON;
 
     YAHOO.ForexInvest.SystemConsole = function (container) {
         this.container = container;
     };
     YAHOO.ForexInvest.SystemConsole.prototype = {
         init : function () {
-
             // Instantiate a Panel from markup
             var that = this;
             Connect.asyncRequest('get', '/app/tab/system-console', {
@@ -49,7 +49,21 @@ YAHOO.namespace('ForexInvest.SystemConsole');
             var componentInfoPanelContentEL = Selector.query(".system-console .system-panel.component .panel-content",
                 this.container, true);
             if(componentInfoPanelContentEL){
-
+                var that = this;
+                Connect.asyncRequest('get', '/app/system-console/ComponentInfo', {
+                    success: function(response){
+                        var json = jsonHelper.parse(response.responseText);
+                        var cpuEl = Selector.query("span.js-cpu-usage", componentInfoPanelContentEL, true);
+                        var memEl = Selector.query("span.js-mem-usage", componentInfoPanelContentEL, true);
+                        var activemqEl = Selector.query("span.js-activemq-server", componentInfoPanelContentEL, true);
+                        cpuEl.innerHTML = json.cpuUsage;
+                        memEl.innerHTML = json.memUsage;
+                        Dom.removeClass(activemqEl, json.isJMSServerRunning?"status-down": "status-up");
+                        Dom.addClass(activemqEl, json.isJMSServerRunning?"status-up": "status-down");
+                    },
+                    failure: null,
+                    argument: { that: that }
+                }, null);
             }
 
         }

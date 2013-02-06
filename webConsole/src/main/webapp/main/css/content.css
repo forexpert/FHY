@@ -8,6 +8,21 @@
     width: auto;
 }
 
+#systemMonitor-tabContainer .system-panel span.js-activemq-server.status-down {
+    background: url("../img/icon_sprite.png") no-repeat scroll -61px -51px transparent;
+    display: inline-block;
+    height: 15px;
+    width: 20px;
+}
+
+#systemMonitor-tabContainer .system-panel span.js-activemq-server.status-up {
+    background: url("../img/icon_sprite.png") no-repeat scroll -100px -53px transparent;
+    display: inline-block;
+    height: 15px;
+    width: 20px;
+
+}
+
 
 
 fieldset {

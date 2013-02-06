@@ -1,4 +1,4 @@
-package com.mengruojun.webconsole.web;
+package com.mengruojun.webconsole.web.controller;
 
 import com.mengruojun.webconsole.service.SystemMonitorService;
 import com.mengruojun.webconsole.utils.JSONUtils;
@@ -38,11 +38,13 @@ public class MainController {
   public String getComponentInfo(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
 
     JSONObject reply = new JSONObject();
-    double cpuUsage = systemMonitorService.getCPUUsage();
-    double memUsage = systemMonitorService.getMemUsage();
+    String cpuUsage = systemMonitorService.getCPUUsage();
+    String memUsage = systemMonitorService.getMemUsage();
+    boolean isJMSServerRunning = systemMonitorService.isJMSServerRunning();
 
-
-    reply.put("status", "success");
+    reply.put("cpuUsage", cpuUsage);
+    reply.put("memUsage", memUsage);
+    reply.put("isJMSServerRunning", isJMSServerRunning);
     JSONUtils.writeJSON(reply, request, response);
     //ManagementFactory.
     return null;

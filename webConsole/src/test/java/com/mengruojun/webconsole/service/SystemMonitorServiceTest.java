@@ -1,35 +1,32 @@
 package com.mengruojun.webconsole.service;
-import com.mengruojun.forex.activemq.ActivemqServer;
-import junit.framework.TestCase;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.log4j.Logger;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import com.mengruojun.forex.activemq.ActivemqServer;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Ignore;
+import static junit.framework.Assert.*;
+
+
 
 /**
  * SystemMonitorServiceTest
  */
 
-public class SystemMonitorServiceTest extends TestCase{
+public class SystemMonitorServiceTest{
 
   Logger logger = Logger.getLogger(SystemMonitorService.class);
 
   SystemMonitorService sms = null;
 
-  @Override
+  @Before
   public void setUp(){
     sms = new SystemMonitorService();
     sms.setJmsPort(61616);
   }
 
-
+  @Ignore
   @Test
   public void testActiveMQRunning() throws Exception{
     boolean isJMSServerRunning = sms.isJMSServerRunning();
@@ -41,5 +38,11 @@ public class SystemMonitorServiceTest extends TestCase{
     as.stop();
     isJMSServerRunning = sms.isJMSServerRunning();
     assertFalse(isJMSServerRunning);
+  }
+
+  @Test
+  public void testCPUAndMem() throws Exception{
+    sms.getCPUUsage();
+    sms.getMemUsage();
   }
 }
