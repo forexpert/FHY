@@ -20,12 +20,23 @@
           <legend>Component Info</legend>
           <div class="panel-content">
             <ul>
-              <li><span>CPU :</span> <span class="js-cpu-usage">10%</span> </li>
-              <li><span>Memory:</span> <span class="js-mem-usage">100M/16G</span></li>
-              <li><span>ActiveMQ Server Status: </span> <span class="js-activemq-server status-down"> </span></li>
-              <li>Dukascopy Real Server : running</li>
-              <li>Dukascopy Demo Server : running</li>
-              <li>Mock Server : stop</li>
+              <li class="js-cpu-usage"><span class="title">CPU :</span> <span class="value">10%</span> </li>
+              <li class="js-mem-usage"><span class="title">Memory:</span> <span class="value">100M/16G</span></li>
+              <li class="activemq-server">
+                <span class="title">ActiveMQ Server Status: </span>
+                <span class="server-status down">${dump}</span>
+                <button class="button">Start</button>
+              </li>
+              <li class="mock-broker-server">
+                <span class="title">Mock Broker Server: </span>
+                <span class="server-status down">${dump}</span>
+                <button class="button">Start</button>
+              </li>
+              <li class="strategy-center-server">
+                <span class="title">Strategy Center Server: </span>
+                <span class="server-status down">${dump}</span>
+                <button class="button">Start</button>
+              </li>
             </ul>
           </div>
         </fieldset>

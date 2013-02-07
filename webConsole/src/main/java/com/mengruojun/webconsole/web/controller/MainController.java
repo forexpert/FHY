@@ -41,13 +41,22 @@ public class MainController {
     String cpuUsage = systemMonitorService.getCPUUsage();
     String memUsage = systemMonitorService.getMemUsage();
     boolean isJMSServerRunning = systemMonitorService.isJMSServerRunning();
-
+    boolean isMockBrokerServerRunning = systemMonitorService.isMockBrokerServerRunning();
+    boolean isStrategyServerRunning = systemMonitorService.isStrategyServerRunning();
     reply.put("cpuUsage", cpuUsage);
     reply.put("memUsage", memUsage);
     reply.put("isJMSServerRunning", isJMSServerRunning);
+    reply.put("isMockBrokerServerRunning", isMockBrokerServerRunning);
+    reply.put("isStrategyServerRunning", isStrategyServerRunning);
     JSONUtils.writeJSON(reply, request, response);
     //ManagementFactory.
     return null;
+  }
+
+  @RequestMapping(value="system-console/startComponent", method=RequestMethod.POST)
+  public void startComponent(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
+
+
   }
 
 }

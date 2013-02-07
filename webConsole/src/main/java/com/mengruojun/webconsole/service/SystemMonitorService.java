@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
  */
 public class SystemMonitorService {
   Logger logger = Logger.getLogger(SystemMonitorService.class);
-  DecimalFormat decimalFormat = new DecimalFormat("######.0");
+  DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
   private int jmsPort;
 
@@ -44,11 +44,21 @@ public class SystemMonitorService {
     return false;
   }
 
+  public boolean isMockBrokerServerRunning(){
+    //todo cmeng
+    return false;
+  }
+
+  public boolean isStrategyServerRunning(){
+    //todo cmeng
+    return false;
+  }
+
   public String getMemUsage() {
     int[] memInfo = new int[0];
     try {
       memInfo = LinuxSystemTool.getMemInfo();
-      return decimalFormat.format(memInfo[1]/1024.0/1024.0) + "G" + " / " + decimalFormat.format(memInfo[0]/1024.0/1024.0) + "G";
+      return decimalFormat.format(memInfo[1]/1024.0/1024.0) + "G (free) " + " / " + decimalFormat.format(memInfo[0]/1024.0/1024.0) + "G";
     } catch (IOException e) {
       logger.error("", e);
     } catch (InterruptedException e) {

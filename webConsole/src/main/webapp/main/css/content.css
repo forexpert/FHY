@@ -8,22 +8,24 @@
     width: auto;
 }
 
-#systemMonitor-tabContainer .system-panel span.js-activemq-server.status-down {
+#systemMonitor-tabContainer .system-panel .server-status.down {
     background: url("../img/icon_sprite.png") no-repeat scroll -61px -51px transparent;
     display: inline-block;
-    height: 15px;
-    width: 20px;
+    height: 18px;
+    width: 18px;
+    vertical-align: bottom;
 }
 
-#systemMonitor-tabContainer .system-panel span.js-activemq-server.status-up {
-    background: url("../img/icon_sprite.png") no-repeat scroll -100px -53px transparent;
+#systemMonitor-tabContainer .system-panel .server-status.up {
+    background: url("../img/icon_sprite.png") no-repeat scroll -101px -53px transparent;
     display: inline-block;
-    height: 15px;
-    width: 20px;
-
+    height: 18px;
+    width: 18px;
+    vertical-align: bottom;
 }
-
-
+#systemMonitor-tabContainer .system-panel button.hide{
+    display: none;
+}
 
 fieldset {
     border: 2px solid #AAAAAA;
@@ -45,4 +47,5 @@ fieldset li {
     margin-left: 25px;
     margin-right: 30px;
     padding: 0;
+    line-height: 18px;
 }
