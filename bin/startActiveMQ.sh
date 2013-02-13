@@ -1,3 +1,3 @@
-mvn exec:java -f ../forex/activemq/pom.xml -Dexec.mainClass="com.mengruojun.forex.activemq.ActivemqServer"
+terminator -T activeMQ --command='mvn exec:java -f ../forex/activemq/pom.xml -Dexec.mainClass="com.mengruojun.forex.activemq.ActivemqServer"'
 
 

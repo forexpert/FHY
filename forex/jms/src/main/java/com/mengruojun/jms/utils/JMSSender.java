@@ -1,4 +1,4 @@
-package com.mengruojun.brokerclient.dukascopy;
+package com.mengruojun.jms.utils;
 
 import org.apache.log4j.Logger;
 import org.springframework.jms.core.JmsTemplate;

@@ -36,7 +36,14 @@
         <property name="destination" ref="jmsTopicClientInfo"/>
         <property name="messageListener" ref="clientDataReceiver" />
     </bean>
+
+    <bean id="tradeCommandSender" class="com.mengruojun.jms.utils.JMSSender">
+        <property name="template" ref="jmsTemplate" />
+        <property name="destination" ref="jmsTopicTradeCommand" />
+    </bean>
     <!-- Add new DAOs here -->
 
     <!-- Add new Managers here -->
+    <!--<bean id="marketDataManager" class="com.mengruojun.strategycenter.component.marketdata.MarketDataManager"></bean>-->
+
 </beans>

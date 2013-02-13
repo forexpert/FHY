@@ -2,21 +2,15 @@ package com.mengruojun.brokerclient.dukascopy;
 
 import com.dukascopy.api.*;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
-import com.mengruojun.common.domain.Position;
-import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
-import com.mengruojun.common.domain.enumerate.Direction;
-import com.mengruojun.common.domain.enumerate.PositionStatus;
 import com.mengruojun.jms.domain.ClientInfoMessage;
-import com.mengruojun.jms.domain.MarketDataMessage;
+import com.mengruojun.jms.utils.JMSSender;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
 import javax.jms.Destination;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

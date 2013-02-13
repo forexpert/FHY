@@ -21,4 +21,9 @@ public abstract class AbstractBrokerClient {
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
+
+
+    //abstract void connect();
+
+
 }

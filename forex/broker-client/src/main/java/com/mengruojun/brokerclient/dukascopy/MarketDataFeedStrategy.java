@@ -14,18 +14,15 @@ import com.dukascopy.api.Instrument;
 import com.dukascopy.api.JFException;
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
-import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
-import com.mengruojun.common.domain.enumerate.Direction;
-import com.mengruojun.common.domain.enumerate.PositionStatus;
 import com.mengruojun.jms.domain.ClientInfoMessage;
+import com.mengruojun.jms.domain.JMSSender;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

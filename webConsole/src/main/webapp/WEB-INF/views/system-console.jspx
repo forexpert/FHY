@@ -25,17 +25,17 @@
               <li class="activemq-server">
                 <span class="title">ActiveMQ Server Status: </span>
                 <span class="server-status down">${dump}</span>
-                <button class="button">Start</button>
+                <!--<button class="button" compName="activemq-server">Start</button>-->
               </li>
               <li class="mock-broker-server">
                 <span class="title">Mock Broker Server: </span>
                 <span class="server-status down">${dump}</span>
-                <button class="button">Start</button>
+                <!--<button class="button" compName="mock-broker-server">Start</button>-->
               </li>
               <li class="strategy-center-server">
                 <span class="title">Strategy Center Server: </span>
                 <span class="server-status down">${dump}</span>
-                <button class="button">Start</button>
+                <!--<button class="button" compName="strategy-center-server">Start</button>-->
               </li>
             </ul>
           </div>

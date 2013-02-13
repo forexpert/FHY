@@ -18,7 +18,25 @@ public class OHLC{
   private double askVolume;
   private double bidVolume;
 
-  public double getAskOpen() {
+    public  OHLC (){
+
+    }
+
+    public OHLC(double askOpen, double askHigh, double askLow, double askClose, double askVolume,
+                double bidOpen, double bidHigh, double bidLow, double bidClose, double bidVolume) {
+        this.askOpen = askOpen;
+        this.askHigh = askHigh;
+        this.askLow = askLow;
+        this.askClose = askClose;
+        this.bidOpen = bidOpen;
+        this.bidHigh = bidHigh;
+        this.bidLow = bidLow;
+        this.bidClose = bidClose;
+        this.askVolume = askVolume;
+        this.bidVolume = bidVolume;
+    }
+
+    public double getAskOpen() {
     return askOpen;
   }
 

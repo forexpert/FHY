@@ -5,7 +5,6 @@ import com.dukascopy.api.Instrument;
 import com.dukascopy.api.system.ClientFactory;
 import com.dukascopy.api.system.IClient;
 import com.mengruojun.brokerclient.AbstractBrokerClient;
-import com.mengruojun.brokerclient.dukascopy.utils.DukascopyClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,7 +32,7 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
 
     private void initClient() throws Exception {
         //get the instance of the IClient interface
-        final IClient client = DukascopyClientFactory.createNewInstance();
+        final IClient client = ClientFactory.getDefaultInstance();
         //set the listener that will receive system events
         client.setSystemListener(new DefaultSystemListenerImpl(client, jnlpUrl, userName, password));
 
@@ -77,7 +76,7 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.start();
+        //this.start();  to start it in main method
     }
 
 

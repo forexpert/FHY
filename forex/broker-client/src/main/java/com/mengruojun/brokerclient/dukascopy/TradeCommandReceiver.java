@@ -1,6 +1,8 @@
 package com.mengruojun.brokerclient.dukascopy;
 
-import com.dukascopy.api.IContext;
+import com.dukascopy.api.*;
+import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
+import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import org.apache.log4j.Logger;
@@ -58,16 +60,66 @@ public class TradeCommandReceiver{
                     handleCommand(tcm);
                 }
             } catch (JMSException ex) {
+                logger.error("", ex);
                 throw new RuntimeException(ex);
+            } catch (JFException ex) {
+                logger.error("", ex);
             }
         } else {
             logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actuall is " + message);
         }
     }
 
-    private void handleCommand(TradeCommandMessage tcm) {
+    private void handleCommand(TradeCommandMessage tcm) throws JFException {
         //todo
         //context.getEngine().submitOrder()...
+
+        String positionLabel = tcm.getPositionId();
+        Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
+        Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
+        Double openPrice = tcm.getOpenPrice();
+        Double stopLossPrice = tcm.getStopLossPrice();
+        Double takeProfitPrice = tcm.getTakeProfitPrice();
+
+        switch (tcm.getTradeCommandType()){
+            case openAtMarketPrice: {
+                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
+                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+                break;
+            }
+            case openAtSetPrice: {
+                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUYLIMIT : IEngine.OrderCommand.SELLLIMIT;
+                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+                break;
+            }
+            case cancel:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order != null){
+                    order.close();
+                }
+                break;
+            }
+            case change:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
+                    order.setOpenPrice(openPrice);
+                }
+                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
+                        || order.getState() == IOrder.State.FILLED){
+                    order.setRequestedAmount(amount);
+                    order.setStopLossPrice(stopLossPrice);
+                    order.setTakeProfitPrice(takeProfitPrice);
+                }
+                break;
+            }
+            case close:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order != null){
+                    order.close(amount);
+                }
+                break;
+            }
+        }
         logger.info("sending TradeCommandMessage to Dukascopy server" + tcm);
 
     }

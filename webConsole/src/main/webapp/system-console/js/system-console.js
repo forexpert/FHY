@@ -48,26 +48,29 @@ YAHOO.namespace('ForexInvest.SystemConsole');
         initComponentInfoPanel : function () {
             var componentInfoPanelContentEL = Selector.query(".system-console .system-panel.component .panel-content",
                 this.container, true);
-            this.startActiveMQButton = new YAHOO.widget.Button(Selector.query("li.activemq-server button", componentInfoPanelContentEL, true));
-            this.startMockBrokerServerButton = new YAHOO.widget.Button(Selector.query("li.mock-broker-server", componentInfoPanelContentEL, true));
-            this.startStrategyCenterButton = new YAHOO.widget.Button(Selector.query("li.strategy-center-server", componentInfoPanelContentEL, true));
-
-            this.startActiveMQButton.on("click", function (event) {
+            /*this.startActiveMQButton = new YAHOO.widget.Button(Selector.query("li.activemq-server button", componentInfoPanelContentEL, true));
+            this.startMockBrokerServerButton = new YAHOO.widget.Button(Selector.query("li.mock-broker-server button", componentInfoPanelContentEL, true));
+            this.startStrategyCenterButton = new YAHOO.widget.Button(Selector.query("li.strategy-center-server button", componentInfoPanelContentEL, true));
+            var buttonEventListener = function (event) {
                 YAHOO.util.Event.preventDefault(event);
                 var target = YAHOO.util.Event.getTarget(event);
-                var serverName = Dom.getAttribute(target.parentNode, "class");
+                var compName = Dom.getAttribute(target, "compName");
                 Connect.asyncRequest('post', '/app/system-console/startComponent', {
                     success : null,
                     failure : null
-                }, "serverName=" + serverName);
-            });
+                }, "compName=" + compName);
+            };
+            this.startActiveMQButton.on("click", buttonEventListener);
+            this.startMockBrokerServerButton.on("click", buttonEventListener);
+            this.startStrategyCenterButton.on("click", buttonEventListener);*/
 
 
-            if (componentInfoPanelContentEL) {
+            var updateComponentInfo = function(){
                 var that = this;
                 Connect.asyncRequest('get', '/app/system-console/ComponentInfo', {
                     success : function (response) {
                         var json = jsonHelper.parse(response.responseText);
+
                         var cpuEl = Selector.query("li.js-cpu-usage span.value", componentInfoPanelContentEL, true);
                         var memEl = Selector.query("li.js-mem-usage span.value", componentInfoPanelContentEL, true);
                         var activemqEl = Selector.query("li.activemq-server", componentInfoPanelContentEL, true);
@@ -80,7 +83,7 @@ YAHOO.namespace('ForexInvest.SystemConsole');
                             var buttonEL = Selector.query("button", serverEl, true);
                             Dom.removeClass(statusEL, isRunning ? "down" : "up");
                             Dom.addClass(statusEL, isRunning ? "up" : "down");
-                            isRunning ? Dom.addClass(buttonEL, "hide") : Dom.removeClass(buttonEL, "hide");
+                            //isRunning ? Dom.addClass(buttonEL, "hide") : Dom.removeClass(buttonEL, "hide");
                         }
                         updateServerELUI(activemqEl, json.isJMSServerRunning);
                         updateServerELUI(mockBrokerServerEl, json.isMockBrokerServerRunning);
@@ -89,9 +92,15 @@ YAHOO.namespace('ForexInvest.SystemConsole');
                     failure : null,
                     argument : { that : that }
                 }, null);
+                setTimeout(updateComponentInfo, 10000);
+            };
+            if (componentInfoPanelContentEL) {
+                updateComponentInfo();
             }
 
         }
+
+
     }
 
 })();

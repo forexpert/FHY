@@ -20,11 +20,11 @@ but it doesn't do anything about broker, like connection to broker server or so.
  */
 public class BrokerClient {
 
-    public BrokerClient(BrokerType brokerType, String clientName, String strategyName, Double accountLeverage,
+    public BrokerClient(BrokerType brokerType, String clientId, String strategyName, Double accountLeverage,
                         Currency baseCurrency, Double startMoney, Double currentMoney, List<Position> openPositions,
                         List<Position> pendingPositions, List<Position> closedPositions) {
         this.brokerType = brokerType;
-        this.clientName = clientName;
+        this.clientId = clientId;
         StrategyName = strategyName;
         this.accountLeverage = accountLeverage;
         this.baseCurrency = baseCurrency;
@@ -36,7 +36,7 @@ public class BrokerClient {
     }
 
     private BrokerType brokerType;
-    private String clientName;
+    private String clientId;
     private String StrategyName;
     private Double accountLeverage;
     private Currency baseCurrency;
@@ -61,12 +61,12 @@ public class BrokerClient {
         this.brokerType = brokerType;
     }
 
-    public String getClientName() {
-        return clientName;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getStrategyName() {

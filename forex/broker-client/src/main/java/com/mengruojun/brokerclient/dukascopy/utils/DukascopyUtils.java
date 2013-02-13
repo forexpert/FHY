@@ -22,10 +22,27 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DukascopyUtils {
+
+    /**
+     * The global amount unit is K, but in dukascopy is million. So
+     * @param k  k is amount based on the unit K
+     * @return
+     */
+    public static double toDukascopyAmountFromK(double k){
+        return k/1000.0;
+    }
+
     public static com.mengruojun.common.domain.Instrument fromDukascopyInstrument(Instrument instrument){
         Currency c1 = Currency.fromJDKCurrency(instrument.getPrimaryCurrency());
         Currency c2 = Currency.fromJDKCurrency(instrument.getSecondaryCurrency());
         return new com.mengruojun.common.domain.Instrument(c1,c2);
+
+    }
+
+    public static Instrument toDukascopyInstrument(com.mengruojun.common.domain.Instrument instrument){
+        String c1 = instrument.getCurrency1().toString();
+        String c2 = instrument.getCurrency2().toString();
+        return Instrument.fromString(c1 + "/" + c2);
 
     }
 

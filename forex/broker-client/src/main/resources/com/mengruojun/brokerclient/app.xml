@@ -34,14 +34,14 @@
         <property name="password" value="${brokerclient.dukascopy.markertdatafeeder.password}"/>
     </bean>
 
-    <!--<bean id="dukascopyClient1" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+    <bean id="dukascopyClient1" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
         <property name="brokerType" value="DukascopyDemo"/>
         <property name="clientId" value="dukascopyClient1"/>
         <property name="strategy" ref="msgRouterStrategy"/>
         <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
         <property name="userName" value="${brokerclient.dukascopy.client1.username}"/>
         <property name="password" value="${brokerclient.dukascopy.client1.password}"/>
-    </bean>-->
+    </bean>
 
     <!-- Add JMS listener here -->
     <!--<bean id="tradeCommandJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer" lazy-init="true">
@@ -50,12 +50,12 @@
         <property name="messageListener" ref="tradeCommandReceiver" />
     </bean>-->
 
-    <bean id="marketDataSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
+    <bean id="marketDataSender" class="com.mengruojun.jms.utils.JMSSender">
         <property name="template" ref="jmsTemplate" />
         <property name="destination" ref="jmsTopicMarketBarData" />
     </bean>
 
-    <bean id="clientInfoSender" class="com.mengruojun.brokerclient.dukascopy.JMSSender">
+    <bean id="clientInfoSender" class="com.mengruojun.jms.utils.JMSSender">
         <property name="template" ref="jmsTemplate" />
         <property name="destination" ref="jmsTopicClientInfo" />
     </bean>

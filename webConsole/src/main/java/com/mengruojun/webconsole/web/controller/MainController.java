@@ -21,42 +21,56 @@ import java.io.IOException;
 @Controller
 public class MainController {
 
-  @Autowired
-  SystemMonitorService systemMonitorService;
+    @Autowired
+    SystemMonitorService systemMonitorService;
 
-  @RequestMapping(value="tab/{tabName}", method=RequestMethod.GET)
-  public String getTabContentHtml(@PathVariable String tabName, Model model) {
-    //model.addAttribute(new Account());
-    return tabName;
-  }
-
-
-  /*********tab system-console******************/
-
-    /*********ComponentInfo******************/
-  @RequestMapping(value="system-console/ComponentInfo", method=RequestMethod.GET)
-  public String getComponentInfo(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
-
-    JSONObject reply = new JSONObject();
-    String cpuUsage = systemMonitorService.getCPUUsage();
-    String memUsage = systemMonitorService.getMemUsage();
-    boolean isJMSServerRunning = systemMonitorService.isJMSServerRunning();
-    boolean isMockBrokerServerRunning = systemMonitorService.isMockBrokerServerRunning();
-    boolean isStrategyServerRunning = systemMonitorService.isStrategyServerRunning();
-    reply.put("cpuUsage", cpuUsage);
-    reply.put("memUsage", memUsage);
-    reply.put("isJMSServerRunning", isJMSServerRunning);
-    reply.put("isMockBrokerServerRunning", isMockBrokerServerRunning);
-    reply.put("isStrategyServerRunning", isStrategyServerRunning);
-    JSONUtils.writeJSON(reply, request, response);
-    //ManagementFactory.
-    return null;
-  }
-
-  @RequestMapping(value="system-console/startComponent", method=RequestMethod.POST)
-  public void startComponent(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
+    @RequestMapping(value = "tab/{tabName}", method = RequestMethod.GET)
+    public String getTabContentHtml(@PathVariable String tabName, Model model) {
+        //model.addAttribute(new Account());
+        return tabName;
+    }
 
 
-  }
+    /*********tab system-console******************/
 
+    /**
+     * ******ComponentInfo*****************
+     */
+    @RequestMapping(value = "system-console/ComponentInfo", method = RequestMethod.GET)
+    public String getComponentInfo(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
+
+        JSONObject reply = new JSONObject();
+        String cpuUsage = systemMonitorService.getCPUUsage();
+        String memUsage = systemMonitorService.getMemUsage();
+        boolean isJMSServerRunning = systemMonitorService.isJMSServerRunning();
+        boolean isMockBrokerServerRunning = systemMonitorService.isMockBrokerServerRunning();
+        boolean isStrategyServerRunning = systemMonitorService.isStrategyServerRunning();
+        reply.put("cpuUsage", cpuUsage);
+        reply.put("memUsage", memUsage);
+        reply.put("isJMSServerRunning", isJMSServerRunning);
+        reply.put("isMockBrokerServerRunning", isMockBrokerServerRunning);
+        reply.put("isStrategyServerRunning", isStrategyServerRunning);
+        JSONUtils.writeJSON(reply, request, response);
+        return null;
+    }/*
+
+    @RequestMapping(value = "system-console/startComponent", method = RequestMethod.POST)
+    public void startComponent(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException {
+        JSONObject reply = new JSONObject();
+
+        String compName = request.getParameter("compName");
+        if (compName.equals("activemq-server")) {
+
+        } else if (compName.equals("mock-broker-server")) {
+
+        } else if (compName.equals("strategy-center-server")) {
+
+        } else {
+
+        }
+
+        JSONUtils.writeJSON(reply, request, response);
+
+    }
+*/
 }

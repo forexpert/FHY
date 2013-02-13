@@ -121,5 +121,6 @@ public class MA_Play implements IStrategy {
       logger.info("");
       logger.info("");
       logger.info("");
+
     }
 }

@@ -1,0 +1,1 @@
+terminator -T DukascopyDemoClient1 --command='mvn exec:java -f ../forex/broker-client/pom.xml -Dexec.mainClass="com.mengruojun.brokerclient.Main" -Dexec.args="dukascopyClient1"'
