@@ -2,6 +2,7 @@ package com.mengruojun.strategycenter.component.client;
 
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
+import com.mengruojun.strategycenter.component.marketdata.MarketDataManager;
 import com.mengruojun.strategycenter.component.strategy.StrategyManager;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 import com.mengruojun.strategycenter.springevent.ClientRegisterEvent;
@@ -29,11 +30,13 @@ public class ClientManager implements ApplicationListener {
 
     @Autowired
     StrategyManager strategyManager;
-
+    @Autowired
+    MarketDataManager marketDataManager;
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if(event instanceof MarketDataReceivedEvent){
             synchronized (brokerClientMap) {
+                marketDataManager.push((MarketDataMessage) event.getSource());
                 for(BrokerClient bc : brokerClientMap.values()){
                     strategyManager.handle(bc, (MarketDataMessage)event.getSource());
                 }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * this MarketData is used for
@@ -27,7 +28,7 @@ public class MarketDataManager {
 
     private List<HistoryDataKBar> kbarList = new ArrayList<HistoryDataKBar>();
 
-    private Map<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>> kbarMap = new HashMap<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>>();
+    private Map<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>> kbarMap = new ConcurrentHashMap<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>>();
 
     /**
      * init kbarMap from DB

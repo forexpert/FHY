@@ -52,7 +52,7 @@ public class DukascopyUtils {
             //set base client account info
             cim.setBrokerType(brokerType);
             cim.setClientId(context.getAccount().getAccountId());
-            cim.setStrategyId("TBD");// to be determined by client manager
+            cim.setStrategyId("sample");// to be determined by client manager
             cim.setBaseCurrency(context.getAccount().getCurrency());
             cim.setCurrentBalance(context.getAccount().getBalance());
             cim.setCurrentEquity(context.getAccount().getEquity());

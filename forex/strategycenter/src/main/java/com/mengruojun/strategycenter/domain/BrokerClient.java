@@ -3,20 +3,24 @@ package com.mengruojun.strategycenter.domain;
 
 import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.enumerate.BrokerType;
+import com.mengruojun.jms.domain.TradeCommandMessage;
+
 import java.util.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/*
-This class presents broker clients but only used for client manager.
-Which has some properties like:
-client type
-client name
-client strategy
-and etc.
-
-but it doesn't do anything about broker, like connection to broker server or so.
+/**
+ * This class presents broker clients but only used for client manager.
+ * Which has some properties like:
+ * client type
+ * client name
+ * client strategy
+ * and etc.
+ * <p/>
+ * but it doesn't do anything about broker, like connection to broker server or so.
  */
 public class BrokerClient {
 
@@ -52,6 +56,12 @@ public class BrokerClient {
     private List<Position> pendingPositions = new ArrayList<Position>(); //todo init position list
     private List<Position> closedPositions = new ArrayList<Position>(); //todo init position list
 
+    /**
+     *   After strategy instance did the analysis on this client at a certain time point, it should add the analysis result into this map.
+     *   The analysis result should be a list of TradeCommandMessage. Even if the strategy doesn't want the client do any trade,
+     *   it should pass in list of TradeCommandMessage, which size is 0.
+     */
+    private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap =  new ConcurrentHashMap<Long, List<TradeCommandMessage>>();
 
     public BrokerType getBrokerType() {
         return brokerType;
@@ -131,5 +141,13 @@ public class BrokerClient {
 
     public void setClosedPositions(List<Position> closedPositions) {
         this.closedPositions = closedPositions;
+    }
+
+    public Map<Long, List<TradeCommandMessage>> getAnalyzedTradeCommandMap() {
+        return analyzedTradeCommandMap;
+    }
+
+    public void setAnalyzedTradeCommandMap(Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap) {
+        this.analyzedTradeCommandMap = analyzedTradeCommandMap;
     }
 }

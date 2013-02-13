@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.*;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -48,16 +49,17 @@ public class TradeCommandReceiver{
         if (message instanceof ObjectMessage) {
             try {
                 Object msgObj = ((ObjectMessage) message).getObject();
-                if (msgObj instanceof TradeCommandMessage) {
-                    TradeCommandMessage tcm = (TradeCommandMessage) msgObj;
-                    logger.info("TradeCommandMessage: ");
-                    logger.info("getTradeCommandType " + tcm.getTradeCommandType());
+                if (msgObj instanceof List) {
+                    for(TradeCommandMessage tcm : (List<TradeCommandMessage>) msgObj){
+                        logger.info("TradeCommandMessage: ");
+                        logger.info("getTradeCommandType " + tcm.getTradeCommandType());
 
-                    logger.info("");
-                    logger.info("");
-                    logger.info("");
-                    //todo cmeng to handler the command
-                    handleCommand(tcm);
+                        logger.info("");
+                        logger.info("");
+                        logger.info("");
+                        //todo cmeng to handler the command
+                        handleCommand(tcm);
+                    }
                 }
             } catch (JMSException ex) {
                 logger.error("", ex);

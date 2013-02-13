@@ -14,6 +14,9 @@ public class TradeCommandMessage implements Serializable {
 
     Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
     Direction direction;
+    /**
+     * Amount in K unit
+     */
     Double amount;
     Double openPrice;
     Double closePrice;

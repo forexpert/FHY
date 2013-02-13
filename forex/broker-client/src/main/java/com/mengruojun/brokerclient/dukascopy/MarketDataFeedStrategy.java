@@ -17,7 +17,7 @@ import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.jms.domain.ClientInfoMessage;
-import com.mengruojun.jms.domain.JMSSender;
+import com.mengruojun.jms.utils.JMSSender;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
