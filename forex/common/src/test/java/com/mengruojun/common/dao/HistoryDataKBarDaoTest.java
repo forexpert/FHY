@@ -9,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -23,10 +24,8 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     public void setUp() {
     }
 
-    @Ignore
     @Test
     public void getUser() {
-        HistoryDataKBar kdb = historyDataKBarDao.get(0L);
-        assertNull(kdb);
+        assertFalse(historyDataKBarDao.exists(0L));
     }
 }

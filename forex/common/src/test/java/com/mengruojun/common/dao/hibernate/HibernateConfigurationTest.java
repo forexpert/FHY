@@ -15,7 +15,6 @@ public class HibernateConfigurationTest extends BaseDaoTestCase {
     @Autowired
     SessionFactory sessionFactory;
 
-    @Ignore
     @Test
     public void testColumnMapping() throws Exception {
         Session session = sessionFactory.openSession();
