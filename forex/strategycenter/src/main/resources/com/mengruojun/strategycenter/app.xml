@@ -11,6 +11,7 @@
             <list>
                 <value>classpath:/com/mengruojun/common/global.properties</value>
                 <value>classpath:/com/mengruojun/jms/jms.properties</value>
+                <value>classpath:/com/mengruojun/common/db/jdbc.properties</value>
             </list>
         </property>
     </bean>
@@ -18,11 +19,15 @@
     <!-- Activates scanning of @Autowired -->
     <context:annotation-config/>
 
+    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
+    <import resource="classpath:com/mengruojun/common/db/applicationContext-dao.xml"/>
+
+
     <!-- Activates scanning of @Repository and @Service -->
     <context:component-scan base-package="com.mengruojun"/>
 
 
-    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
+
 
     <!-- Add JMS listener here -->
     <bean id="marketDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">

@@ -1,5 +1,6 @@
-package com.mengruojun.strategycenter.common.dao;
+package com.mengruojun.common.dao.impl;
 
+import com.mengruojun.common.dao.GenericDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;

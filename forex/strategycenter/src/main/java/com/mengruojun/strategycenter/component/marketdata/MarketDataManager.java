@@ -1,11 +1,11 @@
 package com.mengruojun.strategycenter.component.marketdata;
 
+import com.mengruojun.common.dao.HistoryDataKBarDao;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.jms.domain.MarketDataMessage;
-import com.mengruojun.strategycenter.component.marketdata.dao.HistoryDataKBarDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

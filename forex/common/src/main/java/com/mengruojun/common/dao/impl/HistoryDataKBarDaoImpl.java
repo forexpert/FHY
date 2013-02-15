@@ -1,12 +1,8 @@
-package com.mengruojun.strategycenter.component.marketdata.dao.impl;
+package com.mengruojun.common.dao.impl;
 
-
+import com.mengruojun.common.dao.HistoryDataKBarDao;
 import com.mengruojun.common.domain.HistoryDataKBar;
-import com.mengruojun.strategycenter.common.dao.GenericDaoHibernate;
-import com.mengruojun.strategycenter.component.marketdata.dao.HistoryDataKBarDao;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 
 /**

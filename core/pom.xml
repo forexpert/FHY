@@ -5,7 +5,7 @@
     
     <parent>
         <groupId>com.mengruojun</groupId>
-        <artifactId>ForexInvest</artifactId>
+        <artifactId>ForexInvest-pom</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>ta-lib</groupId>
             <artifactId>ta-lib</artifactId>
-            <version>0.4</version>
+            <version>0.4.4dc</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>

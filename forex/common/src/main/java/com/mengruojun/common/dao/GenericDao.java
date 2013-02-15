@@ -1,4 +1,4 @@
-package com.mengruojun.strategycenter.common.dao;
+package com.mengruojun.common.dao;
 
 import java.io.Serializable;
 import java.util.List;

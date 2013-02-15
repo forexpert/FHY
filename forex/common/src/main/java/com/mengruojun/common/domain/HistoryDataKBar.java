@@ -2,13 +2,9 @@ package com.mengruojun.common.domain;
 
 
 import org.hibernate.annotations.Cascade;
-import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,7 +15,6 @@ import java.util.Set;
 public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
   private static final long serialVersionUID = -1943659317753245831L;
-
   /**
    * Like EUR/USD, USD/JPY and etc
    */
@@ -101,7 +96,8 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
   public void setOhlc(OHLC ohlc) {
     this.ohlc = ohlc;
   }
-  // override method
+
+    // override method
 
   @Override
   public String toString() {
