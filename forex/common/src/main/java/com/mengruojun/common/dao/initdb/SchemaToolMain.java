@@ -1,7 +1,7 @@
 package com.mengruojun.common.dao.initdb;
 
-import com.mengruojun.common.db.routingdatasource.DataSourceType;
-import com.mengruojun.common.db.routingdatasource.RoutingDataSourceContextHolder;
+import com.mengruojun.common.dao.db.routingdatasource.DataSourceType;
+import com.mengruojun.common.dao.db.routingdatasource.RoutingDataSourceContextHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;

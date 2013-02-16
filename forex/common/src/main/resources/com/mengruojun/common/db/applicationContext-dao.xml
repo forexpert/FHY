@@ -19,9 +19,9 @@
     <!-- JNDI DataSource for J2EE environments -->
     <!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/appfuse"/>-->
 
-    <bean id="dataSource" class="com.mengruojun.common.db.routingdatasource.RoutingDataSource">
+    <bean id="dataSource" class="com.mengruojun.common.dao.db.routingdatasource.RoutingDataSource">
         <property name="targetDataSources">
-            <map key-type="com.mengruojun.common.db.routingdatasource.DataSourceType">
+            <map key-type="com.mengruojun.common.dao.db.routingdatasource.DataSourceType">
                 <entry key="PRODUCTION" value-ref="productiondataSource"/>
                 <entry key="TEST" value-ref="testdataSource"/>
             </map>
@@ -70,6 +70,6 @@
     <!-- Activates scanning of @Repository -->
     <context:component-scan base-package="com.mengruojun.common.dao"/>
     <!-- Activates scanning of @Service -->
-    <context:component-scan base-package="com.mengruojun.service"/>
+    <!--<context:component-scan base-package="com.mengruojun.service"/>-->
 
 </beans>

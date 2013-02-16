@@ -1,4 +1,4 @@
-package com.mengruojun.common.db.routingdatasource;
+package com.mengruojun.common.dao.db.routingdatasource;
 
 import org.springframework.util.Assert;
 

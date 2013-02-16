@@ -9,7 +9,7 @@
     <groupId>com.mengruojun.forex</groupId>
     <artifactId>broker-client-pom</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>broker-client-pom</name>
+    <name>broker-client</name>
 
     <parent>
         <groupId>com.mengruojun.forex</groupId>

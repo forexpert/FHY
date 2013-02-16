@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mengruojun.forex</groupId>
-    <artifactId>activemq</artifactId>
+    <artifactId>activemq-pom</artifactId>
     <packaging>jar</packaging>
     <name>activemq</name>
     <url>http://maven.apache.org</url>

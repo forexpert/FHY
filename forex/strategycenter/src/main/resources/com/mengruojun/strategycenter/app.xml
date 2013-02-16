@@ -11,7 +11,7 @@
             <list>
                 <value>classpath:/com/mengruojun/common/global.properties</value>
                 <value>classpath:/com/mengruojun/jms/jms.properties</value>
-                <value>classpath:/com/mengruojun/common/db/jdbc.properties</value>
+                <value>classpath:/com/mengruojun/common/dao/db/jdbc.properties</value>
             </list>
         </property>
     </bean>
