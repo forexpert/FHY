@@ -11,7 +11,7 @@
     <groupId>com.mengruojun.forex</groupId>
     <artifactId>strategy-center-pom</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>strategy-center-pom</name>
+    <name>strategy-center</name>
 
     <dependencies>
         <dependency>

@@ -1,3 +1,4 @@
 1. user different processor to start different Dukascopy client, due to:
     1) Dukascopy API can only return a static FXClient.
     2) We only have up to three Dukascoy client in the system: one is price feeder, one is demo account testing, and one is real account.
+2. 周末非交易日时段数据如何处理

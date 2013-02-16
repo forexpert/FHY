@@ -6,6 +6,7 @@ import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.jms.domain.MarketDataMessage;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class MarketDataManager {
+  Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     HistoryDataKBarDao historyDataKBarDao;
@@ -67,7 +69,7 @@ public class MarketDataManager {
         double bidClose = marketDataMessage.getBidClose();
         double bidVolume = marketDataMessage.getBidVolume();
 
-        if (containKbar(instrument, openTime, timeWindowType)) {
+        if (!containKbar(instrument, openTime, timeWindowType)) {
             OHLC ohlc = new OHLC(askOpen, askHigh, askLow, askClose, askVolume,
                     bidOpen, bidHigh, bidLow, bidClose, bidVolume);
 
@@ -89,6 +91,8 @@ public class MarketDataManager {
      * @param kbar
      */
     private void saveOrUpdate(HistoryDataKBar kbar) {
+      historyDataKBarDao.save(kbar);
+      logger.info("Save a Kbar: " + kbar.toString());
     }
 
     private void putKBarIntoMap(HistoryDataKBar kbar, Instrument instrument, Long openTime, TimeWindowType timeWindowType) {

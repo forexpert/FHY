@@ -19,7 +19,7 @@
     <context:annotation-config/>
 
     <!-- Activates scanning of @Repository and @Service -->
-    <context:component-scan base-package="com.mengruojun"/>
+    <context:component-scan base-package="com.mengruojun.jms"/>
 
     <!-- 配置JMS连接工厂 -->
     <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">

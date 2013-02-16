@@ -9,6 +9,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
+import java.io.Serializable;
+
 import static com.mengruojun.common.utils.EqualsUtils.areEqual;
 import static com.mengruojun.common.utils.HashUtils.HASH_UTILS_SEED;
 import static com.mengruojun.common.utils.HashUtils.hash;
@@ -18,7 +20,7 @@ import static com.mengruojun.common.utils.ValidationUtils.validateNotNull;
  * Trade Instrument, like EUR/USD
  */
 @Embeddable
-public class Instrument{
+public class Instrument implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Enumerated(EnumType.STRING)

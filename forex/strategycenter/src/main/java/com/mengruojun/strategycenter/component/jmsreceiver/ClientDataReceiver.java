@@ -34,6 +34,7 @@ public class ClientDataReceiver implements MessageListener, ApplicationContextAw
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+      logger.info("clientDataReceiver started");
     }
 
 

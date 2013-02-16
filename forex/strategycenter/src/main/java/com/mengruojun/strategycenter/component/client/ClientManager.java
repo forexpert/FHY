@@ -25,7 +25,9 @@ import java.util.Map;
 @Service
 public class ClientManager implements ApplicationListener {
     Logger logger = Logger.getLogger(ClientManager.class);
-
+  {
+    logger.info("ClientManager started");
+  }
     Map<String, BrokerClient> brokerClientMap = new HashMap<String, BrokerClient>();
 
     @Autowired

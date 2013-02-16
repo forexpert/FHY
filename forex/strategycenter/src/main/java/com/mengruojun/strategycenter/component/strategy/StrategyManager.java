@@ -16,33 +16,36 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class StrategyManager {
-    @Autowired
-    JMSSender  tradeCommandSender;
+  @Autowired
+  JMSSender tradeCommandSender;
 
-    private Map<String, BaseStrategy> strategyMap = new ConcurrentHashMap<String, BaseStrategy>();
+  private Map<String, BaseStrategy> strategyMap = new ConcurrentHashMap<String, BaseStrategy>();
 
-    public StrategyManager(){
-        init();
-    }
-    /**
-     * init strategyMap by registering strategies, which are all instances of Base Strategy
-     */
-    public void init(){
-        strategyMap.put("sample", new SampleStrategy());
-    }
+  public StrategyManager() {
+    init();
+  }
+
+  /**
+   * init strategyMap by registering strategies, which are all instances of Base Strategy
+   */
+  public void init() {
+    strategyMap.put("sample", new SampleStrategy());
+  }
 
 
-    public void handle(BrokerClient bc, MarketDataMessage source) {
-        synchronized (strategyMap){
-            BaseStrategy strategy = strategyMap.get( bc.getStrategyName());
-            long currentTime = source.getStartTime() + source.getTimeWindowType().getTimeInMillis();
-            List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, currentTime);
-            if(tradeCommandMessageList !=null){
-                tradeCommandSender.sendObjectMessage(tradeCommandMessageList);
-            }
+  public void handle(BrokerClient bc, MarketDataMessage source) {
+    synchronized (strategyMap) {
+      BaseStrategy strategy = strategyMap.get(bc.getStrategyName());
+      if (strategy != null) {
+        long currentTime = source.getStartTime() + source.getTimeWindowType().getTimeInMillis();
+        List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, currentTime);
+        if (tradeCommandMessageList != null) {
+          tradeCommandSender.sendObjectMessage(tradeCommandMessageList);
         }
-
+      }
     }
+
+  }
 
 
 }

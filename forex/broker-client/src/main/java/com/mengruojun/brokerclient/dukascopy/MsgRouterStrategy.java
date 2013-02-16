@@ -61,7 +61,8 @@ public class MsgRouterStrategy implements IStrategy {
                 try {
                     tradeCommandReceiver.receive();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                  logger.error("", e);
+                  //todo cmeng --jiji 一旦这里出异常， tradeCommandReceiver就会退出运行，这里需要有重启和通知的功能
                 }
             }
         }.start();
@@ -71,7 +72,7 @@ public class MsgRouterStrategy implements IStrategy {
      * register client by JMS to the Client Manager
      */
     private void registerClient() throws JFException {
-        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context);
+        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context, "sample");
         clientInfoSender.sendObjectMessage(cim);
     }
 

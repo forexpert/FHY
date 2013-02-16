@@ -59,7 +59,7 @@ public class MarketDataFeedStrategy implements IStrategy {
      * register client by JMS to the Client Manager
      */
     private void registerClient() throws JFException {
-        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context);
+        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
         clientInfoSender.sendObjectMessage(cim);
     }
 

@@ -27,6 +27,7 @@ public class MarketDataReceiver implements MessageListener, ApplicationContextAw
 
     {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+      logger.info("marketDataReceiver started");
     }
 
 
@@ -50,9 +51,6 @@ public class MarketDataReceiver implements MessageListener, ApplicationContextAw
                     logger.info("Time Window is " + mdm.getTimeWindowType());
                     logger.info("ask OHLC is " + mdm.getAskOpen() + " " + mdm.getAskHigh() + " "
                             + mdm.getAskLow() + " " + mdm.getAskClose());
-                    logger.info("");
-                    logger.info("");
-                    logger.info("");
                     //todo cmeng 1. save into DB and memory
                     //todo cmeng 2. computing indicators
                     //todo cmeng 3. notify client manager
