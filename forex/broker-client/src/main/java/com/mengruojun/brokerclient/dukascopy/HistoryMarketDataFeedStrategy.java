@@ -37,46 +37,51 @@ import java.util.TimeZone;
 @Service("historyMarketDataFeedStrategy")
 public class HistoryMarketDataFeedStrategy implements IStrategy {
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
   }
 
-    private IEngine engine = null;
-    private IContext context = null;
-    private IIndicators indicators = null;
-    private int tagCounter = 0;
-    private double[] ma1 = new double[Instrument.values().length];
-    private IConsole console;
-    Logger logger = Logger.getLogger(this.getClass());
-    private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
+  private IEngine engine = null;
+  private IContext context = null;
+  private IIndicators indicators = null;
+  private int tagCounter = 0;
+  private double[] ma1 = new double[Instrument.values().length];
+  private IConsole console;
+  Logger logger = Logger.getLogger(this.getClass());
+  private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
 
-    @Autowired
-    private JMSSender marketDataSender;
-    @Autowired
-    private JMSSender clientInfoSender;
+  @Autowired
+  private JMSSender marketDataSender;
+  @Autowired
+  private JMSSender clientInfoSender;
 
 
-    public void onStart(final IContext context) throws JFException {
-        this.context = context;
-        engine = context.getEngine();
-        indicators = context.getIndicators();
-        this.console = context.getConsole();
-        console.getOut().println("Started");
-        try{
-          this.getAllHistoryData();
-        } catch (Exception e){
-          logger.error("", e);
-        }
-
+  public void onStart(final IContext context) throws JFException {
+    this.context = context;
+    engine = context.getEngine();
+    indicators = context.getIndicators();
+    this.console = context.getConsole();
+    console.getOut().println("Started");
+    try {
+      this.getAllHistoryData();
+    } catch (Exception e) {
+      logger.error("", e);
     }
-  private void getHistoryData(Instrument instrument, long from_long, long to_long)  throws JFException, ParseException {
 
-    List<IBar> askbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS , OfferSide.ASK, from_long, to_long);
-    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS , OfferSide.BID, from_long, to_long);
-    for(int i = 0; i< askbars.size(); i++){
+  }
+
+  private void getHistoryData(Instrument instrument, long from_long, long to_long) throws JFException, ParseException {
+    logger.info("Getting History Data: Instrument-->" + instrument +
+            ";  from-->" + sdf.format(new Date(from_long)) +
+            ";  to-->" + sdf.format(new Date(to_long))
+              );
+    List<IBar> askbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.ASK, from_long, to_long);
+    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.BID, from_long, to_long);
+    for (int i = 0; i < askbars.size(); i++) {
       IBar askBar = askbars.get(i);
       IBar bidBar = bidbars.get(i);
-      if(askBar.getTime() != bidBar.getTime()){
+      if (askBar.getTime() != bidBar.getTime()) {
         logger.error("askBars doesn't match bidBars");
         throw new RuntimeException("askBars doesn't match bidBars");
       }
@@ -92,50 +97,47 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
     }
 
   }
+
   private void getAllHistoryData() throws JFException, ParseException {
-
-    Date from = sdf.parse("2010.01.01 00:00:01");
-    Date to = sdf.parse("2010.01.02 00:00:01");
-    long from_long = this.context.getDataService().getTimeOfFirstCandle(Instrument.EURUSD, Period.TEN_SECS);
-    long oneday_long = 24*3600*1000L;
-
-
-    logger.info("from_long is " + sdf.format(new Date(from_long)));
-
-    while(new Date().getTime() > (from_long + oneday_long) ) {
-
-      for(Instrument instrument : dukascopyInstrumentList){
-        getHistoryData(instrument, from_long, (from_long + oneday_long));
+    long oneday_long = 24 * 3600 * 1000L;
+    long global_from_long = sdf.parse("2010.01.01 01:00:00 +0000").getTime();
+    for (Instrument instrument : dukascopyInstrumentList) {
+      long from_long = this.context.getDataService().getTimeOfFirstCandle(instrument, Period.TEN_SECS);
+      from_long += 10*1000L;
+      if(from_long < global_from_long){
+        from_long = global_from_long;
       }
-
-      from_long += oneday_long;
+      while (new Date().getTime() > (from_long + oneday_long)) {
+        getHistoryData(instrument, from_long, (from_long + oneday_long));
+        from_long += oneday_long;
+      }
     }
   }
 
-  private String ibarToString(IBar ibar){
+  private String ibarToString(IBar ibar) {
     return "IBar: [" + ibar.getTime() + "] [OHLC is " + ibar.getOpen() + ", " + ibar.getHigh()
-            + ", " + ibar.getLow()+ ", " + ibar.getClose() + "]";
+            + ", " + ibar.getLow() + ", " + ibar.getClose() + "]";
   }
 
-    /**
-     * register client by JMS to the Client Manager
-     */
-    private void registerClient() throws JFException {
-        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
-        clientInfoSender.sendObjectMessage(cim);
-    }
+  /**
+   * register client by JMS to the Client Manager
+   */
+  private void registerClient() throws JFException {
+    ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
+    clientInfoSender.sendObjectMessage(cim);
+  }
 
-    public void onStop() throws JFException {
-        for (IOrder order : engine.getOrders()) {
-            order.close();
-        }
-        console.getOut().println("Stopped");
+  public void onStop() throws JFException {
+    for (IOrder order : engine.getOrders()) {
+      order.close();
     }
+    console.getOut().println("Stopped");
+  }
 
-    public void onTick(Instrument instrument, ITick tick) throws JFException {
-    }
+  public void onTick(Instrument instrument, ITick tick) throws JFException {
+  }
 
-    public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
+  public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
         /*if (period.equals(Period.TEN_SECS)) {
             TimeWindowType twt = TimeWindowType.S10;
             MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
@@ -146,12 +148,12 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
 
             marketDataSender.sendObjectMessage(mdm);
         }*/
-    }
+  }
 
-    public void onMessage(IMessage message) throws JFException {
-    }
+  public void onMessage(IMessage message) throws JFException {
+  }
 
-    public void onAccount(IAccount account) throws JFException {
-        //registerClient();
-    }
+  public void onAccount(IAccount account) throws JFException {
+    //registerClient();
+  }
 }
