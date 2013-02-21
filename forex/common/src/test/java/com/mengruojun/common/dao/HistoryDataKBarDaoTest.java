@@ -53,6 +53,8 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     Date now = new Date();
     log.info("For GMT+8, now is :" + sdf_gmt8.format(now));
     log.info("For GMT+0, now is :" + sdf.format(now));
+
+    log.info(sdf.format(new Date(1361436230000L)));
   }
 
   @Test

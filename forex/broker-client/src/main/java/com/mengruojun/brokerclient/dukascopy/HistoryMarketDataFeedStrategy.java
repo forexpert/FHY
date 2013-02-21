@@ -69,12 +69,10 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
         }
 
     }
-  private void getHistoryData(Instrument instrument)  throws JFException, ParseException {
-    long one_day = 1000* 3600* 24;
-    long from_long = this.context.getDataService().getTimeOfFirstCandle(instrument, Period.TEN_SECS);
-    long to_long = from_long + one_day;
+  private void getHistoryData(Instrument instrument, long from_long, long to_long)  throws JFException, ParseException {
+
     List<IBar> askbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS , OfferSide.ASK, from_long, to_long);
-    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS , OfferSide.ASK, from_long, to_long);
+    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS , OfferSide.BID, from_long, to_long);
     for(int i = 0; i< askbars.size(); i++){
       IBar askBar = askbars.get(i);
       IBar bidBar = bidbars.get(i);
@@ -96,13 +94,21 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   }
   private void getAllHistoryData() throws JFException, ParseException {
 
-    Date from = sdf.parse("2010.01.01 00:00:00");
-    Date to = sdf.parse("2010.01.02 00:00:00");
+    Date from = sdf.parse("2010.01.01 00:00:01");
+    Date to = sdf.parse("2010.01.02 00:00:01");
     long from_long = this.context.getDataService().getTimeOfFirstCandle(Instrument.EURUSD, Period.TEN_SECS);
+    long oneday_long = 24*3600*1000L;
+
+
     logger.info("from_long is " + sdf.format(new Date(from_long)));
-    List<IBar> ibars = this.context.getHistory().getBars(Instrument.EURUSD, Period.TEN_SECS , OfferSide.ASK, from.getTime(), to.getTime());
-    for(IBar ibar : ibars){
-      logger.info(ibar.toString());
+
+    while(new Date().getTime() > (from_long + oneday_long) ) {
+
+      for(Instrument instrument : dukascopyInstrumentList){
+        getHistoryData(instrument, from_long, (from_long + oneday_long));
+      }
+
+      from_long += oneday_long;
     }
   }
 
@@ -130,7 +136,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
     }
 
     public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-        if (period.equals(Period.TEN_SECS)) {
+        /*if (period.equals(Period.TEN_SECS)) {
             TimeWindowType twt = TimeWindowType.S10;
             MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
                     askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
@@ -139,13 +145,13 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
                     instrument.getSecondaryCurrency(), twt);
 
             marketDataSender.sendObjectMessage(mdm);
-        }
+        }*/
     }
 
     public void onMessage(IMessage message) throws JFException {
     }
 
     public void onAccount(IAccount account) throws JFException {
-        registerClient();
+        //registerClient();
     }
 }
