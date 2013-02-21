@@ -2,3 +2,11 @@
     1) Dukascopy API can only return a static FXClient.
     2) We only have up to three Dukascoy client in the system: one is price feeder, one is demo account testing, and one is real account.
 2. 周末非交易日时段数据如何处理
+3. 历史数据和现实数据如何结合起来
+  1) 显示数据
+
+
+4. Strategy实验田，如何和Strategy结合起来
+5. 目前，发送tradeCommand会有NPE错，并且会停止TCReceiver
+
+

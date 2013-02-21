@@ -8,13 +8,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * HistoryDataKBar
+ * HistoryDataKBar takes id as primary key and has an UniqueConstraint
+ *
  */
 @Entity
-@Table(name = "HistoryDataKBar")
+@Table(name = "HistoryDataKBar",
+        uniqueConstraints={@UniqueConstraint(columnNames={"openTime","currency1","currency2","timeWindowType"})})
 public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
+
   private static final long serialVersionUID = -1943659317753245831L;
+
   /**
    * Like EUR/USD, USD/JPY and etc
    */
@@ -101,7 +105,7 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
   @Override
   public String toString() {
-    return openTime + timeWindowType.toString() + instrument;  //To change body of implemented methods use File | Settings | File Templates.
+    return openTime + timeWindowType.toString() + instrument;
   }
 
   @Override
@@ -115,7 +119,7 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
     final HistoryDataKBar historyDataKBar = (HistoryDataKBar) o;
 
-    return historyDataKBar != null ? this.toString().equals(historyDataKBar.toString()) : false;
+    return this.toString().equals(historyDataKBar.toString());
   }
 
   @Override

@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,7 +30,7 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
     private String password;
 
     private IStrategy strategy;
-
+  private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
 
     private void initClient() throws Exception {
         //get the instance of the IClient interface
@@ -53,7 +55,10 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
 
         //subscribe to the instruments
         Set<Instrument> instruments = new HashSet<Instrument>();
-        instruments.add(Instrument.EURUSD);
+      for(Instrument instrument : dukascopyInstrumentList){
+        instruments.add(instrument);
+      }
+
         LOGGER.info("Subscribing instruments...");
         client.setSubscribedInstruments(instruments);
 

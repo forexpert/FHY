@@ -33,6 +33,14 @@
         <property name="userName" value="${brokerclient.dukascopy.markertdatafeeder.username}"/>
         <property name="password" value="${brokerclient.dukascopy.markertdatafeeder.password}"/>
     </bean>
+    <bean id="dukascopyHistoryMarketDataFeedClient" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+        <property name="brokerType" value="DukascopyMarketDataFeeder"/>
+        <property name="clientId" value="dukascopyHistoryMarketDataFeedClient"/>
+        <property name="strategy" ref="historyMarketDataFeedStrategy"/>
+        <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
+        <property name="userName" value="${brokerclient.dukascopy.markertdatafeeder.username}"/>
+        <property name="password" value="${brokerclient.dukascopy.markertdatafeeder.password}"/>
+    </bean>
 
     <bean id="dukascopyClient1" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
         <property name="brokerType" value="DukascopyDemo"/>
