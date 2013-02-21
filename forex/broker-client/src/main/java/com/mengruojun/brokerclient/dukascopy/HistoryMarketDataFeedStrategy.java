@@ -36,7 +36,7 @@ import java.util.TimeZone;
  */
 @Service("historyMarketDataFeedStrategy")
 public class HistoryMarketDataFeedStrategy implements IStrategy {
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
   }

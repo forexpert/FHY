@@ -20,7 +20,7 @@ import java.util.TimeZone;
 
 public class TradeCommandReceiver{
     Logger logger = Logger.getLogger(this.getClass());
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
     {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     }

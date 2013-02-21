@@ -1,4 +1,4 @@
-package com.mengruojun.strategycenter.component.marketdata;
+package com.mengruojun.strategycenter.component.historydata;
 
 import com.mengruojun.common.dao.HistoryDataKBarDao;
 import com.mengruojun.common.domain.HistoryDataKBar;
@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 @Service
-public class MarketdataService {
+public class HistoryMarketdataService {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Autowired

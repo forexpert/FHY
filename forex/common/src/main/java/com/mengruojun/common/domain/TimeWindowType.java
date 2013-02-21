@@ -1,7 +1,11 @@
 package com.mengruojun.common.domain;
 
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 public enum TimeWindowType {
-    S10(10 * 1000),
+
+  S10(10 * 1000),
     S20(20 * 1000),
     S30(30 * 1000),
     M1(60 * 1000),
@@ -11,7 +15,14 @@ public enum TimeWindowType {
     H4(4 * 3600 * 1000),
     D1(24 * 3600 * 1000);
 
-    private long timeInMillis;
+
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+
+  {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
+
+  private long timeInMillis;
 
     private TimeWindowType(long timeInMillis) {
 
@@ -24,4 +35,8 @@ public enum TimeWindowType {
     public long getTimeInMillis() {
         return timeInMillis;
     }
+
+  public boolean canEndWithTime(long endTime) {
+    return false;
+  }
 }

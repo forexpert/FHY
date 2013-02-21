@@ -31,7 +31,7 @@ import java.util.TimeZone;
 @Service("clientDataReceiver")
 public class ClientDataReceiver implements MessageListener, ApplicationContextAware {
     Logger logger = Logger.getLogger(this.getClass());
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
     {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
       logger.info("clientDataReceiver started");

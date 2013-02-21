@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +26,8 @@ import static org.junit.Assert.assertNull;
 public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
   Log log = LogFactory.getLog(HistoryDataKBarDaoTest.class);
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  SimpleDateFormat sdf_gmt8 = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -44,6 +46,13 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
   @Test
   public void getBar() {
     assertFalse(historyDataKBarDao.exists(0L));
+  }
+
+  @Test
+  public void testTimeZone(){
+    Date now = new Date();
+    log.info("For GMT+8, now is :" + sdf_gmt8.format(now));
+    log.info("For GMT+0, now is :" + sdf.format(now));
   }
 
   @Test

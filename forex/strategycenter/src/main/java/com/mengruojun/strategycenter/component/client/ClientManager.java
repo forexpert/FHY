@@ -28,7 +28,7 @@ public class ClientManager implements ApplicationListener {
   {
     logger.info("ClientManager started");
   }
-    Map<String, BrokerClient> brokerClientMap = new HashMap<String, BrokerClient>();
+    final Map<String, BrokerClient> brokerClientMap = new HashMap<String, BrokerClient>();
 
     @Autowired
     StrategyManager strategyManager;
