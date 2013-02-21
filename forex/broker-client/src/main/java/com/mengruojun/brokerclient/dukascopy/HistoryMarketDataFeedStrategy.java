@@ -1,5 +1,6 @@
 package com.mengruojun.brokerclient.dukascopy;
 
+import com.dukascopy.api.Filter;
 import com.dukascopy.api.IAccount;
 import com.dukascopy.api.IBar;
 import com.dukascopy.api.IConsole;
@@ -76,8 +77,8 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
             ";  from-->" + sdf.format(new Date(from_long)) +
             ";  to-->" + sdf.format(new Date(to_long))
               );
-    List<IBar> askbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.ASK, from_long, to_long);
-    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.BID, from_long, to_long);
+    List<IBar> askbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
+    List<IBar> bidbars = this.context.getHistory().getBars(instrument, Period.TEN_SECS, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
     for (int i = 0; i < askbars.size(); i++) {
       IBar askBar = askbars.get(i);
       IBar bidBar = bidbars.get(i);
