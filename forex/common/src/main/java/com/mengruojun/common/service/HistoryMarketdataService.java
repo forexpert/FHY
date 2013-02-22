@@ -1,12 +1,10 @@
-package com.mengruojun.strategycenter.component.historydata;
+package com.mengruojun.common.service;
 
 import com.mengruojun.common.dao.HistoryDataKBarDao;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
-import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.IndicatorType;
-import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,17 +29,17 @@ public class HistoryMarketdataService {
    * 2. generate bars into DB
    * 3. computing indicators and save into DB
    *
-   * @param marketDataMessage marketDataMessage is only based on 10S bars
+   * @param kbar kbar is only based on 10S bars
    */
-  public void handle(MarketDataMessage marketDataMessage) {
-    if (marketDataMessage.getTimeWindowType() == TimeWindowType.S10) {
+  public void handle(HistoryDataKBar kbar) {
+    if (kbar.getTimeWindowType() == TimeWindowType.S10) {
       List<TimeWindowType> timeWindowTypeList = Arrays.asList(TimeWindowType.values());
       List<IndicatorType> indicatorTypeList = Arrays.asList(IndicatorType.values());
-      long barStartTime = marketDataMessage.getStartTime();
-      long barEndTime = marketDataMessage.getStartTime() + marketDataMessage.getTimeWindowType().getTimeInMillis();
+      long barStartTime = kbar.getOpenTime();
+      long barEndTime = kbar.getOpenTime() + kbar.getTimeWindowType().getTimeInMillis();
 
       // 1 save 10s bar into DB
-      save10SBarIntoDB(marketDataMessage);
+      save10SBarIntoDB(kbar);
       // 2 generate bars in all timewindowTypes.
       generateAndSaveBarsInAllTimewindowTypes(timeWindowTypeList, barEndTime);
       // 3. computing indicators and save into DB
@@ -74,29 +72,9 @@ public class HistoryMarketdataService {
 
   /**
    * convert MarketDataMessage to HistoryDataKBar and save into db
-   * @param marketDataMessage  marketDataMessage
+   * @param kbar  kbar
    */
-  private void save10SBarIntoDB(MarketDataMessage marketDataMessage) {
-    Instrument instrument = new Instrument(marketDataMessage.getCurrency1() + "/" + marketDataMessage.getCurrency2());
-    Long openTime = marketDataMessage.getStartTime();
-    TimeWindowType timeWindowType = marketDataMessage.getTimeWindowType();
-
-    double askOpen = marketDataMessage.getAskOpen();
-    double askHigh = marketDataMessage.getAskHigh();
-    double askLow = marketDataMessage.getAskLow();
-    double askClose = marketDataMessage.getAskClose();
-    double askVolume = marketDataMessage.getAskVolume();
-
-    double bidOpen = marketDataMessage.getBidOpen();
-    double bidHigh = marketDataMessage.getBidHigh();
-    double bidLow = marketDataMessage.getBidLow();
-    double bidClose = marketDataMessage.getBidClose();
-    double bidVolume = marketDataMessage.getBidVolume();
-
-
-    OHLC ohlc = new OHLC(askOpen, askHigh, askLow, askClose, askVolume,
-            bidOpen, bidHigh, bidLow, bidClose, bidVolume);
-    HistoryDataKBar kbar = new HistoryDataKBar(instrument, timeWindowType, openTime, openTime + timeWindowType.getTimeInMillis(), ohlc);
+  private void save10SBarIntoDB(HistoryDataKBar kbar) {
     //todo cmeng -- consider if there is really a update case
     save(kbar);
 
@@ -107,8 +85,10 @@ public class HistoryMarketdataService {
    * @param kbar kbar
    */
   private void save(HistoryDataKBar kbar) {
-    historyDataKBarDao.save(kbar);
-    logger.info("Save a Kbar: " + kbar.toString());
+    if(historyDataKBarDao.find(kbar.getOpenTime(), kbar.getInstrument(), kbar.getTimeWindowType()) == null){
+      historyDataKBarDao.save(kbar);
+      logger.info("Saved a Kbar: " + kbar.toString());
+    }
   }
 
   /**
@@ -118,5 +98,10 @@ public class HistoryMarketdataService {
   public void rebuildAllBarsAndIndicators() {
     //to do cmeng
   }
+
+  public HistoryDataKBar getLatest10SBar(Instrument instrument) {
+    return historyDataKBarDao.getLatest10SBar(instrument);
+  }
+
 
 }

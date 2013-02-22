@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="false">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/com/mengruojun/common/global.properties</value>
+                <value>classpath:/com/mengruojun/jms/jms.properties</value>
+                <value>classpath:/com/mengruojun/brokerclient/dukascopy/dukascopy.properties</value>
+                <value>classpath:com/mengruojun/common/db/jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Activates scanning of @Autowired -->
+    <context:annotation-config/>
+
+    <!-- Activates scanning of @Repository and @Service -->
+    <!--<context:component-scan base-package="com.mengruojun.brokerclient"/>-->
+    <context:component-scan base-package="com.mengruojun.forex.brokerclient.dukascopy.integration"/>
+
+    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
+    <import resource="classpath:com/mengruojun/common/db/app-common.xml"/>
+
+    <bean id="dukascopyHistoryMarketDataFeedClient" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+        <property name="brokerType" value="DukascopyMarketDataFeeder"/>
+        <property name="clientId" value="dukascopyHistoryMarketDataFeedClient"/>
+        <property name="strategy" ref="historyMarketDataFeedTestStrategy"/>
+        <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
+        <property name="userName" value="${brokerclient.dukascopy.client4.username}"/>
+        <property name="password" value="${brokerclient.dukascopy.client4.password}"/>
+    </bean>
+    <!-- Add new DAOs here -->
+
+    <!-- Add new Managers here -->
+</beans>

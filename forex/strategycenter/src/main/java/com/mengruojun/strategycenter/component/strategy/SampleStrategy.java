@@ -23,7 +23,7 @@ public class SampleStrategy extends BaseStrategy {
         List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
         TradeCommandMessage tcm = new TradeCommandMessage();
         tcm.setAmount(1d);
-        tcm.setInstrument(Instrument.MakeInstrument(Currency.EUR,Currency.USD));
+        tcm.setInstrument(new Instrument(Currency.EUR,Currency.USD));
         tcm.setTradeCommandType(TradeCommandType.openAtMarketPrice);
         tcm.setDirection(Direction.Long);
         tcmList.add(tcm);

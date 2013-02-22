@@ -5,6 +5,7 @@ import com.dukascopy.api.Instrument;
 import com.dukascopy.api.system.ClientFactory;
 import com.dukascopy.api.system.IClient;
 import com.mengruojun.brokerclient.AbstractBrokerClient;
+import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,7 +31,7 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
     private String password;
 
     private IStrategy strategy;
-  private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
+  private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
     private void initClient() throws Exception {
         //get the instance of the IClient interface

@@ -18,7 +18,7 @@ import java.util.*;
  * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
  */
 @ContextConfiguration(
-        locations = {"classpath:/com/mengruojun/common/db/applicationContext-dao.xml"})
+        locations = {"classpath:/com/mengruojun/common/db/app-common.xml"})
 public abstract class BaseDaoTestCase extends AbstractTransactionalJUnit4SpringContextTests {
     @Autowired
     private SessionFactory sessionFactory;

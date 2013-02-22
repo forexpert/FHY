@@ -50,8 +50,8 @@
                 hibernate.query.substitutions=true 'Y', false 'N'
                 hibernate.cache.use_second_level_cache=true
                 hibernate.cache.provider_class=org.hibernate.cache.EhCacheProvider
-                hibernate.show_sql=true
-                hibernate.format_sql=true
+                <!--hibernate.show_sql=true
+                hibernate.format_sql=true-->
             </value>
             <!-- Turn batching off for better error messages under PostgreSQL -->
             <!-- hibernate.jdbc.batch_size=0 -->
@@ -69,6 +69,6 @@
     <!-- Activates scanning of @Repository -->
     <context:component-scan base-package="com.mengruojun.common.dao"/>
     <!-- Activates scanning of @Service -->
-    <!--<context:component-scan base-package="com.mengruojun.service"/>-->
+    <context:component-scan base-package="com.mengruojun.common.service"/>
 
 </beans>

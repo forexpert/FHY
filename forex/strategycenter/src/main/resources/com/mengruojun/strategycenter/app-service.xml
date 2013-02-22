@@ -19,27 +19,10 @@
     <!-- Activates scanning of @Autowired -->
     <context:annotation-config/>
 
-    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
-    <import resource="classpath:/com/mengruojun/strategycenter/app-service.xml"/>
+    <import resource="classpath:com/mengruojun/common/db/app-common.xml"/>
+    <!-- Activates scanning of @Repository and @Service -->
+    <context:component-scan base-package="com.mengruojun.strategycenter"/>
 
-
-    <!-- Add JMS listener here -->
-    <bean id="marketDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="jmsTopicMarketBarData"/>
-        <property name="messageListener" ref="marketDataReceiver" />
-    </bean>
-
-    <bean id="clientDataJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="jmsTopicClientInfo"/>
-        <property name="messageListener" ref="clientDataReceiver" />
-    </bean>
-
-    <bean id="tradeCommandSender" class="com.mengruojun.jms.utils.JMSSender">
-        <property name="template" ref="jmsTemplate" />
-        <property name="destination" ref="jmsTopicTradeCommand" />
-    </bean>
     <!-- Add new DAOs here -->
 
     <!-- Add new Managers here -->

@@ -9,9 +9,11 @@ import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.common.domain.enumerate.PositionStatus;
+import com.mengruojun.common.utils.TradingUitils;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +34,18 @@ public class DukascopyUtils {
   public static double toDukascopyAmountFromK(double k) {
     return k / 1000.0;
   }
+  public static List<Instrument> getInterestInstrumentList(){
+    List<Instrument> reList = new ArrayList<Instrument>();
+    List<com.mengruojun.common.domain.Instrument> list = TradingUitils.getInterestInstrumentList();
+    for(com.mengruojun.common.domain.Instrument instrument:list){
+      reList.add(DukascopyUtils.toDukascopyInstrument(instrument));
+    }
+    return reList;
+  }
 
+  public static List<Instrument> getAllInstrument(){
+    return Arrays.asList(Instrument.values());
+  }
   public static com.mengruojun.common.domain.Instrument fromDukascopyInstrument(Instrument instrument) {
     Currency c1 = Currency.fromJDKCurrency(instrument.getPrimaryCurrency());
     Currency c2 = Currency.fromJDKCurrency(instrument.getSecondaryCurrency());

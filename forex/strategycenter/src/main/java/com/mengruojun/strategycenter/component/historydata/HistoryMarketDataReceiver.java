@@ -1,7 +1,7 @@
 package com.mengruojun.strategycenter.component.historydata;
 
+import com.mengruojun.common.service.HistoryMarketdataService;
 import com.mengruojun.jms.domain.MarketDataMessage;
-import com.mengruojun.strategycenter.springevent.MarketDataReceivedEvent;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -49,7 +48,7 @@ public class HistoryMarketDataReceiver implements MessageListener, ApplicationCo
         Object msgObj = ((ObjectMessage) message).getObject();
         if (msgObj instanceof MarketDataMessage) {
           MarketDataMessage mdm = (MarketDataMessage) msgObj;
-          historyMarketdataService.handle(mdm);
+          historyMarketdataService.handle(mdm.convertToHistorydataKBar());
         }
       } catch (JMSException ex) {
         throw new RuntimeException(ex);

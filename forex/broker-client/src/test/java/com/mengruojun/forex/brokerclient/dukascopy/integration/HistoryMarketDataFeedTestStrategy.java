@@ -1,4 +1,4 @@
-package com.mengruojun.brokerclient.dukascopy;
+package com.mengruojun.forex.brokerclient.dukascopy.integration;
 
 import com.dukascopy.api.Filter;
 import com.dukascopy.api.IAccount;
@@ -18,11 +18,8 @@ import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.TimeWindowType;
-import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.service.HistoryMarketdataService;
-import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
-import com.mengruojun.jms.utils.JMSSender;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -38,8 +34,8 @@ import java.util.TimeZone;
 /**
  * This is a Dukascopy historyMarketDataFeedStrategy Strategy.
  */
-@Service("historyMarketDataFeedStrategy")
-public class HistoryMarketDataFeedStrategy implements IStrategy {
+@Service("historyMarketDataFeedTestStrategy")
+public class HistoryMarketDataFeedTestStrategy implements IStrategy {
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
   {
@@ -56,11 +52,11 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
   @Autowired
-  private JMSSender marketDataSender;
-  @Autowired
-  private JMSSender clientInfoSender;
-  @Autowired
   HistoryMarketdataService historyMarketdataService;
+  private List<HistoryDataKBar> serverBars;
+  Period testPeriod;
+  String testBar_start;
+  String testBar_end;
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;
@@ -69,15 +65,19 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
     this.console = context.getConsole();
     console.getOut().println("Started");
     try {
-      this.getAllHistoryData(Period.TEN_SECS);
+      synchronized (serverBars){
+        serverBars.addAll(this.getAllHistoryData(Instrument.EURUSD, testPeriod, testBar_start, testBar_end));
+        serverBars.notify();
+      }
     } catch (Exception e) {
       logger.error("", e);
     }
 
   }
 
-  private void getHistoryData(Period period, Instrument instrument, long from_long, long to_long) throws JFException, ParseException {
-    try{
+  private List<HistoryDataKBar> getHistoryData(Period period, Instrument instrument, long from_long, long to_long) throws JFException, ParseException {
+    List<HistoryDataKBar> kBars = new ArrayList<HistoryDataKBar>();
+    try {
 
       logger.info("Getting History Data: Instrument-->" + instrument +
               ";  from-->" + sdf.format(new Date(from_long)) +
@@ -100,65 +100,55 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
                 askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
                 instrument.getSecondaryCurrency(), twt);
         HistoryDataKBar kbar = mdm.convertToHistorydataKBar();
-        historyMarketdataService.handle(kbar);
+        kBars.add(kbar);
       }
-    } catch (Exception e){
+    } catch (Exception e) {
       logger.error("", e);
       logger.info("run again in 5 minutes:");
       try {
-        Thread.sleep(5*60*1000L);
+        Thread.sleep(5 * 60 * 1000L);
       } catch (InterruptedException e1) {
         logger.error("", e1);
       }
       getHistoryData(period, instrument, from_long, to_long);
     }
 
+    return kBars;
+
   }
 
-  private void getAllHistoryData(Period period) throws JFException, ParseException {
-    long intervalEachTimeForGetData = period.getInterval()* 1000; // 1000 rows each time
+  private List<HistoryDataKBar> getAllHistoryData(Instrument instrument, Period period, String from, String to) throws JFException, ParseException {
+    List<HistoryDataKBar> kBars = new ArrayList<HistoryDataKBar>();
 
-    long global_from_long = sdf.parse("2010.01.01 01:00:00 +0000").getTime();
-    for (Instrument instrument : dukascopyInstrumentList) {
-      HistoryDataKBar db_latest = this.historyMarketdataService.getLatest10SBar(
-              new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()));
+    long intervalEachTimeForGetData = period.getInterval() * 1000; // 1000 rows each time
 
-      long from_long = 0;
-      if(db_latest == null){
-        from_long = this.context.getDataService().getTimeOfFirstCandle(instrument, period);
-        from_long += period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
-      }else {         //continue last execution
-        from_long = db_latest.getOpenTime();
-      }
-      if(from_long < global_from_long){
-        from_long = global_from_long;
-      }
+    long global_from_long = sdf.parse(from).getTime();
+    long global_to_long = sdf.parse(to).getTime();
 
-      while(true){
-        if(new Date().getTime() > (from_long + intervalEachTimeForGetData)){
-          long to_long = from_long + intervalEachTimeForGetData;
-          getHistoryData(period, instrument, from_long, to_long);
-          from_long += intervalEachTimeForGetData;
-        } else {
-          long to_long = new Date().getTime();
-          getHistoryData(period,instrument,from_long,to_long);
-          break;
-        }
+
+    //for (Instrument instrument : dukascopyInstrumentList) {
+
+    long from_long = global_from_long + period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
+
+
+    while (true) {
+      if (global_to_long > (from_long + intervalEachTimeForGetData)) {
+        long to_long = from_long + intervalEachTimeForGetData;
+        kBars.addAll(getHistoryData(period, instrument, from_long, to_long));
+
+        from_long += intervalEachTimeForGetData;
+      } else {
+        kBars.addAll(getHistoryData(period, instrument, from_long, global_to_long));
+        break;
       }
     }
+
+    return kBars;
   }
 
   private String ibarToString(IBar ibar) {
     return "IBar: [" + ibar.getTime() + "] [OHLC is " + ibar.getOpen() + ", " + ibar.getHigh()
             + ", " + ibar.getLow() + ", " + ibar.getClose() + "]";
-  }
-
-  /**
-   * register client by JMS to the Client Manager
-   */
-  private void registerClient() throws JFException {
-    ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
-    clientInfoSender.sendObjectMessage(cim);
   }
 
   public void onStop() throws JFException {
@@ -172,16 +162,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   }
 
   public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-        /*if (period.equals(Period.TEN_SECS)) {
-            TimeWindowType twt = TimeWindowType.S10;
-            MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
-                    askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
-                    bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
-                    askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
-                    instrument.getSecondaryCurrency(), twt);
 
-            marketDataSender.sendObjectMessage(mdm);
-        }*/
   }
 
   public void onMessage(IMessage message) throws JFException {
@@ -189,5 +170,38 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
 
   public void onAccount(IAccount account) throws JFException {
     //registerClient();
+  }
+
+  public void setServerBars(List<HistoryDataKBar> serverBars) {
+    this.serverBars = serverBars;
+  }
+
+  public List<HistoryDataKBar> getServerBars() {
+    return serverBars;
+  }
+
+
+  public String getTestBar_start() {
+    return testBar_start;
+  }
+
+  public void setTestBar_start(String testBar_start) {
+    this.testBar_start = testBar_start;
+  }
+
+  public String getTestBar_end() {
+    return testBar_end;
+  }
+
+  public void setTestBar_end(String testBar_end) {
+    this.testBar_end = testBar_end;
+  }
+
+  public Period getTestPeriod() {
+    return testPeriod;
+  }
+
+  public void setTestPeriod(Period testPeriod) {
+    this.testPeriod = testPeriod;
   }
 }

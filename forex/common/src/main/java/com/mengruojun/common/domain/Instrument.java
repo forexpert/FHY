@@ -66,7 +66,11 @@ public class Instrument implements Serializable {
    * @param c1 A currency which may end up as CCY1 depending on precedence comparison with c2.
    * @param c2 A currency which may end up as CCY2 depending on precednece comparison with c1.
    * @return an Instrument whose currency ordering is based on precedence.
+   *
+   * Waring: this method will make mistakes for "XAG/USD" and "XAU/USD", it will make them to "USD/XAG" and "USD/XAU" .
+   * So use public Instrument(Currency c1, Currency c2)  instead;
    */
+  @Deprecated
   public static Instrument MakeInstrument(Currency c1, Currency c2) {
     validateNotNull(c1, "the first currency cannot be null");
     validateNotNull(c2, "the second currency cannot be null");

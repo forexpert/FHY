@@ -1,5 +1,8 @@
 package com.mengruojun.jms.domain;
 
+import com.mengruojun.common.domain.HistoryDataKBar;
+import com.mengruojun.common.domain.Instrument;
+import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 
 import java.io.Serializable;
@@ -140,6 +143,31 @@ public class MarketDataMessage implements Serializable {
 
   public void setTimeWindowType(TimeWindowType timeWindowType) {
     this.timeWindowType = timeWindowType;
+  }
+
+  public HistoryDataKBar convertToHistorydataKBar(){
+
+    Instrument instrument = new Instrument(this.getCurrency1() + "/" + this.getCurrency2());
+    Long openTime = this.getStartTime();
+    TimeWindowType timeWindowType = this.getTimeWindowType();
+
+    double askOpen = this.getAskOpen();
+    double askHigh = this.getAskHigh();
+    double askLow = this.getAskLow();
+    double askClose = this.getAskClose();
+    double askVolume = this.getAskVolume();
+
+    double bidOpen = this.getBidOpen();
+    double bidHigh = this.getBidHigh();
+    double bidLow = this.getBidLow();
+    double bidClose = this.getBidClose();
+    double bidVolume = this.getBidVolume();
+
+
+    OHLC ohlc = new OHLC(askOpen, askHigh, askLow, askClose, askVolume,
+            bidOpen, bidHigh, bidLow, bidClose, bidVolume);
+    HistoryDataKBar kbar = new HistoryDataKBar(instrument, timeWindowType, openTime, openTime + timeWindowType.getTimeInMillis(), ohlc);
+    return kbar;
   }
 
   private long startTime;
