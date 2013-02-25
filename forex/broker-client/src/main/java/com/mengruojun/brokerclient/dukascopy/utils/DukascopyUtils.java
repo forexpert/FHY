@@ -1,10 +1,8 @@
 package com.mengruojun.brokerclient.dukascopy.utils;
 
-import com.dukascopy.api.IContext;
-import com.dukascopy.api.IOrder;
-import com.dukascopy.api.Instrument;
-import com.dukascopy.api.JFException;
+import com.dukascopy.api.*;
 import com.mengruojun.common.domain.Position;
+import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
@@ -34,6 +32,21 @@ public class DukascopyUtils {
   public static double toDukascopyAmountFromK(double k) {
     return k / 1000.0;
   }
+
+  public static TimeWindowType convertPeriodToTimeWindowType(Period period){
+      if(period == Period.TEN_SECS)  return TimeWindowType.S10;
+      if(period == Period.TWENTY_SECS) return TimeWindowType.S20;
+      if(period == Period.THIRTY_SECS) return TimeWindowType.S30;
+      if(period == Period.ONE_MIN) return TimeWindowType.M1;
+      if(period == Period.FIVE_MINS) return TimeWindowType.M5;
+      if(period == Period.TEN_MINS) return TimeWindowType.M10;
+      if(period == Period.ONE_HOUR) return TimeWindowType.H1;
+      if(period == Period.FOUR_HOURS) return TimeWindowType.H4;
+      if(period == Period.DAILY) return TimeWindowType.D1;
+
+      return null;
+  }
+
   public static List<Instrument> getInterestInstrumentList(){
     List<Instrument> reList = new ArrayList<Instrument>();
     List<com.mengruojun.common.domain.Instrument> list = TradingUitils.getInterestInstrumentList();

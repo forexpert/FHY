@@ -87,7 +87,7 @@ public class HistoryMarketdataService {
   private void save(HistoryDataKBar kbar) {
     if(historyDataKBarDao.find(kbar.getOpenTime(), kbar.getInstrument(), kbar.getTimeWindowType()) == null){
       historyDataKBarDao.save(kbar);
-      logger.info("Saved a Kbar: " + kbar.toString());
+      logger.debug("Saved a Kbar: " + kbar.toString());
     }
   }
 
@@ -99,8 +99,8 @@ public class HistoryMarketdataService {
     //to do cmeng
   }
 
-  public HistoryDataKBar getLatest10SBar(Instrument instrument) {
-    return historyDataKBarDao.getLatest10SBar(instrument);
+  public HistoryDataKBar getLatestBarForPeriod(Instrument instrument, TimeWindowType timeWindowType) {
+    return historyDataKBarDao.getLatestBarForPeriod(instrument, timeWindowType);
   }
 
 

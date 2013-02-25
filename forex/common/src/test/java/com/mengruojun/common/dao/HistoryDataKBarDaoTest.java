@@ -60,6 +60,13 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     log.info(sdf.parse("2010.01.06 00:00:00 +0000").getTime());
   }
 
+    @Test
+    public void convertLongToData() throws ParseException {
+        log.info(sdf.format(new Date(1295447600000L)));
+    }
+
+
+
   @Test
   public void save() throws ParseException {
     String startTime = "3000.01.01 00:00:00 +0000";
@@ -82,7 +89,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
             sdf.parse(startTime).getTime(), sdf.parse(endTime).getTime(), new OHLC(2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d));
     bar_2 = historyDataKBarDao.save(bar_2);
 
-    HistoryDataKBar latestBar = historyDataKBarDao.getLatest10SBar(new Instrument(Currency.EUR, Currency.USD));
+    HistoryDataKBar latestBar = historyDataKBarDao.getLatestBarForPeriod(new Instrument(Currency.EUR, Currency.USD), TimeWindowType.S10);
     assertEquals(bar_2, latestBar);
 
 

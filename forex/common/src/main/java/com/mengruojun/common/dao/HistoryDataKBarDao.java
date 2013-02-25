@@ -21,5 +21,5 @@ public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
    */
   HistoryDataKBar find(long startTime, Instrument instrument, TimeWindowType timeWindowType);
 
-  HistoryDataKBar getLatest10SBar(Instrument instrument);
+  HistoryDataKBar getLatestBarForPeriod(Instrument instrument, TimeWindowType timeWindowType);
 }

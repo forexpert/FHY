@@ -4,12 +4,15 @@ import com.dukascopy.api.Instrument;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.enumerate.Currency;
 import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * DukascopyUtilsTest
  */
 public class DukascopyUtilsTest extends TestCase{
+    Logger logger = Logger.getLogger(this.getClass());
     @Test
     public void testInstrumentConversion(){
         com.mengruojun.common.domain.Instrument instrument = DukascopyUtils.fromDukascopyInstrument(Instrument.EURUSD);
@@ -20,5 +23,15 @@ public class DukascopyUtilsTest extends TestCase{
 
         com.mengruojun.common.domain.Instrument instrument3 = DukascopyUtils.fromDukascopyInstrument(Instrument.NZDUSD);
         assertNotSame(new com.mengruojun.common.domain.Instrument(Currency.USD, Currency.NZD), instrument3);
+    }
+    @Ignore
+    @Test
+    public void testLogFile(){
+        for(int i=0;i<10;i++)  {
+        logger.info("This is Info");
+        logger.debug("This is debug");
+        logger.warn("This is warn");
+        logger.error("This is error");
+        }
     }
 }

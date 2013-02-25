@@ -62,6 +62,8 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   @Autowired
   HistoryMarketdataService historyMarketdataService;
 
+  private String globalFromStr = "2013.02.22 00:00:00 +0000";
+
   public void onStart(final IContext context) throws JFException {
     this.context = context;
     engine = context.getEngine();
@@ -93,7 +95,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           throw new RuntimeException("askBars doesn't match bidBars");
         }
 
-        TimeWindowType twt = TimeWindowType.S10;
+        TimeWindowType twt = DukascopyUtils.convertPeriodToTimeWindowType(period);
         MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
                 askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
                 bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
@@ -118,10 +120,12 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   private void getAllHistoryData(Period period) throws JFException, ParseException {
     long intervalEachTimeForGetData = period.getInterval()* 1000; // 1000 rows each time
 
-    long global_from_long = sdf.parse("2010.01.01 01:00:00 +0000").getTime();
+    long global_from_long = sdf.parse(globalFromStr).getTime();
     for (Instrument instrument : dukascopyInstrumentList) {
-      HistoryDataKBar db_latest = this.historyMarketdataService.getLatest10SBar(
-              new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()));
+      HistoryDataKBar db_latest = this.historyMarketdataService.getLatestBarForPeriod(
+              new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),
+              DukascopyUtils.convertPeriodToTimeWindowType(period)
+              );
 
       long from_long = 0;
       if(db_latest == null){

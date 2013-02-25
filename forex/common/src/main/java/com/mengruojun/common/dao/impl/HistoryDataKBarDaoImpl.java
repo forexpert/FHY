@@ -66,7 +66,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
   }
 
   @Override
-  public HistoryDataKBar getLatest10SBar(final Instrument instrument) {
+  public HistoryDataKBar getLatestBarForPeriod(final Instrument instrument, final TimeWindowType timeWindowType) {
     final String hql = "from HistoryDataKBar where instrument.currency1 = :currency1 and instrument.currency2 = :currency2 " +
             "and timeWindowType = :timeWindowType order by openTime desc ";
     HistoryDataKBar bar = (HistoryDataKBar) getHibernateTemplate().execute(
@@ -76,7 +76,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
                 Query query = session.createQuery(hql);
                 query.setParameter("currency1", instrument.getCurrency1());
                 query.setParameter("currency2", instrument.getCurrency2());
-                query.setParameter("timeWindowType", TimeWindowType.S10);
+                query.setParameter("timeWindowType", timeWindowType);
                 query.setFirstResult(0);
                 query.setMaxResults(1);
                 return query.uniqueResult();
