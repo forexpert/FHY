@@ -144,7 +144,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           getHistoryData(period, instrument, from_long, to_long);
           from_long += intervalEachTimeForGetData;
         } else {
-          long to_long = new Date().getTime();
+          long to_long = from_long + intervalEachTimeForGetData;
           getHistoryData(period,instrument,from_long,to_long);
           break;
         }
