@@ -126,7 +126,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   }
 
   private void getAllHistoryData(Period period) throws JFException, ParseException {
-    long intervalEachTimeForGetData = period.getInterval()* 999; // 1000 rows each time
+    long intervalEachTimeForGetData = period.getInterval()* 9999; // 10000 rows each time
 
     long global_from_long = sdf.parse(globalFromStr).getTime();
     for (Instrument instrument : dukascopyInstrumentList) {
