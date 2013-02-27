@@ -58,7 +58,7 @@
     </logger>
    
     <logger name="com.mengruojun">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     <logger name="com.historydatacenter">
         <level value="DEBUG"/>

@@ -21,6 +21,7 @@ public class HistoryMarketdataService {
 
   @Autowired
   HistoryDataKBarDao historyDataKBarDao;
+
   /**
    * This method will be called by marketDate JMS Receiver .
    * This method will do the following on the fly.
@@ -54,7 +55,7 @@ public class HistoryMarketdataService {
    *
    * @param indicatorTypeList  indicator type list
    * @param timeWindowTypeList bars in time window type list
-   * @param barEndTime       the indicators which are to be generated are should be associated with the bars end with the barEndTime
+   * @param barEndTime         the indicators which are to be generated are should be associated with the bars end with the barEndTime
    */
   private void generateIndicatorsForAllBars(List<IndicatorType> indicatorTypeList, List<TimeWindowType> timeWindowTypeList, long barEndTime) {
 
@@ -62,8 +63,9 @@ public class HistoryMarketdataService {
 
   /**
    * generate bars starting from barStartTime in timeWindowTypeList
-   * @param timeWindowTypeList  timeWindowTypeList
-   * @param barEndTime        end with the barEndTime
+   *
+   * @param timeWindowTypeList timeWindowTypeList
+   * @param barEndTime         end with the barEndTime
    */
   private void generateAndSaveBarsInAllTimewindowTypes(List<TimeWindowType> timeWindowTypeList, long barEndTime) {
 
@@ -72,7 +74,8 @@ public class HistoryMarketdataService {
 
   /**
    * convert MarketDataMessage to HistoryDataKBar and save into db
-   * @param kbar  kbar
+   *
+   * @param kbar kbar
    */
   private void save10SBarIntoDB(HistoryDataKBar kbar) {
     //todo cmeng -- consider if there is really a update case
@@ -82,13 +85,18 @@ public class HistoryMarketdataService {
 
   /**
    * save kbar into db
+   *
    * @param kbar kbar
    */
   private void save(HistoryDataKBar kbar) {
-    if(historyDataKBarDao.find(kbar.getOpenTime(), kbar.getInstrument(), kbar.getTimeWindowType()) == null){
+    //if(historyDataKBarDao.find(kbar.getOpenTime(), kbar.getInstrument(), kbar.getTimeWindowType()) == null){
+    try {
       historyDataKBarDao.save(kbar);
       logger.debug("Saved a Kbar: " + kbar.toString());
+    } catch (Exception e) {
+      logger.error("there might be already one duplicated record");
     }
+
   }
 
   /**

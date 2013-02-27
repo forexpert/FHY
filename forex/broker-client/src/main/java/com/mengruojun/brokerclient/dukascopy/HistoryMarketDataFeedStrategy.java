@@ -62,7 +62,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   @Autowired
   HistoryMarketdataService historyMarketdataService;
 
-  private String globalFromStr = "2013.02.22 00:00:00 +0000";
+  private String globalFromStr = "2010.03.01 00:00:00 +0000";
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;
@@ -143,9 +143,12 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           long to_long = from_long + intervalEachTimeForGetData;
           getHistoryData(period, instrument, from_long, to_long);
           from_long += intervalEachTimeForGetData;
-        } else {
-          long to_long = from_long + intervalEachTimeForGetData;
-          getHistoryData(period,instrument,from_long,to_long);
+        } else {// the remain history data  : The getBar method returns an IBar by shift. Shift of value 0 refers to the current candle that's not is not yet fully formed, 1 - latest fully formed candle, 2 - second to last candle.
+          IBar prevBar = this.context.getHistory().getBar(instrument, period, OfferSide.BID, 1);
+          if(prevBar != null){
+            long to_long = prevBar.getTime();
+            getHistoryData(period,instrument,from_long,to_long);
+          }
           break;
         }
       }
