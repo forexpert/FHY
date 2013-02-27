@@ -87,6 +87,8 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       );
       List<IBar> askbars = this.context.getHistory().getBars(instrument, period, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
       List<IBar> bidbars = this.context.getHistory().getBars(instrument, period, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
+      logger.info("Getting ends");
+
       //kbars which will be inserted.
       List<HistoryDataKBar> kbars = new ArrayList<HistoryDataKBar>();
       for (int i = 0; i < askbars.size(); i++) {
@@ -107,8 +109,9 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
         //historyMarketdataService.handle(kbar);
         kbars.add(kbar);
       }
-
+      logger.info("saving" + kbars.size() + " bars start");
       historyMarketdataService.handle(kbars);
+      logger.info("saving" + kbars.size() + " bars end");
     } catch (Exception e){
       logger.error("", e);
       logger.info("run again in 5 minutes:");
@@ -123,7 +126,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   }
 
   private void getAllHistoryData(Period period) throws JFException, ParseException {
-    long intervalEachTimeForGetData = period.getInterval()* 1000; // 1000 rows each time
+    long intervalEachTimeForGetData = period.getInterval()* 999; // 1000 rows each time
 
     long global_from_long = sdf.parse(globalFromStr).getTime();
     for (Instrument instrument : dukascopyInstrumentList) {
@@ -147,12 +150,11 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
         if(new Date().getTime() > (from_long + intervalEachTimeForGetData)){
           long to_long = from_long + intervalEachTimeForGetData;
           getHistoryData(period, instrument, from_long, to_long);
-          from_long += intervalEachTimeForGetData;
+          from_long = to_long + period.getInterval();
         } else {// the remain history data  : The getBar method returns an IBar by shift. Shift of value 0 refers to the current candle that's not is not yet fully formed, 1 - latest fully formed candle, 2 - second to last candle.
           IBar prevBar = this.context.getHistory().getBar(instrument, period, OfferSide.BID, 1);
-          if(prevBar != null){
-            long to_long = prevBar.getTime();
-            getHistoryData(period, instrument, from_long, to_long);
+          if(prevBar != null && from_long<=prevBar.getTime()){
+            getHistoryData(period, instrument, from_long, prevBar.getTime());
           }
           break;
         }

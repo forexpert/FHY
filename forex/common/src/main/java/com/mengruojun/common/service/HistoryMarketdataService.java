@@ -51,17 +51,8 @@ public class HistoryMarketdataService {
   public void handle(List<HistoryDataKBar> kbars) {
     //if (kbar.getTimeWindowType() == TimeWindowType.S10) {
     try {
-      // determine if the first record is alread existed.
-      if (kbars != null) {
-        HistoryDataKBar firstBar = kbars.get(0);
-        if (historyDataKBarDao.find(firstBar.getOpenTime(), firstBar.getInstrument(), firstBar.getTimeWindowType()) != null) {
-          logger.info("find a duplicated record. Remove it from batch list");
-          kbars.remove(firstBar);
-        }
-      }
-
       historyDataKBarDao.batchSave(kbars);
-      logger.debug("Saved Kbars size: " + kbars.size());
+      logger.info("Saved Kbars size: " + kbars.size());
     } catch (Exception e) {
       logger.error("", e);
 
