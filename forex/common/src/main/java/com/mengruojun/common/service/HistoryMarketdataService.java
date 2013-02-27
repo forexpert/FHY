@@ -46,8 +46,23 @@ public class HistoryMarketdataService {
       // 3. computing indicators and save into DB
       generateIndicatorsForAllBars(indicatorTypeList, timeWindowTypeList, barEndTime);
     }
+  }
 
+  public void handle(List<HistoryDataKBar> kbars) {
+    //if (kbar.getTimeWindowType() == TimeWindowType.S10) {
+    try {
+      historyDataKBarDao.batchSave(kbars);
+      logger.debug("Saved Kbars size: " + kbars.size());
+    } catch (Exception e) {
+      logger.error("", e);
 
+      logger.info("there might be already one duplicated record in batch mode, now insert one by one:");
+      // when exception occurs, save one by one
+      for(HistoryDataKBar bar : kbars){
+        handle(bar);
+      }
+    }
+    //}
   }
 
   /**
@@ -94,7 +109,7 @@ public class HistoryMarketdataService {
       historyDataKBarDao.save(kbar);
       logger.debug("Saved a Kbar: " + kbar.toString());
     } catch (Exception e) {
-      logger.error("there might be already one duplicated record");
+      logger.error("there might be already one duplicated record", e);
     }
 
   }

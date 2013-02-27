@@ -11,6 +11,8 @@ import org.hibernate.annotations.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.JdbcAccessor;
@@ -19,6 +21,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -40,16 +43,15 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
   }
 
   //private HibernateTemplate hibernateTemplate;
-  private NamedParameterJdbcTemplate jdbcTemplate;
+  private JdbcTemplate jdbcTemplate;
 
   /**
    * @param dataSource the jdbc data source
    */
   @Autowired
   public final void setDataSource(@Qualifier("dataSource") DataSource dataSource) {
-    if (jdbcTemplate == null || dataSource != ((JdbcAccessor) jdbcTemplate.getJdbcOperations()).getDataSource()) {
-      jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-
+    if (jdbcTemplate == null || dataSource != ((JdbcAccessor) jdbcTemplate.getDataSource()).getDataSource()) {
+      jdbcTemplate = new JdbcTemplate(dataSource);
     }
   }
 
@@ -83,5 +85,52 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
               }
             });
     return bar;
+  }
+
+  @Override
+  /**
+   * use jdbc mode to save bars in a batch. if get any exception, than, use hibernate saving one row by one row;
+   */
+  public void batchSave(final List<HistoryDataKBar> bars) {
+    //id      | version | closeTime     | currency1 | currency2 | askClose | askHigh | askLow  | askOpen | askVolume | bidClose | bidHigh | bidLow  | bidOpen | bidVolume | openTime      | timeWindowType
+    if (bars != null && bars.size() > 0) {
+      String sql = "INSERT INTO HistoryDataKBar " +
+              "( version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime,timeWindowType)" +
+              "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      this.jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          HistoryDataKBar historyDataKBar = bars.get(i);
+          ps.setInt(1, 0);
+          ps.setLong(2, historyDataKBar.getCloseTime());
+
+          ps.setString(3, historyDataKBar.getInstrument().getCurrency1().toString());
+          ps.setString(4, historyDataKBar.getInstrument().getCurrency2().toString());
+
+          ps.setDouble(5,historyDataKBar.getOhlc().getAskClose());
+          ps.setDouble(6,historyDataKBar.getOhlc().getAskHigh());
+          ps.setDouble(7,historyDataKBar.getOhlc().getAskLow());
+          ps.setDouble(8,historyDataKBar.getOhlc().getAskOpen());
+          ps.setDouble(9,historyDataKBar.getOhlc().getAskVolume());
+
+          ps.setDouble(10,historyDataKBar.getOhlc().getBidClose());
+          ps.setDouble(11,historyDataKBar.getOhlc().getBidHigh());
+          ps.setDouble(12,historyDataKBar.getOhlc().getBidLow());
+          ps.setDouble(13,historyDataKBar.getOhlc().getBidOpen());
+          ps.setDouble(14,historyDataKBar.getOhlc().getBidVolume());
+
+          ps.setLong(15, historyDataKBar.getOpenTime());
+          ps.setString(16, historyDataKBar.getTimeWindowType().toString());
+        }
+
+        @Override
+        public int getBatchSize() {
+          return bars.size();
+        }
+      });
+
+    }
+
   }
 }

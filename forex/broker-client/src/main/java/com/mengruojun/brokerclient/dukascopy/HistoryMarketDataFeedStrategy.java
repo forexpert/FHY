@@ -87,6 +87,8 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       );
       List<IBar> askbars = this.context.getHistory().getBars(instrument, period, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
       List<IBar> bidbars = this.context.getHistory().getBars(instrument, period, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
+      //kbars which will be inserted.
+      List<HistoryDataKBar> kbars = new ArrayList<HistoryDataKBar>();
       for (int i = 0; i < askbars.size(); i++) {
         IBar askBar = askbars.get(i);
         IBar bidBar = bidbars.get(i);
@@ -102,8 +104,11 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
                 askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
                 instrument.getSecondaryCurrency(), twt);
         HistoryDataKBar kbar = mdm.convertToHistorydataKBar();
-        historyMarketdataService.handle(kbar);
+        //historyMarketdataService.handle(kbar);
+        kbars.add(kbar);
       }
+
+      historyMarketdataService.handle(kbars);
     } catch (Exception e){
       logger.error("", e);
       logger.info("run again in 5 minutes:");
@@ -125,7 +130,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       HistoryDataKBar db_latest = this.historyMarketdataService.getLatestBarForPeriod(
               new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),
               DukascopyUtils.convertPeriodToTimeWindowType(period)
-              );
+      );
 
       long from_long = 0;
       if(db_latest == null){
@@ -147,7 +152,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           IBar prevBar = this.context.getHistory().getBar(instrument, period, OfferSide.BID, 1);
           if(prevBar != null){
             long to_long = prevBar.getTime();
-            getHistoryData(period,instrument,from_long,to_long);
+            getHistoryData(period, instrument, from_long, to_long);
           }
           break;
         }
