@@ -51,6 +51,15 @@ public class HistoryMarketdataService {
   public void handle(List<HistoryDataKBar> kbars) {
     //if (kbar.getTimeWindowType() == TimeWindowType.S10) {
     try {
+      // determine if the first record is alread existed.
+      if (kbars != null) {
+        HistoryDataKBar firstBar = kbars.get(0);
+        if (historyDataKBarDao.find(firstBar.getOpenTime(), firstBar.getInstrument(), firstBar.getTimeWindowType()) != null) {
+          logger.info("find a duplicated record. Remove it from batch list");
+          kbars.remove(firstBar);
+        }
+      }
+
       historyDataKBarDao.batchSave(kbars);
       logger.debug("Saved Kbars size: " + kbars.size());
     } catch (Exception e) {
@@ -58,7 +67,7 @@ public class HistoryMarketdataService {
 
       logger.info("there might be already one duplicated record in batch mode, now insert one by one:");
       // when exception occurs, save one by one
-      for(HistoryDataKBar bar : kbars){
+      for (HistoryDataKBar bar : kbars) {
         handle(bar);
       }
     }
