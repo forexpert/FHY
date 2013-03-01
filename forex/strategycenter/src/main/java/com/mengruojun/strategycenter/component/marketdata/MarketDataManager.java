@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * this MarketData is used for
+ * this MarketData is used for live data management
  */
 @Service
 public class MarketDataManager {
@@ -49,8 +49,7 @@ public class MarketDataManager {
     /**
      * push a marketData in this manager.  Then the manager can maintain marketData by:
      * 1) push into memory
-     * 2) push into DB
-     * 3) computing indicators and attributes
+     * 3) computing indicators and attributes and push them into memory
      */
     public void push(MarketDataMessage marketDataMessage) {
         Instrument instrument = new Instrument(marketDataMessage.getCurrency1() + "/" + marketDataMessage.getCurrency2());
@@ -77,7 +76,7 @@ public class MarketDataManager {
 
             putKBarIntoMap(kbar, instrument, openTime, timeWindowType);
 
-            saveOrUpdate(kbar);
+            //saveOrUpdate(kbar);
 
         } else {
             // update into kbarMap
@@ -117,7 +116,7 @@ public class MarketDataManager {
     }
 
     /**
-     * return KBar from memory or DB by giving startTime, instrument and timeWidowType
+     * return KBar from memory  by giving startTime, instrument and timeWidowType
      *
      * @param openTime
      * @param timeWindowType
@@ -125,11 +124,7 @@ public class MarketDataManager {
      */
     public HistoryDataKBar getKBar(Long openTime, Instrument instrument, TimeWindowType timeWindowType) {
         HistoryDataKBar kbar = kbarMap.get(instrument).get(openTime).get(timeWindowType);
-        if (kbar != null) {
-            return kbar;
-        } else {
-            return getKBarFromDB(openTime, instrument, timeWindowType);
-        }
+        return kbar;
     }
 
     private HistoryDataKBar getKBarFromDB(Long openTime, Instrument instrument, TimeWindowType timeWindowType) {

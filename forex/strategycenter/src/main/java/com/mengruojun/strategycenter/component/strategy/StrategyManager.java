@@ -34,7 +34,6 @@ public class StrategyManager {
 
 
   public void handle(BrokerClient bc, MarketDataMessage source) {
-    synchronized (strategyMap) {
       BaseStrategy strategy = strategyMap.get(bc.getStrategyName());
       if (strategy != null) {
         long currentTime = source.getStartTime() + source.getTimeWindowType().getTimeInMillis();
@@ -43,8 +42,6 @@ public class StrategyManager {
           tradeCommandSender.sendObjectMessage(tradeCommandMessageList);
         }
       }
-    }
-
   }
 
 
