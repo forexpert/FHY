@@ -19,7 +19,8 @@ import java.util.TimeZone;
 /**
  * MarketDataReceiver
  */
-@Service("historyMarketDataReceiver")
+//@Service("historyMarketDataReceiver")
+@Deprecated
 public class HistoryMarketDataReceiver implements MessageListener, ApplicationContextAware {
   Logger logger = Logger.getLogger(this.getClass());
 

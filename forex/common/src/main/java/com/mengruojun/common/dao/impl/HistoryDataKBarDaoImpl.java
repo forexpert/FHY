@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.JdbcAccessor;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -87,6 +89,24 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
     return bar;
   }
 
+  /**
+   * getBarsByOpenTimeRange
+   * The openTimes of return bars are all more than or equal to openTimeFrom, but less than openTimeTo
+   * @param instrument instrument
+   * @param timeWindowType timeWindowType
+   * @param openTimeFrom openTimeFrom
+   * @param openTimeTo openTimeTo
+   * @return a list of HistoryDataKBar
+   */
+  @Override
+  public List<HistoryDataKBar> getBarsByOpenTimeRange(final Instrument instrument, final TimeWindowType timeWindowType, final long openTimeFrom, final long openTimeTo){
+    List bars = getHibernateTemplate().find("from HistoryDataKBar where instrument.currency1 = ? and instrument.currency2 = ?" +
+            "and openTime >= ? and openTime < ? and timeWindowType = ? order by openTime",
+            instrument.getCurrency1(), instrument.getCurrency2(), openTimeFrom, openTimeTo, timeWindowType);
+    return bars;
+  }
+
+
   @Override
   /**
    * use jdbc mode to save bars in a batch. if get any exception, than, use hibernate saving one row by one row;
@@ -131,6 +151,23 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
       });
 
     }
+
+  }
+
+  @Override
+  public String getMysqlTimeZone(){
+
+    final StringBuffer timezone = new StringBuffer();
+    jdbcTemplate.query("show variables LIKE 'time_zone'",
+            new Object[] {},
+            new RowCallbackHandler() {
+              public void processRow(ResultSet rs) throws SQLException {
+                timezone.append(rs.getString(2)) ;
+              }
+            });
+
+    return timezone.toString();
+
 
   }
 }

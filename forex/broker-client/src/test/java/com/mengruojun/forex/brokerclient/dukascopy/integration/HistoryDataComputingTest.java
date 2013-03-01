@@ -40,8 +40,8 @@ public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringC
   @Test
   public void testComputeM1Bars() throws InterruptedException {
 
-    String start="2010.02.09 00:00:00 +0000";
-    String end="2010.02.09 01:00:00 +0000";
+    String start="2011.02.09 00:00:00 +0000";
+    String end="2011.02.09 01:00:00 +0000";
     historyMarketDataFeedTestStrategy.setServerBars(kBarsFromDukascopyServer);
     historyMarketDataFeedTestStrategy.setTestBar_start(start);
     historyMarketDataFeedTestStrategy.setTestBar_end(end);

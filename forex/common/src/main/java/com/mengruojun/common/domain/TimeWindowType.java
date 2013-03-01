@@ -11,6 +11,7 @@ public enum TimeWindowType {
   M1(60 * 1000),
   M5(60 * 5 * 1000),
   M10(60 * 5 * 1000),
+  M30(60 * 30 * 1000),
   H1(3600 * 1000),
   H4(4 * 3600 * 1000),
   D1(24 * 3600 * 1000);
@@ -25,11 +26,7 @@ public enum TimeWindowType {
   private long timeInMillis;
 
   private TimeWindowType(long timeInMillis) {
-
-  }
-
-  private TimeWindowType() {
-
+    this.timeInMillis = timeInMillis;
   }
 
   public long getTimeInMillis() {

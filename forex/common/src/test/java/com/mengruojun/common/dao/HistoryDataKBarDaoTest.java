@@ -44,6 +44,12 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
   }
 
   @Test
+  public void testMysqlTimeZone(){
+    //show variables like 'time_zone';
+    assertEquals("+00:00", historyDataKBarDao.getMysqlTimeZone());
+  }
+
+  @Test
   public void getBar() {
     assertFalse(historyDataKBarDao.exists(0L));
   }
@@ -58,12 +64,15 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     log.info(sdf.format(new Date(1295447600000L)));
     log.info(sdf.parse("2010.01.05 00:00:00 +0000").getTime());
     log.info(sdf.parse("2013.02.22 00:00:00 +0000").getTime());
-    log.info(sdf.parse("2010.01.06 00:00:00 +0000").getTime());
+    log.info(sdf.parse("2013.02.27 21:46:30 +0000").getTime());
   }
 
     @Test
     public void convertLongToData() throws ParseException {
-        log.info(sdf.format(new Date(1295447600000L)));
+        log.info(sdf.format(new Date(1267401600000L)));
+        log.info(sdf.format(new Date(1267401610000L)));
+        log.info(sdf.format(new Date(1267401690000L)));
+        log.info(sdf.format(new Date(1267488000000L)));
     }
 
 

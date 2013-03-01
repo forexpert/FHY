@@ -93,7 +93,7 @@ public class HistoryMarketDataFeedTestStrategy implements IStrategy {
           throw new RuntimeException("askBars doesn't match bidBars");
         }
 
-        TimeWindowType twt = TimeWindowType.S10;
+        TimeWindowType twt = DukascopyUtils.convertPeriodToTimeWindowType(period);
         MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
                 askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
                 bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
@@ -114,7 +114,6 @@ public class HistoryMarketDataFeedTestStrategy implements IStrategy {
     }
 
     return kBars;
-
   }
 
   private List<HistoryDataKBar> getAllHistoryData(Instrument instrument, Period period, String from, String to) throws JFException, ParseException {
