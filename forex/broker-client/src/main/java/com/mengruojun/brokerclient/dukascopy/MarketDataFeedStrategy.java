@@ -23,8 +23,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is a Dukascopy marketDataFeedStrategy Strategy, which won't do anything about trading but just send market data msg to
@@ -39,12 +38,14 @@ public class MarketDataFeedStrategy implements IStrategy {
     private double[] ma1 = new double[Instrument.values().length];
     private IConsole console;
     Logger logger = Logger.getLogger(this.getClass());
-    private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
+    private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
     @Autowired
     private JMSSender marketDataSender;
     @Autowired
     private JMSSender clientInfoSender;
+
+    private Map<com.mengruojun.common.domain.Instrument, MarketDataMessage> marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
 
 
     public void onStart(final IContext context) throws JFException {
@@ -81,8 +82,18 @@ public class MarketDataFeedStrategy implements IStrategy {
                     bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
                     askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
                     instrument.getSecondaryCurrency(), twt);
+            com.mengruojun.common.domain.Instrument  fiInstrument = DukascopyUtils.fromDukascopyInstrument(instrument);
 
-            marketDataSender.sendObjectMessage(mdm);
+            if(marketDataMessageMap.get(instrument) != null){
+                //理论上不会走到这一步
+                logger.error("Dukascopy Markder Data Feeder has error. marketDataMessageMap didn't collect all interested data!. Now clear the map!");
+                marketDataMessageMap.clear();
+            }
+            marketDataMessageMap.put(fiInstrument, mdm);
+            if(marketDataMessageMap.size() == dukascopyInstrumentList.size()){
+                marketDataSender.sendObjectMessage(marketDataMessageMap);
+                marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
+            }
         }
     }
 

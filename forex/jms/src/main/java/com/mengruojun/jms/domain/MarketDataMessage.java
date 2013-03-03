@@ -4,6 +4,8 @@ import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.io.Serializable;
 import java.util.Currency;
@@ -184,4 +186,15 @@ public class MarketDataMessage implements Serializable {
   private Currency currency1;
   private Currency currency2;
   private TimeWindowType timeWindowType;
+
+  @Override
+  public String toString(){
+      ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.DEFAULT_STYLE)
+              .append("startTime", this.startTime)
+              .append("currency1", this.currency1)
+              .append("currency2", this.currency2)
+              .append("timeWindowType", this.timeWindowType);
+      return sb.toString();
+
+  }
 }

@@ -1,5 +1,7 @@
 package com.mengruojun.strategycenter.component.jmsreceiver;
 
+import com.mengruojun.common.domain.Instrument;
+import com.mengruojun.common.utils.TradingUitils;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.strategycenter.springevent.MarketDataReceivedEvent;
 import org.apache.log4j.Logger;
@@ -14,6 +16,8 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -45,22 +49,18 @@ public class MarketDataReceiver implements MessageListener, ApplicationContextAw
         if (message instanceof ObjectMessage) {
             try {
                 Object msgObj = ((ObjectMessage) message).getObject();
-                if (msgObj instanceof MarketDataMessage) {
-                    MarketDataMessage mdm = (MarketDataMessage) msgObj;
-                    logger.info("Start time is " + sdf.format(new Date(mdm.getStartTime())));
-                    logger.info("Time Window is " + mdm.getTimeWindowType());
-                    logger.info("ask OHLC is " + mdm.getAskOpen() + " " + mdm.getAskHigh() + " "
-                            + mdm.getAskLow() + " " + mdm.getAskClose());
-                    //todo cmeng 1. save into DB and memory
-                    //todo cmeng 2. computing indicators
-                    //todo cmeng 3. notify client manager
-                    applicationContext.publishEvent(new MarketDataReceivedEvent(mdm));
+                if (msgObj instanceof Map) {
+                    Map mdmMap = (Map)msgObj;
+                    if(mdmMap.size() > 0 && mdmMap.get(mdmMap.entrySet().iterator().next())  instanceof  MarketDataMessage){
+                        logger.info("mdmMap size should be " + TradingUitils.getInterestInstrumentList().size() + ", Actual is " + mdmMap.size());
+                        applicationContext.publishEvent(new MarketDataReceivedEvent(mdmMap));
+                    }
                 }
             } catch (JMSException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actuall is " + message);
+            logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actual is " + message);
         }
     }
 }

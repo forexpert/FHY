@@ -10,14 +10,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * this MarketData is used for live data management
+ *
+ * kbarMap is a ConcurrentHashMap which contains all live data, include diversified TimeWindowType bars and related indicators.
+ * All indicators' value are stored into HistoryDataKBar.historyDataKBarAttribute.
+ * All indicators' value should be calculated only when they are really to be used.
  */
 @Service
 public class MarketDataManager {
@@ -26,83 +28,41 @@ public class MarketDataManager {
     @Autowired
     HistoryDataKBarDao historyDataKBarDao;
 
-    long kbarListMemorySize = 50000;
-
-    private List<HistoryDataKBar> kbarList = new ArrayList<HistoryDataKBar>();
-
-    private Map<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>> kbarMap = new ConcurrentHashMap<Instrument, Map<Long, Map<TimeWindowType, HistoryDataKBar>>>();
-
     /**
-     * init kbarMap from DB
+     * 1. To compute other Bars from S10 bar, we only need to keep the max map size as 6. (since we can compute S20 by S10, S30 by S20, ..., D1 by H4);
+     *      For Each computing the max last level data size is only 6;
+     * 2. But we also need to compute indicators. So let's keep 500 here;
      */
-    public void init(){
+    long eachKBarMapMaxSize = 500;
 
-    }
+    private Map<Instrument, Map<TimeWindowType, Map<Long, HistoryDataKBar>>> kbarMap =
+            new ConcurrentHashMap<Instrument, Map<TimeWindowType, Map<Long, HistoryDataKBar>>>();
 
-    /**
-     * we may need to supplement KBar from file from Dukascopy
-     */
-    public void insertOrUpdateFromFile(){
 
-    }
 
     /**
      * push a marketData in this manager.  Then the manager can maintain marketData by:
      * 1) push into memory
      * 3) computing indicators and attributes and push them into memory
      */
-    public void push(MarketDataMessage marketDataMessage) {
-        Instrument instrument = new Instrument(marketDataMessage.getCurrency1() + "/" + marketDataMessage.getCurrency2());
-        Long openTime = marketDataMessage.getStartTime();
-        TimeWindowType timeWindowType = marketDataMessage.getTimeWindowType();
+    public void push(Map<Instrument, MarketDataMessage> s10MdmMap) {
 
-        double askOpen = marketDataMessage.getAskOpen();
-        double askHigh = marketDataMessage.getAskHigh();
-        double askLow = marketDataMessage.getAskLow();
-        double askClose = marketDataMessage.getAskClose();
-        double askVolume = marketDataMessage.getAskVolume();
+        //todo next cmeng
 
-        double bidOpen = marketDataMessage.getBidOpen();
-        double bidHigh = marketDataMessage.getBidHigh();
-        double bidLow = marketDataMessage.getBidLow();
-        double bidClose = marketDataMessage.getBidClose();
-        double bidVolume = marketDataMessage.getBidVolume();
-
-        if (!containKbar(instrument, openTime, timeWindowType)) {
-            OHLC ohlc = new OHLC(askOpen, askHigh, askLow, askClose, askVolume,
-                    bidOpen, bidHigh, bidLow, bidClose, bidVolume);
-
-            HistoryDataKBar kbar = new HistoryDataKBar(instrument, timeWindowType, openTime, openTime + timeWindowType.getTimeInMillis(), ohlc);
-
-            putKBarIntoMap(kbar, instrument, openTime, timeWindowType);
-
-            //saveOrUpdate(kbar);
-
-        } else {
-            // update into kbarMap
-        }
 
 
     }
 
-    /**
-     * save kbar into db
-     * @param kbar
-     */
-    private void saveOrUpdate(HistoryDataKBar kbar) {
-      historyDataKBarDao.save(kbar);
-      logger.info("Save a Kbar: " + kbar.toString());
-    }
 
     private void putKBarIntoMap(HistoryDataKBar kbar, Instrument instrument, Long openTime, TimeWindowType timeWindowType) {
         synchronized (kbarMap){
             if(kbarMap.get(instrument) == null) {
-                kbarMap.put(instrument, new HashMap<Long, Map<TimeWindowType, HistoryDataKBar>>());
+                kbarMap.put(instrument, new HashMap<TimeWindowType, Map<Long, HistoryDataKBar>>());
             }
-            if(kbarMap.get(instrument).get(openTime) == null){
-                kbarMap.get(instrument).put(openTime, new HashMap<TimeWindowType, HistoryDataKBar>());
+            if(kbarMap.get(instrument).get(timeWindowType) == null){
+                kbarMap.get(instrument).put(timeWindowType, new HashMap<Long, HistoryDataKBar>());
             }
-            kbarMap.get(instrument).get(openTime).put(timeWindowType, kbar);
+            kbarMap.get(instrument).get(timeWindowType).put(openTime, kbar);
         }
     }
 
@@ -125,11 +85,5 @@ public class MarketDataManager {
     public HistoryDataKBar getKBar(Long openTime, Instrument instrument, TimeWindowType timeWindowType) {
         HistoryDataKBar kbar = kbarMap.get(instrument).get(openTime).get(timeWindowType);
         return kbar;
-    }
-
-    private HistoryDataKBar getKBarFromDB(Long openTime, Instrument instrument, TimeWindowType timeWindowType) {
-
-        // todo cmeng
-        return null;
     }
 }

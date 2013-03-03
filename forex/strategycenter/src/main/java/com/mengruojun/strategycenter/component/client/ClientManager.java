@@ -1,5 +1,7 @@
 package com.mengruojun.strategycenter.component.client;
 
+import com.mengruojun.common.domain.Instrument;
+import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.strategycenter.component.marketdata.MarketDataManager;
@@ -13,8 +15,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manager multiple broker clients
@@ -38,9 +39,19 @@ public class ClientManager implements ApplicationListener {
     public void onApplicationEvent(ApplicationEvent event) {
         if(event instanceof MarketDataReceivedEvent){
             synchronized (brokerClientMap) {
-                marketDataManager.push((MarketDataMessage) event.getSource());
-                for(BrokerClient bc : brokerClientMap.values()){
-                    strategyManager.handle(bc, (MarketDataMessage)event.getSource());
+                Map<Instrument, MarketDataMessage> mdmMap = (HashMap<Instrument, MarketDataMessage>)event.getSource();
+                if(verifyMarketData(mdmMap)){
+                    Long endTime = getEndTime(mdmMap);
+                    marketDataManager.push(mdmMap);
+                    for(BrokerClient bc : brokerClientMap.values()){
+                        strategyManager.handle(bc, endTime);
+                    }
+                } else {   // it shouldn't go to here
+                    logger.error("verifyMarketData failed. The market data is :");
+                    Iterator iterator = mdmMap.values().iterator();
+                    while(iterator.hasNext()) {
+                        logger.error(iterator.next().toString());
+                    }
                 }
             }
         }
@@ -59,6 +70,49 @@ public class ClientManager implements ApplicationListener {
                 }
             }
         }
+
+    }
+
+    private Long getEndTime(Map<Instrument, MarketDataMessage> mdmMap) {
+        Iterator iterator = mdmMap.values().iterator();
+        while(iterator.hasNext()) {
+            MarketDataMessage mdm = (MarketDataMessage)iterator.next();
+            return mdm.getStartTime() + mdm.getTimeWindowType().getTimeInMillis();
+        }
+        return null;
+    }
+
+    /**
+     *
+     *  All marketDataMessage should have the same start time and timeWindowType
+     *  @return return true if data is available;
+     */
+    private boolean verifyMarketData(Map<Instrument, MarketDataMessage> mdmMap) {
+        Long openTime = null;
+        TimeWindowType twt = null;
+
+        Iterator iterator = mdmMap.values().iterator();
+        while(iterator.hasNext()) {
+            MarketDataMessage mdm = (MarketDataMessage)iterator.next();
+            if(openTime == null){
+                openTime = mdm.getStartTime();
+            } else{
+                if(openTime != mdm.getStartTime()){
+                    return false;
+                }
+            }
+
+            if( twt == null){
+                twt = mdm.getTimeWindowType();
+            } else {
+                if(twt != mdm.getTimeWindowType()){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
 
     }
 }
