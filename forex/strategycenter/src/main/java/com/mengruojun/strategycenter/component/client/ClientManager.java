@@ -25,94 +25,92 @@ import java.util.*;
  */
 @Service
 public class ClientManager implements ApplicationListener {
-    Logger logger = Logger.getLogger(ClientManager.class);
+  Logger logger = Logger.getLogger(ClientManager.class);
+
   {
     logger.info("ClientManager started");
   }
-    final Map<String, BrokerClient> brokerClientMap = new HashMap<String, BrokerClient>();
 
-    @Autowired
-    StrategyManager strategyManager;
-    @Autowired
-    MarketDataManager marketDataManager;
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if(event instanceof MarketDataReceivedEvent){
-            synchronized (brokerClientMap) {
-                Map<Instrument, MarketDataMessage> mdmMap = (HashMap<Instrument, MarketDataMessage>)event.getSource();
-                if(verifyMarketData(mdmMap)){
-                    Long endTime = getEndTime(mdmMap);
-                    marketDataManager.push(mdmMap);
-                    for(BrokerClient bc : brokerClientMap.values()){
-                        strategyManager.handle(bc, endTime);
-                    }
-                } else {   // it shouldn't go to here
-                    logger.error("verifyMarketData failed. The market data is :");
-                    Iterator iterator = mdmMap.values().iterator();
-                    while(iterator.hasNext()) {
-                        logger.error(iterator.next().toString());
-                    }
-                }
-            }
+  final Map<String, BrokerClient> brokerClientMap = new HashMap<String, BrokerClient>();
+
+  @Autowired
+  StrategyManager strategyManager;
+  @Autowired
+  MarketDataManager marketDataManager;
+
+  @Override
+  public void onApplicationEvent(ApplicationEvent event) {
+    if (event instanceof MarketDataReceivedEvent) {
+      synchronized (brokerClientMap) {
+        Map<Instrument, MarketDataMessage> mdmMap = (HashMap<Instrument, MarketDataMessage>) event.getSource();
+        if (verifyMarketData(mdmMap)) {
+          Long endTime = getEndTime(mdmMap);
+          marketDataManager.push(mdmMap);
+          for (BrokerClient bc : brokerClientMap.values()) {
+            strategyManager.handle(bc, endTime);
+          }
+        } else {   // it shouldn't go to here
+          logger.error("verifyMarketData failed. The market data is :");
+          for (MarketDataMessage marketDataMessage : mdmMap.values()) {
+            logger.error(marketDataMessage.toString());
+          }
         }
-
-        if (event instanceof ClientRegisterEvent) {
-            synchronized (brokerClientMap) {
-                ClientInfoMessage cim = (ClientInfoMessage) event.getSource();
-                if (brokerClientMap.containsKey(cim.getClientId())) {
-                    //todo update broker client info
-                } else { // register a new broker client
-                    BrokerClient bc = new BrokerClient(cim.getBrokerType(), cim.getClientId(), cim.getStrategyId(),
-                            cim.getLeverage(), cim.getBaseCurrency(), cim.getCurrentBalance(), cim.getCurrentBalance(),
-                            cim.getOpenPositionList(),cim.getPendingPositionList(),cim.getClosedPositionList());
-                    brokerClientMap.put(bc.getClientId(), bc);
-                    logger.info("Current brokerclient size is " + brokerClientMap.size());
-                }
-            }
-        }
-
+      }
     }
 
-    private Long getEndTime(Map<Instrument, MarketDataMessage> mdmMap) {
-        Iterator iterator = mdmMap.values().iterator();
-        while(iterator.hasNext()) {
-            MarketDataMessage mdm = (MarketDataMessage)iterator.next();
-            return mdm.getStartTime() + mdm.getTimeWindowType().getTimeInMillis();
+    if (event instanceof ClientRegisterEvent) {
+      synchronized (brokerClientMap) {
+        ClientInfoMessage cim = (ClientInfoMessage) event.getSource();
+        if (brokerClientMap.containsKey(cim.getClientId())) {
+          //todo update broker client info
+        } else { // register a new broker client
+          BrokerClient bc = new BrokerClient(cim.getBrokerType(), cim.getClientId(), cim.getStrategyId(),
+                  cim.getLeverage(), cim.getBaseCurrency(), cim.getCurrentBalance(), cim.getCurrentBalance(),
+                  cim.getOpenPositionList(), cim.getPendingPositionList(), cim.getClosedPositionList());
+          brokerClientMap.put(bc.getClientId(), bc);
+          logger.info("Current brokerclient size is " + brokerClientMap.size());
         }
-        return null;
+      }
     }
 
-    /**
-     *
-     *  All marketDataMessage should have the same start time and timeWindowType
-     *  @return return true if data is available;
-     */
-    private boolean verifyMarketData(Map<Instrument, MarketDataMessage> mdmMap) {
-        Long openTime = null;
-        TimeWindowType twt = null;
+  }
 
-        Iterator iterator = mdmMap.values().iterator();
-        while(iterator.hasNext()) {
-            MarketDataMessage mdm = (MarketDataMessage)iterator.next();
-            if(openTime == null){
-                openTime = mdm.getStartTime();
-            } else{
-                if(openTime != mdm.getStartTime()){
-                    return false;
-                }
-            }
-
-            if( twt == null){
-                twt = mdm.getTimeWindowType();
-            } else {
-                if(twt != mdm.getTimeWindowType()){
-                    return false;
-                }
-            }
-        }
-
-        return true;
-
-
+  private Long getEndTime(Map<Instrument, MarketDataMessage> mdmMap) {
+    for (MarketDataMessage mdm : mdmMap.values()) {
+      return mdm.getStartTime() + mdm.getTimeWindowType().getTimeInMillis();
     }
+    return null;
+  }
+
+  /**
+   * All marketDataMessage should have the same start time and timeWindowType
+   *
+   * @return return true if data is available;
+   */
+  private boolean verifyMarketData(Map<Instrument, MarketDataMessage> mdmMap) {
+    Long openTime = null;
+    TimeWindowType twt = null;
+
+    for (MarketDataMessage mdm : mdmMap.values()) {
+      if (openTime == null) {
+        openTime = mdm.getStartTime();
+      } else {
+        if (openTime != mdm.getStartTime()) {
+          return false;
+        }
+      }
+
+      if (twt == null) {
+        twt = mdm.getTimeWindowType();
+      } else {
+        if (twt != mdm.getTimeWindowType()) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+
+
+  }
 }

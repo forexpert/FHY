@@ -29,6 +29,36 @@ public enum TimeWindowType {
     this.timeInMillis = timeInMillis;
   }
 
+  /**
+   * get next level TimeWindowType. E.g.  if passing in D1, return H4; passing in H4, return H1; and etc.
+   * @return
+   */
+  public static TimeWindowType getNextLevel(TimeWindowType twt){
+    switch (twt){
+      case D1:
+        return H4;
+      case H4 :
+        return H1;
+      case H1:
+        return M30;
+      case M30:
+        return M10;
+      case M5:
+        return M1;
+      case M1:
+        return S30;
+      /*S30 and S20 both have S10 as next level*/
+      case S30:
+      case S20:
+        return S10;
+      case S10:
+        return null;
+      default:
+        return null;
+
+    }
+  }
+
   public long getTimeInMillis() {
     return timeInMillis;
   }

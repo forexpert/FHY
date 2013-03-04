@@ -1,6 +1,5 @@
 package com.mengruojun.strategycenter.component.strategy;
 
-import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import com.mengruojun.jms.utils.JMSSender;
 import com.mengruojun.strategycenter.domain.BrokerClient;
