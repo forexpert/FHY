@@ -1,6 +1,8 @@
 package com.mengruojun.common.domain;
 
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -104,8 +106,14 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
     // override method
 
   @Override
-  public String toString() {
-    return openTime + timeWindowType.toString() + instrument;
+  public String toString(){
+    ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.DEFAULT_STYLE)
+            .append("openTime", this.openTime)
+            .append("instrument", this.instrument)
+            .append("OHLC", this.ohlc)
+            .append("timeWindowType", this.timeWindowType);
+    return sb.toString();
+
   }
 
   @Override
@@ -124,7 +132,7 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
   @Override
   public int hashCode() {
-    return this.toString().hashCode();
+    return super.hashCode();
   }
 }
 

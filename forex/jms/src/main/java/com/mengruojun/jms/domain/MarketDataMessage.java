@@ -147,6 +147,22 @@ public class MarketDataMessage implements Serializable {
     this.timeWindowType = timeWindowType;
   }
 
+  /**
+   * For test purpose.
+   * long startTime, double askOpen, double askHigh, double askLow, double askClose,
+   double bidOpen, double bidHigh, double bidLow, double bidClose, double askVolume,
+   double bidVolume, Currency currency1, Currency currency2, TimeWindowType timeWindowType
+   * @return MarketDataMessage
+   */
+  public static MarketDataMessage buildFromKBar(HistoryDataKBar kBar){
+    MarketDataMessage mdm = new MarketDataMessage(kBar.getOpenTime(),
+            kBar.getOhlc().getAskOpen(), kBar.getOhlc().getAskHigh(),kBar.getOhlc().getAskLow(),kBar.getOhlc().getAskClose(),
+            kBar.getOhlc().getBidOpen(), kBar.getOhlc().getBidHigh(),kBar.getOhlc().getBidLow(),kBar.getOhlc().getBidClose(),
+            kBar.getOhlc().getAskVolume(),kBar.getOhlc().getBidVolume(),kBar.getInstrument().getCurrency1().toJDKCurrency(), kBar.getInstrument().getCurrency2().toJDKCurrency(), kBar.getTimeWindowType()
+            );
+    return  mdm;
+  }
+
   public HistoryDataKBar convertToHistorydataKBar(){
 
     Instrument instrument = new Instrument(this.getCurrency1() + "/" + this.getCurrency2());

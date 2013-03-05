@@ -1,12 +1,17 @@
 package com.mengruojun.common.domain;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import javax.persistence.Embeddable;
+import java.text.DecimalFormat;
 
 /**
  * open, high, low, close data
  */
 @Embeddable
 public class OHLC{
+  static DecimalFormat decimalFormat = new DecimalFormat("0.0");
   private double askOpen;
   private double askHigh;
   private double askLow;
@@ -115,4 +120,37 @@ public class OHLC{
   public void setBidVolume(double bidVolume) {
     this.bidVolume = bidVolume;
   }
+
+
+  @Override
+  public String toString(){
+    ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+            .append("askOpen", this.askOpen)
+            .append("askHigh", this.askHigh)
+            .append("askLow", this.askLow)
+            .append("askClose", this.askClose)
+            .append("askVolume", OHLC.decimalFormat.format(this.askVolume))
+            .append("bidOpen", this.bidOpen)
+            .append("bidHigh", this.bidHigh)
+            .append("bidLow", this.bidLow)
+            .append("bidClose", this.bidClose)
+            .append("bidVolume", OHLC.decimalFormat.format(this.bidVolume));
+    return sb.toString();
+
+  }
+
+  @Override
+  public boolean equals(Object o){
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof OHLC)) {
+      return false;
+    }
+
+    final OHLC ohlc = (OHLC) o;
+
+    return this.toString().equals(ohlc.toString());
+  }
+
 }

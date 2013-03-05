@@ -199,4 +199,9 @@ public enum Currency
         }
         return null;
     }
+
+    public java.util.Currency toJDKCurrency(){
+      return java.util.Currency.getInstance(this.toString());
+
+    }
 }

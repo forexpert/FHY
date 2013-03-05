@@ -34,15 +34,7 @@ public class HistoryMarketdataService {
    * @param kbar kbar is only based on 10S bars
    */
   @Deprecated
-  public void handle(HistoryDataKBar kbar) {/*
-    if (kbar.getTimeWindowType() == TimeWindowType.S10) {
-      List<TimeWindowType> timeWindowTypeList = Arrays.asList(TimeWindowType.values());
-      List<IndicatorType> indicatorTypeList = Arrays.asList(IndicatorType.values());
-      long barStartTime = kbar.getOpenTime();
-      long barEndTime = kbar.getOpenTime() + kbar.getTimeWindowType().getTimeInMillis();
-
-
-    }*/
+  public void handle(HistoryDataKBar kbar) {
     logger.error("this method is deprecated!");
   }
 
@@ -74,47 +66,12 @@ public class HistoryMarketdataService {
    generateAndSaveBarsInAllTimewindowTypes(timeWindowTypeList, barEndTime);
    // 3. computing indicators and save into DB
    generateIndicatorsForAllBars(indicatorTypeList, timeWindowTypeList, barEndTime);
+
+   * It seems we don't need to save other bars and indicators into DB. Instead, we can compute them on the fly and maintain them as a fixed size collection
    * @param kbars
    */
   public void handle(List<HistoryDataKBar> kbars) {
     saveBars(kbars);
-    //generateAndSaveBarsInAllTimewindowTypes();
-    //generateIndicatorsForAllBars();
-  }
-
-  /**
-   * generate all indicators in indicatorTypeList for all bars
-   *
-   */
-  private void generateIndicatorsForAllBars() {
-
-  }
-
-  /**
-   * generate all types of bars in timeWindowTypeList
-   * and save them into db
-   *
-   * Perhaps ,we should use sql instead of java
-   */
-  @Deprecated
-  private void generateAndSaveBarsInAllTimewindowTypes() {
-    for(TimeWindowType timeWindowType : TimeWindowType.values()){
-      for(Instrument instrument : TradingUitils.getInterestInstrumentList()){
-        switch (timeWindowType){
-          case S10: // we alread have S10 data
-            break;
-          case S20:
-            this.historyDataKBarDao.getLatestBarForPeriod(instrument, TimeWindowType.M1);
-            this.historyDataKBarDao.getBarsByOpenTimeRange(instrument, TimeWindowType.S30, 1L, 1L);
-            break;
-          /*case M1:
-            this.historyDataKBarDao.getLatestBarForPeriod(instrument, TimeWindowType.M1);
-            this.historyDataKBarDao.getBarsByOpenTimeRange(instrument, TimeWindowType.S30, 1L, 1L);
-            break;*/
-        }
-      }
-    }
-
   }
 
 
