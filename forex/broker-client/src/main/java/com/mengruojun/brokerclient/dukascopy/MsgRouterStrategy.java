@@ -73,19 +73,6 @@ public class MsgRouterStrategy implements IStrategy {
             }
         }.start();
         logger.info("tradeCommandReceiver started!");
-        synchronized (tcmQueue){
-          while(tcmQueue.isEmpty()){
-            try {
-              tcmQueue.wait();
-              handleCommand(tcmQueue.poll());
-            } catch (InterruptedException e) {
-              logger.error("", e);
-            } catch (JFException e) {
-              logger.error("", e);
-            }
-
-          }
-        }
 
     }
 
@@ -103,59 +90,66 @@ public class MsgRouterStrategy implements IStrategy {
         }
         console.getOut().println("Stopped");
     }
-  private void handleCommand(TradeCommandMessage tcm) throws JFException {
+  private void handleCommand(Instrument instrumentExpected, TradeCommandMessage tcm) throws JFException {
+      logger.info("handleCommand TradeCommandMessage :" + tcm);
 
+      Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
+    if(instrumentExpected.equals(instrument)){
 
-    String positionLabel = tcm.getPositionId();
-    Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
-    Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
-    Double openPrice = tcm.getOpenPrice();
-    Double stopLossPrice = tcm.getStopLossPrice();
-    Double takeProfitPrice = tcm.getTakeProfitPrice();
+        String positionLabel = tcm.getPositionId();
+        Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
+        Double openPrice = tcm.getOpenPrice();
+        Double stopLossPrice = tcm.getStopLossPrice();
+        Double takeProfitPrice = tcm.getTakeProfitPrice();
 
-    switch (tcm.getTradeCommandType()){
-      case openAtMarketPrice: {
-        IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
-        context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
-        break;
-      }
-      case openAtSetPrice: {
-        IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUYLIMIT : IEngine.OrderCommand.SELLLIMIT;
-        context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
-        break;
-      }
-      case cancel:{
-        IOrder order = context.getEngine().getOrder(positionLabel);
-        if(order != null){
-          order.close();
+        switch (tcm.getTradeCommandType()){
+            case openAtMarketPrice: {
+                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
+                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+                break;
+            }
+            case openAtSetPrice: {
+                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUYLIMIT : IEngine.OrderCommand.SELLLIMIT;
+                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+                break;
+            }
+            case cancel:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order != null){
+                    order.close();
+                }
+                break;
+            }
+            case change:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
+                    order.setOpenPrice(openPrice);
+                }
+                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
+                        || order.getState() == IOrder.State.FILLED){
+                    order.setRequestedAmount(amount);
+                    order.setStopLossPrice(stopLossPrice);
+                    order.setTakeProfitPrice(takeProfitPrice);
+                }
+                break;
+            }
+            case close:{
+                IOrder order = context.getEngine().getOrder(positionLabel);
+                if(order != null){
+                    order.close(amount);
+                }
+                break;
+            }
         }
-        break;
-      }
-      case change:{
-        IOrder order = context.getEngine().getOrder(positionLabel);
-        if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
-          order.setOpenPrice(openPrice);
-        }
-        if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
-                || order.getState() == IOrder.State.FILLED){
-          order.setRequestedAmount(amount);
-          order.setStopLossPrice(stopLossPrice);
-          order.setTakeProfitPrice(takeProfitPrice);
-        }
-        break;
-      }
-      case close:{
-        IOrder order = context.getEngine().getOrder(positionLabel);
-        if(order != null){
-          order.close(amount);
-        }
-        break;
-      }
+        logger.info("sending TradeCommandMessage to Dukascopy server " + tcm);
     }
-    logger.info("sending TradeCommandMessage to Dukascopy server " + tcm);
 
   }
     public void onTick(Instrument instrument, ITick tick) throws JFException {
+        synchronized (tcmQueue){
+            logger.info("Instrument is " + instrument + " Tick time is" + tick.getTime());
+            if(!tcmQueue.isEmpty()) handleCommand(instrument, tcmQueue.poll());
+        }
     }
 
 

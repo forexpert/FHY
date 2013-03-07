@@ -30,6 +30,11 @@ public class TradeCommandMessage implements Serializable {
     public TradeCommandMessage() {
     }
 
+    @Override
+    public String toString(){
+        return "TradeCommandMessage has a position with id as " + positionId;
+    }
+
     public Instrument getInstrument() {
         return instrument;
     }

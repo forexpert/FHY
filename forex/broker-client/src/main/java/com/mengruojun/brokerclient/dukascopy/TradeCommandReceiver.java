@@ -62,7 +62,6 @@ public class TradeCommandReceiver{
                         //handleCommand(tcm);
                       synchronized (tcmQueue){
                         tcmQueue.add(tcm) ;
-                        tcmQueue.notifyAll();
                       }
 
                     }
