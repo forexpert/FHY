@@ -38,7 +38,7 @@ public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringC
   }
 
   @Test
-  public void testComputeM1Bars() throws InterruptedException {
+  public void testGetHistoryBarsFromDukascopyServer() throws InterruptedException {
 
     String start="2011.02.09 00:00:00 +0000";
     String end="2011.02.09 01:00:00 +0000";

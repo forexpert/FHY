@@ -50,8 +50,8 @@ public class MarketDataReceiver implements MessageListener, ApplicationContextAw
             try {
                 Object msgObj = ((ObjectMessage) message).getObject();
                 if (msgObj instanceof Map) {
-                    Map mdmMap = (Map)msgObj;
-                    if(mdmMap.size() > 0 && mdmMap.get(mdmMap.entrySet().iterator().next())  instanceof  MarketDataMessage){
+                    Map mdmMap = (Map<Instrument, MarketDataMessage>)msgObj;
+                    if(mdmMap.size() > 0 && mdmMap.values().toArray()[0]  instanceof  MarketDataMessage){
                         logger.info("mdmMap size should be " + TradingUitils.getInterestInstrumentList().size() + ", Actual is " + mdmMap.size());
                         applicationContext.publishEvent(new MarketDataReceivedEvent(mdmMap));
                     }

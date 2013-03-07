@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.Queue;
 
 /**
  * To receive trade command from client manager, then send them to dukascopy broker server
@@ -25,7 +25,8 @@ public class TradeCommandReceiver{
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public TradeCommandReceiver(IContext context, JmsTemplate template, Destination destination) {
+    public TradeCommandReceiver(java.util.Queue<TradeCommandMessage> tcmQueue, JmsTemplate template, Destination destination) {
+      this.tcmQueue = tcmQueue;
         this.context = context;
         this.template = template;
         this.destination = destination;
@@ -34,7 +35,7 @@ public class TradeCommandReceiver{
     IContext context;
     private JmsTemplate template;
     private Destination destination;
-
+    private Queue<TradeCommandMessage> tcmQueue;
     public void receive()  throws JMSException, InterruptedException {
         while (true) {
             Message message = template.receive(destination);
@@ -58,14 +59,17 @@ public class TradeCommandReceiver{
                         logger.info("");
                         logger.info("");
                         //todo cmeng to handler the command
-                        handleCommand(tcm);
+                        //handleCommand(tcm);
+                      synchronized (tcmQueue){
+                        tcmQueue.add(tcm) ;
+                        tcmQueue.notifyAll();
+                      }
+
                     }
                 }
-            } catch (JMSException ex) {
+            } catch (Exception ex) {
                 logger.error("", ex);
                 throw new RuntimeException(ex);
-            } catch (JFException ex) {
-                logger.error("", ex);
             }
         } else {
             logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actuall is " + message);
@@ -73,8 +77,7 @@ public class TradeCommandReceiver{
     }
 
     private void handleCommand(TradeCommandMessage tcm) throws JFException {
-        //todo
-        //context.getEngine().submitOrder()...
+
 
         String positionLabel = tcm.getPositionId();
         Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
