@@ -6,7 +6,15 @@
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
-                value="%d{MM-dd HH\:mm\:ss.SSS} %-5p [%F\:%L]%x %m%n"/>
+                   value="%d{MM-dd HH\:mm\:ss.SSS} %-5p [%F\:%L]%x %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="log/strategycenter/strategycenter.log"/>
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss.SSS} %-5p [%F\:%L]%x %m%n"/>
         </layout>
     </appender>
 
@@ -30,7 +38,7 @@
     <logger name="org.hibernate">
         <level value="WARN"/>
     </logger>
-  
+
     <!--logger name="org.hibernate.SQL">
         <level value="DEBUG"/>
     </logger-->
@@ -38,9 +46,9 @@
     <logger name="org.springframework">
         <level value="WARN"/>
     </logger>
-   
+
     <logger name="com.mengruojun">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     <logger name="com.historydatacenter">
         <level value="DEBUG"/>
@@ -49,6 +57,8 @@
     <root>
         <level value="WARN"/>
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+
     </root>
 
 </log4j:configuration>
