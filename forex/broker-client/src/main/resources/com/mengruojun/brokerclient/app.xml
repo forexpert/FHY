@@ -43,14 +43,35 @@
         <property name="password" value="${brokerclient.dukascopy.client4.password}"/>
     </bean>
 
+    <!-- ForexInvest Dukascopy Client configuration start-->
+
     <bean id="dukascopyClient1" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
         <property name="brokerType" value="DukascopyDemo"/>
         <property name="clientId" value="dukascopyClient1"/>
-        <property name="strategy" ref="msgRouterStrategy"/>
+        <property name="strategy" ref="msgRouterStrategy1"/>
         <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
         <property name="userName" value="${brokerclient.dukascopy.client1.username}"/>
         <property name="password" value="${brokerclient.dukascopy.client1.password}"/>
     </bean>
+
+    <bean id="msgRouterStrategy1" class="com.mengruojun.brokerclient.dukascopy.MsgRouterStrategy">
+        <property name="strategyName" value="sample"/>
+    </bean>
+
+    <bean id="dukascopyClient2" class="com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient">
+        <property name="brokerType" value="DukascopyDemo"/>
+        <property name="clientId" value="dukascopyClient1"/>
+        <property name="strategy" ref="msgRouterStrategy2"/>
+        <property name="jnlpUrl" value="${brokerclient.dukascopy.demoURL}"/>
+        <property name="userName" value="${brokerclient.dukascopy.client1.username}"/>
+        <property name="password" value="${brokerclient.dukascopy.client1.password}"/>
+    </bean>
+
+    <bean id="msgRouterStrategy2" class="com.mengruojun.brokerclient.dukascopy.MsgRouterStrategy">
+        <property name="strategyName" value="sample2"/>
+    </bean>
+
+    <!-- ForexInvest Dukascopy Client configuration end-->
 
     <!-- Add JMS listener here -->
     <!--<bean id="tradeCommandJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer" lazy-init="true">

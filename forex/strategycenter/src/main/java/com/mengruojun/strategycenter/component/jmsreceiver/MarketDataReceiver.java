@@ -1,7 +1,7 @@
 package com.mengruojun.strategycenter.component.jmsreceiver;
 
 import com.mengruojun.common.domain.Instrument;
-import com.mengruojun.common.utils.TradingUitils;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.strategycenter.springevent.MarketDataReceivedEvent;
 import org.apache.log4j.Logger;
@@ -15,8 +15,6 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -52,7 +50,7 @@ public class MarketDataReceiver implements MessageListener, ApplicationContextAw
                 if (msgObj instanceof Map) {
                     Map mdmMap = (Map<Instrument, MarketDataMessage>)msgObj;
                     if(mdmMap.size() > 0 && mdmMap.values().toArray()[0]  instanceof  MarketDataMessage){
-                        logger.info("mdmMap size should be " + TradingUitils.getInterestInstrumentList().size() + ", Actual is " + mdmMap.size());
+                        logger.debug("mdmMap size should be " + TradingUtils.getInterestInstrumentList().size() + ", Actual is " + mdmMap.size());
                         applicationContext.publishEvent(new MarketDataReceivedEvent(mdmMap));
                     }
                 }

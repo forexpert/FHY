@@ -62,10 +62,10 @@ public class ClientManager implements ApplicationListener {
       synchronized (brokerClientMap) {
         ClientInfoMessage cim = (ClientInfoMessage) event.getSource();
         if (brokerClientMap.containsKey(cim.getClientId())) {
-          //todo update broker client info
+          //todo update broker client info  --cmeng
         } else { // register a new broker client
           BrokerClient bc = new BrokerClient(cim.getBrokerType(), cim.getClientId(), cim.getStrategyId(),
-                  cim.getLeverage(), cim.getBaseCurrency(), cim.getCurrentBalance(), cim.getCurrentBalance(),
+                  cim.getLeverage(), cim.getBaseCurrency(), cim.getCurrentEquity(), cim.getCurrentEquity(),
                   cim.getOpenPositionList(), cim.getPendingPositionList(), cim.getClosedPositionList());
           brokerClientMap.put(bc.getClientId(), bc);
           logger.info("Current brokerclient size is " + brokerClientMap.size());

@@ -7,7 +7,7 @@ import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.utils.HistoryDataKBarUtils;
-import com.mengruojun.common.utils.TradingUitils;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -42,8 +43,9 @@ public class MarketDataManager {
    */
   private long eachKBarMapMaxSize = 100;
 
-  private Map<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>> kbarMap;
+  public static Map<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>> kbarMap;
 
+  public static List<Instrument> interestInstrumentList = TradingUtils.getInterestInstrumentList();
   {
     initKbarMap();
   }
@@ -53,8 +55,7 @@ public class MarketDataManager {
    */
   private void initKbarMap() {
     kbarMap = new ConcurrentHashMap<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>>();
-    List<Instrument> instruments = TradingUitils.getInterestInstrumentList();
-    for (Instrument instrument : instruments) {
+    for (Instrument instrument : interestInstrumentList) {
       Map<TimeWindowType, Queue<HistoryDataKBar>> twtBars = new ConcurrentHashMap<TimeWindowType, Queue<HistoryDataKBar>>();
 
       for (TimeWindowType twt : TimeWindowType.values()) {
@@ -97,7 +98,9 @@ public class MarketDataManager {
    */
   private void calculateAllBar(Long endTime, Instrument instrument) {
     for(TimeWindowType twt : TimeWindowType.values()){
-      getKBarByEndTime(endTime, instrument, twt);
+      if(twt != TimeWindowType.S10){
+        getKBarByEndTime(endTime, instrument, twt);
+      }
     }
   }
 
@@ -122,7 +125,7 @@ public class MarketDataManager {
    * @param timeWindowType timeWindowType
    * @return HistoryDataKBar
    */
-  public HistoryDataKBar getKBarByEndTime_OnlySearch(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
+  public static HistoryDataKBar getKBarByEndTime_OnlySearch(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
 
     endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType,endTime);
 
@@ -135,6 +138,16 @@ public class MarketDataManager {
     return null;
   }
 
+
+  public static Map<Instrument, HistoryDataKBar> getAllInterestInstrumentS10Bars(Long endTime){
+    Map<Instrument, HistoryDataKBar> bars = new HashMap<Instrument, HistoryDataKBar>();
+    for(Instrument instrument: interestInstrumentList){
+      HistoryDataKBar bar = getKBarByEndTime_OnlySearch(endTime, instrument, TimeWindowType.S10);
+      if(bar != null) bars.put(instrument, bar);
+    }
+    return bars;
+  }
+
   /**
    * return KBar from memory  by giving startTime, instrument and timeWidowType
    * if not find, insert one if it is able to calcuated
@@ -144,7 +157,7 @@ public class MarketDataManager {
    * @param timeWindowType timeWindowType
    * @return HistoryDataKBar
    */
-  public HistoryDataKBar getKBarByEndTime(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
+  private HistoryDataKBar getKBarByEndTime(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
 
     endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType,endTime);
 

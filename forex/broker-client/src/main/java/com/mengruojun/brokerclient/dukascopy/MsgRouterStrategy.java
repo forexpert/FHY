@@ -30,8 +30,8 @@ import java.util.List;
  * This is a Dukascopy Strategy, which plays a msg sender and receiver roles.
  * It doesn't do anything about strategy, but delegate the analysis work to JMS topic listener.
  */
-@Service("msgRouterStrategy")
 public class MsgRouterStrategy implements IStrategy {
+
   private IEngine engine = null;
   private IContext context = null;
   private IIndicators indicators = null;
@@ -52,6 +52,7 @@ public class MsgRouterStrategy implements IStrategy {
   private JmsTemplate jsmTemplate;
   @Autowired
   private Destination jmsTopicTradeCommand;
+  private String strategyName;
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;
@@ -88,7 +89,7 @@ public class MsgRouterStrategy implements IStrategy {
    * register client by JMS to the Client Manager
    */
   private void registerClient() throws JFException {
-    ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context, "sample");
+    ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context, strategyName);
     clientInfoSender.sendObjectMessage(cim);
   }
 
@@ -110,5 +111,13 @@ public class MsgRouterStrategy implements IStrategy {
   }
 
   public void onAccount(IAccount account) throws JFException {
+  }
+
+  public void setStrategyName(String strategyName) {
+    this.strategyName = strategyName;
+  }
+
+  public String getStrategyName() {
+    return strategyName;
   }
 }

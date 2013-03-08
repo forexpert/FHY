@@ -115,7 +115,7 @@ public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringCont
   private void verifyGeneratedBar(HistoryDataKBar expectedKBar, HistoryDataKBar currentS10Bar) {
     if (currentS10Bar.getCloseTime().equals(expectedKBar.getCloseTime() - TimeWindowType.S10.getTimeInMillis())) {
       // now the calculatedBar is still not finished. So it should be null or last available bar;
-      HistoryDataKBar calculatedBar = marketDataManager.getKBarByEndTime(expectedKBar.getCloseTime() - TimeWindowType.S10.getTimeInMillis(), currentS10Bar.getInstrument(), expectedKBar.getTimeWindowType());
+      HistoryDataKBar calculatedBar = MarketDataManager.getKBarByEndTime_OnlySearch(expectedKBar.getCloseTime() - TimeWindowType.S10.getTimeInMillis(), currentS10Bar.getInstrument(), expectedKBar.getTimeWindowType());
       if (calculatedBar != null) {
         assertEquals(calculatedBar.getCloseTime() + calculatedBar.getTimeWindowType().getTimeInMillis(), expectedKBar.getCloseTime(), 0);
       }
@@ -123,7 +123,7 @@ public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringCont
 
     if (currentS10Bar.getCloseTime().equals(expectedKBar.getCloseTime())) {
       // now the calculatedBar is just finished. So it should be not null;
-      HistoryDataKBar calculatedBar = marketDataManager.getKBarByEndTime(expectedKBar.getCloseTime(), currentS10Bar.getInstrument(), expectedKBar.getTimeWindowType());
+      HistoryDataKBar calculatedBar = MarketDataManager.getKBarByEndTime_OnlySearch(expectedKBar.getCloseTime(), currentS10Bar.getInstrument(), expectedKBar.getTimeWindowType());
       assertNotNull(calculatedBar);
       log.info(calculatedBar.toString());
       verifyGeneratedBarValue(expectedKBar, calculatedBar);

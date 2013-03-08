@@ -35,8 +35,7 @@ public class StrategyManager {
   public void handle(BrokerClient bc, Long endTime) {
       BaseStrategy strategy = strategyMap.get(bc.getStrategyName());
       if (strategy != null) {
-        long currentTime = endTime;
-        List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, currentTime);
+        List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, endTime);
         if (tradeCommandMessageList != null) {
           tradeCommandSender.sendObjectMessage(tradeCommandMessageList);
         }

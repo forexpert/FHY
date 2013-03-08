@@ -20,6 +20,8 @@ public class Position extends GeneratedIdBaseEntity {
     Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
     PositionStatus status;
     Direction direction;
+
+  /* K as unit  */
     Double amount;
     Double openPrice;
     Double closePrice;

@@ -1,8 +1,11 @@
 package com.mengruojun.strategycenter.domain;
 
 
+import com.mengruojun.common.domain.HistoryDataKBar;
+import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.enumerate.BrokerType;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 
 import java.util.Currency;
@@ -63,7 +66,31 @@ public class BrokerClient {
      */
     private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap =  new ConcurrentHashMap<Long, List<TradeCommandMessage>>();
 
-    public BrokerType getBrokerType() {
+  /**
+   * Util method
+   */
+
+  /**
+   *
+   * @param currentBars is a map for all subscribed instruments' ask close price
+   * @return  current left margin
+   */
+  public Double getLeftMargin(Map<Instrument, HistoryDataKBar> currentBars){
+    Double totalMargin = currentMoney;
+    return currentMoney- getUsedMargin(currentBars);
+
+  }
+
+  public Double getUsedMargin(Map<Instrument, HistoryDataKBar> currentBars){
+    Double usedMargin = 0d;
+    for(Position p :openPositions){
+      Double closePrice = currentBars.get(p.getInstrument()).getOhlc().getAskClose();
+      usedMargin += TradingUtils.calculateMargin(accountLeverage, closePrice, p, com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency));
+    }
+    return usedMargin;
+  }
+
+  public BrokerType getBrokerType() {
         return brokerType;
     }
 
