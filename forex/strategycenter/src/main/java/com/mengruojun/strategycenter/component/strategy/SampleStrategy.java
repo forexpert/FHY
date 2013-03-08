@@ -7,13 +7,20 @@ import com.mengruojun.common.domain.enumerate.TradeCommandType;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * A simpleStrategy just for test purpose
  */
 public class SampleStrategy extends BaseStrategy {
+
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
   public SampleStrategy() {
 
   }
@@ -21,7 +28,7 @@ public class SampleStrategy extends BaseStrategy {
   @Override
   public List<TradeCommandMessage> OnAnalysis(BrokerClient bc, long currentTime) {
     List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
-    TradeCommandMessage tcm = new TradeCommandMessage();
+    TradeCommandMessage tcm = new TradeCommandMessage(currentTime);
     tcm.setPositionId("test" + currentTime);
     tcm.setAmount(1d);
     tcm.setInstrument(new Instrument(Currency.EUR, Currency.USD));

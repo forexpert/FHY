@@ -202,6 +202,5 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   }
 
   public void onAccount(IAccount account) throws JFException {
-    //registerClient();
   }
 }

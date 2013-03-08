@@ -30,7 +30,13 @@
 package com.mengruojun.forex.brokerclient.dukascopy;
 
 import com.dukascopy.api.*;
+import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import org.apache.log4j.Logger;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 public class MA_Play implements IStrategy {
   Logger logger = Logger.getLogger(this.getClass());
@@ -39,6 +45,13 @@ public class MA_Play implements IStrategy {
     private int tagCounter = 0;
     private double[] ma1 = new double[Instrument.values().length];
     private IConsole console;
+
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
+
+  private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
     public void onStart(IContext context) throws JFException {
         engine = context.getEngine();
@@ -55,7 +68,7 @@ public class MA_Play implements IStrategy {
     }
 
     public void onTick(Instrument instrument, ITick tick) throws JFException {
-        if (ma1[instrument.ordinal()] == -1) {
+        /*if (ma1[instrument.ordinal()] == -1) {
             ma1[instrument.ordinal()] = indicators.ema(instrument, Period.TEN_SECS, OfferSide.BID, IIndicators.AppliedPrice.MEDIAN_PRICE, 14, 1);
         }
         double ma0 = indicators.ema(instrument, Period.TEN_SECS, OfferSide.BID, IIndicators.AppliedPrice.MEDIAN_PRICE, 14, 0);
@@ -76,10 +89,13 @@ public class MA_Play implements IStrategy {
                         - instrument.getPipValue() * 10, tick.getBid() + instrument.getPipValue() * 15);
             }
         }
-        ma1[instrument.ordinal()] = ma0;
+        ma1[instrument.ordinal()] = ma0;*/
     }
 
     public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
+      if(dukascopyInstrumentList.contains(instrument)){
+        logger.info("askBar.getTime()  is " + sdf.format(new Date(askBar.getTime())) + ", Instrument is " +instrument + ", period is " + period);
+      }
 
     }
 

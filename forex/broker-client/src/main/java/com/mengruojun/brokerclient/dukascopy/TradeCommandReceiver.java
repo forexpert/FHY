@@ -13,6 +13,7 @@ import javax.jms.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 
 /**
  * To receive trade command from client manager, then send them to dukascopy broker server
@@ -25,8 +26,7 @@ public class TradeCommandReceiver{
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public TradeCommandReceiver(java.util.Queue<TradeCommandMessage> tcmQueue, JmsTemplate template, Destination destination) {
-      this.tcmQueue = tcmQueue;
+    public TradeCommandReceiver(IContext context, JmsTemplate template, Destination destination) {
         this.context = context;
         this.template = template;
         this.destination = destination;
@@ -35,14 +35,18 @@ public class TradeCommandReceiver{
     IContext context;
     private JmsTemplate template;
     private Destination destination;
-    private Queue<TradeCommandMessage> tcmQueue;
-    public void receive()  throws JMSException, InterruptedException {
+    public void receive(){
         while (true) {
+          try{
             Message message = template.receive(destination);
             if (message != null)
-                onMessage(message);
+              onMessage(message);
             else
-                break;
+              break;
+          } catch (Exception e){
+            logger.error("", e);
+          }
+
         }
     }
     public void onMessage(Message message){
@@ -52,18 +56,8 @@ public class TradeCommandReceiver{
                 Object msgObj = ((ObjectMessage) message).getObject();
                 if (msgObj instanceof List) {
                     for(TradeCommandMessage tcm : (List<TradeCommandMessage>) msgObj){
-                        logger.info("TradeCommandMessage: ");
-                        logger.info("getTradeCommandType " + tcm.getTradeCommandType());
-
-                        logger.info("");
-                        logger.info("");
-                        logger.info("");
-                        //todo cmeng to handler the command
-                        //handleCommand(tcm);
-                      synchronized (tcmQueue){
-                        tcmQueue.add(tcm) ;
-                      }
-
+                        logger.debug("TradeCommandMessage: " + tcm.toString());
+                      context.executeTask(new TradeTask(tcm));
                     }
                 }
             } catch (Exception ex) {
@@ -75,56 +69,73 @@ public class TradeCommandReceiver{
         }
     }
 
+
+
+
+  private class TradeTask implements Callable<Object> {
+    private TradeCommandMessage tcm;
+
+    public TradeTask(TradeCommandMessage tcm){
+      this.tcm = tcm;
+    }
+
+    @Override
+    public Object call() throws Exception {
+      handleCommand(tcm);
+      return null;
+    }
+
     private void handleCommand(TradeCommandMessage tcm) throws JFException {
 
 
-        String positionLabel = tcm.getPositionId();
-        Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
-        Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
-        Double openPrice = tcm.getOpenPrice();
-        Double stopLossPrice = tcm.getStopLossPrice();
-        Double takeProfitPrice = tcm.getTakeProfitPrice();
+      String positionLabel = tcm.getPositionId();
+      Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
+      Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
+      Double openPrice = tcm.getOpenPrice();
+      Double stopLossPrice = tcm.getStopLossPrice();
+      Double takeProfitPrice = tcm.getTakeProfitPrice();
 
-        switch (tcm.getTradeCommandType()){
-            case openAtMarketPrice: {
-                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
-                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
-                break;
-            }
-            case openAtSetPrice: {
-                IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUYLIMIT : IEngine.OrderCommand.SELLLIMIT;
-                context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
-                break;
-            }
-            case cancel:{
-                IOrder order = context.getEngine().getOrder(positionLabel);
-                if(order != null){
-                    order.close();
-                }
-                break;
-            }
-            case change:{
-                IOrder order = context.getEngine().getOrder(positionLabel);
-                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
-                    order.setOpenPrice(openPrice);
-                }
-                if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
-                        || order.getState() == IOrder.State.FILLED){
-                    order.setRequestedAmount(amount);
-                    order.setStopLossPrice(stopLossPrice);
-                    order.setTakeProfitPrice(takeProfitPrice);
-                }
-                break;
-            }
-            case close:{
-                IOrder order = context.getEngine().getOrder(positionLabel);
-                if(order != null){
-                    order.close(amount);
-                }
-                break;
-            }
+      switch (tcm.getTradeCommandType()){
+        case openAtMarketPrice: {
+          IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
+          context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+          break;
         }
-        logger.info("sending TradeCommandMessage to Dukascopy server" + tcm);
+        case openAtSetPrice: {
+          IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUYLIMIT : IEngine.OrderCommand.SELLLIMIT;
+          context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
+          break;
+        }
+        case cancel:{
+          IOrder order = context.getEngine().getOrder(positionLabel);
+          if(order != null){
+            order.close();
+          }
+          break;
+        }
+        case change:{
+          IOrder order = context.getEngine().getOrder(positionLabel);
+          if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
+            order.setOpenPrice(openPrice);
+          }
+          if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
+                  || order.getState() == IOrder.State.FILLED){
+            order.setRequestedAmount(amount);
+            order.setStopLossPrice(stopLossPrice);
+            order.setTakeProfitPrice(takeProfitPrice);
+          }
+          break;
+        }
+        case close:{
+          IOrder order = context.getEngine().getOrder(positionLabel);
+          if(order != null){
+            order.close(amount);
+          }
+          break;
+        }
+      }
+      logger.info("sending TradeCommandMessage to Dukascopy server" + tcm);
 
     }
+  }
 }

@@ -3,107 +3,143 @@ package com.mengruojun.jms.domain;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.common.domain.enumerate.TradeCommandType;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * TradeCommandMessage
  */
 public class TradeCommandMessage implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
-    Direction direction;
-    /**
-     * Amount in K unit
-     */
-    Double amount;
-    Double openPrice;
-    Double closePrice;
-    Double stopLossPrice;
-    Double takeProfitPrice;
-    String positionId;
-    private TradeCommandType tradeCommandType;
+  private static final long serialVersionUID = 1L;
 
 
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
 
-    public TradeCommandMessage() {
-    }
+  Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
+  Direction direction;
+  /**
+   * Amount in K unit
+   */
+  Double amount;
+  Double openPrice;
+  Double closePrice;
+  Double stopLossPrice;
+  Double takeProfitPrice;
+  String positionId;
+  private TradeCommandType tradeCommandType;
 
-    @Override
-    public String toString(){
-        return "TradeCommandMessage has a position with id as " + positionId;
-    }
+  /**
+   * What time does this TradeCommandMessage work for.
+   *
+   * Usually, it is used for verify and monitoring
+   */
+  private Long analyzeTime;
 
-    public Instrument getInstrument() {
-        return instrument;
-    }
+  public TradeCommandMessage(Long analyzeTime) {
 
-    public void setInstrument(Instrument instrument) {
-        this.instrument = instrument;
-    }
+    this.analyzeTime = analyzeTime;
+  }
 
-    public Direction getDirection() {
-        return direction;
-    }
+  @Override
+  public String toString() {
+    ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+            .append("analyzeTime", this.analyzeTime)
+            .append("analyzeTime_H", sdf.format(new Date(this.analyzeTime)))
+            .append("positionId", positionId)
+            .append("instrument", this.instrument)
+            .append("amount", this.amount)
+            .append("openPrice", this.openPrice)
+            .append("closePrice", closePrice)
+            .append("stopLossPrice", takeProfitPrice)
+            .append("tradeCommandType", tradeCommandType);
+    return sb.toString();
+  }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
+  public Instrument getInstrument() {
+    return instrument;
+  }
 
-    public Double getAmount() {
-        return amount;
-    }
+  public void setInstrument(Instrument instrument) {
+    this.instrument = instrument;
+  }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+  public Direction getDirection() {
+    return direction;
+  }
 
-    public Double getOpenPrice() {
-        return openPrice;
-    }
+  public void setDirection(Direction direction) {
+    this.direction = direction;
+  }
 
-    public void setOpenPrice(Double openPrice) {
-        this.openPrice = openPrice;
-    }
+  public Double getAmount() {
+    return amount;
+  }
 
-    public Double getClosePrice() {
-        return closePrice;
-    }
+  public void setAmount(Double amount) {
+    this.amount = amount;
+  }
 
-    public void setClosePrice(Double closePrice) {
-        this.closePrice = closePrice;
-    }
+  public Double getOpenPrice() {
+    return openPrice;
+  }
 
-    public Double getStopLossPrice() {
-        return stopLossPrice;
-    }
+  public void setOpenPrice(Double openPrice) {
+    this.openPrice = openPrice;
+  }
 
-    public void setStopLossPrice(Double stopLossPrice) {
-        this.stopLossPrice = stopLossPrice;
-    }
+  public Double getClosePrice() {
+    return closePrice;
+  }
 
-    public Double getTakeProfitPrice() {
-        return takeProfitPrice;
-    }
+  public void setClosePrice(Double closePrice) {
+    this.closePrice = closePrice;
+  }
 
-    public void setTakeProfitPrice(Double takeProfitPrice) {
-        this.takeProfitPrice = takeProfitPrice;
-    }
+  public Double getStopLossPrice() {
+    return stopLossPrice;
+  }
 
-    public String getPositionId() {
-        return positionId;
-    }
+  public void setStopLossPrice(Double stopLossPrice) {
+    this.stopLossPrice = stopLossPrice;
+  }
 
-    public void setPositionId(String positionId) {
-        this.positionId = positionId;
-    }
+  public Double getTakeProfitPrice() {
+    return takeProfitPrice;
+  }
 
-    public TradeCommandType getTradeCommandType() {
-        return tradeCommandType;
-    }
+  public void setTakeProfitPrice(Double takeProfitPrice) {
+    this.takeProfitPrice = takeProfitPrice;
+  }
 
-    public void setTradeCommandType(TradeCommandType tradeCommandType) {
-        this.tradeCommandType = tradeCommandType;
-    }
+  public String getPositionId() {
+    return positionId;
+  }
+
+  public void setPositionId(String positionId) {
+    this.positionId = positionId;
+  }
+
+  public TradeCommandType getTradeCommandType() {
+    return tradeCommandType;
+  }
+
+  public void setTradeCommandType(TradeCommandType tradeCommandType) {
+    this.tradeCommandType = tradeCommandType;
+  }
+
+  public Long getAnalyzeTime() {
+    return analyzeTime;
+  }
+
+  public void setAnalyzeTime(Long analyzeTime) {
+    this.analyzeTime = analyzeTime;
+  }
 }

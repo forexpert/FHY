@@ -54,6 +54,7 @@ public class MarketDataFeedStrategy implements IStrategy {
         indicators = context.getIndicators();
         this.console = context.getConsole();
         console.getOut().println("Started");
+        registerClient();
     }
 
     /**
@@ -101,6 +102,5 @@ public class MarketDataFeedStrategy implements IStrategy {
     }
 
     public void onAccount(IAccount account) throws JFException {
-        registerClient();
     }
 }
