@@ -62,8 +62,8 @@ public class TradingUtils {
   }
 
   public static Double getMinAmount(Instrument instrument) {
-    if (instrument == new Instrument("XAU/USD")) return 0.001;
-    if (instrument == new Instrument("XAG/USD")) return 0.05;
+    if (instrument.equals(new Instrument("XAU/USD"))) return 0.001;
+    if (instrument.equals(new Instrument("XAG/USD"))) return 0.05;
     return 1d;
   }
 

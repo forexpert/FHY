@@ -27,7 +27,7 @@ public class SampleStrategy extends BaseStrategy {
    * @param label user defined identifier for the order. Label must be unique for the given user account among the current orders.
    * 			Allowed characters: letters, numbers and "_". Label must have at most 256 characters.
    */
-  static  SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_Z");
+  static  SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 
   static{
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -39,7 +39,7 @@ public class SampleStrategy extends BaseStrategy {
 
   @Override
   public List<TradeCommandMessage> OnAnalysis(BrokerClient bc, long currentTime) {
-    return factor0(bc,currentTime);
+    return factor1(bc, currentTime);
   }
 
 
@@ -90,16 +90,12 @@ public class SampleStrategy extends BaseStrategy {
         direction = Direction.Short;
       }
 
-      if(direction == null){
-        direction =Direction.Long;
-      }
-
       if(direction != null){
         // verify if money is enough
         if (bc.getOpenPositions().size() < 100 && bc.getLeftMargin(currentPriceMap) > 0) {
           TradeCommandMessage tcm = new TradeCommandMessage(currentTime);
 
-          tcm.setPositionId("test" + sdf.format(new Date(currentTime)));
+          tcm.setPositionId("Test"+bc.getClientId() + "_" + instrument.getCurrency1()+instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime)));
           tcm.setAmount(TradingUtils.getMinAmount(instrument));
           tcm.setInstrument(instrument);
           tcm.setTradeCommandType(TradeCommandType.openAtMarketPrice);

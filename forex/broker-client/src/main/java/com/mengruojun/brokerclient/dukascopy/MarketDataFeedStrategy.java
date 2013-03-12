@@ -17,13 +17,15 @@ import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.jms.domain.ClientInfoMessage;
-import com.mengruojun.jms.utils.JMSSender;
 import com.mengruojun.jms.domain.MarketDataMessage;
+import com.mengruojun.jms.utils.JMSSender;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is a Dukascopy marketDataFeedStrategy Strategy, which won't do anything about trading but just send market data msg to
@@ -31,76 +33,89 @@ import java.util.*;
  */
 @Service("marketDataFeedStrategy")
 public class MarketDataFeedStrategy implements IStrategy {
-    private IEngine engine = null;
-    private IContext context = null;
-    private IIndicators indicators = null;
-    private int tagCounter = 0;
-    private double[] ma1 = new double[Instrument.values().length];
-    private IConsole console;
-    Logger logger = Logger.getLogger(this.getClass());
-    private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
+  private IEngine engine = null;
+  private IContext context = null;
+  private IIndicators indicators = null;
+  private int tagCounter = 0;
+  private double[] ma1 = new double[Instrument.values().length];
+  private IConsole console;
+  Logger logger = Logger.getLogger(this.getClass());
+  private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
-    @Autowired
-    private JMSSender marketDataSender;
-    @Autowired
-    private JMSSender clientInfoSender;
+  @Autowired
+  private JMSSender marketDataSender;
+  @Autowired
+  private JMSSender clientInfoSender;
 
-    private Map<com.mengruojun.common.domain.Instrument, MarketDataMessage> marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
+  private Map<com.mengruojun.common.domain.Instrument, MarketDataMessage> marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
 
 
-    public void onStart(final IContext context) throws JFException {
-        this.context = context;
-        engine = context.getEngine();
-        indicators = context.getIndicators();
-        this.console = context.getConsole();
-        console.getOut().println("Started");
-        registerClient();
+  public void onStart(final IContext context) throws JFException {
+    this.context = context;
+    engine = context.getEngine();
+    indicators = context.getIndicators();
+    this.console = context.getConsole();
+    console.getOut().println("Started");
+    registerClient();
+  }
+
+  /**
+   * register client by JMS to the Client Manager
+   */
+  private void registerClient() throws JFException {
+    ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
+    clientInfoSender.sendObjectMessage(cim);
+  }
+
+  public void onStop() throws JFException {
+    for (IOrder order : engine.getOrders()) {
+      order.close();
     }
+    console.getOut().println("Stopped");
+  }
 
-    /**
-     * register client by JMS to the Client Manager
-     */
-    private void registerClient() throws JFException {
-        ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyMarketDataFeeder, this.context, null);
-        clientInfoSender.sendObjectMessage(cim);
-    }
+  public void onTick(Instrument instrument, ITick tick) throws JFException {
+  }
 
-    public void onStop() throws JFException {
-        for (IOrder order : engine.getOrders()) {
-            order.close();
+  private long currentTenBarStartTime;
+
+  public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
+    if (period.equals(Period.TEN_SECS)) {
+      TimeWindowType twt = TimeWindowType.S10;
+      MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
+              askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
+              bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
+              askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
+              instrument.getSecondaryCurrency(), twt);
+      com.mengruojun.common.domain.Instrument fiInstrument = DukascopyUtils.fromDukascopyInstrument(instrument);
+
+
+      if (askBar.getTime() == currentTenBarStartTime) {
+        marketDataMessageMap.put(fiInstrument, mdm);
+        if (marketDataMessageMap.size() == dukascopyInstrumentList.size()) {
+          marketDataSender.sendObjectMessage(marketDataMessageMap);
+          //clear
+          marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
         }
-        console.getOut().println("Stopped");
-    }
-
-    public void onTick(Instrument instrument, ITick tick) throws JFException {
-    }
-
-    public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) {
-        if (period.equals(Period.TEN_SECS)) {
-            TimeWindowType twt = TimeWindowType.S10;
-            MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
-                    askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
-                    bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
-                    askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
-                    instrument.getSecondaryCurrency(), twt);
-            com.mengruojun.common.domain.Instrument  fiInstrument = DukascopyUtils.fromDukascopyInstrument(instrument);
-
-            if(marketDataMessageMap.get(instrument) != null){
-                //理论上不会走到这一步
-                logger.error("Dukascopy Markder Data Feeder has error. marketDataMessageMap didn't collect all interested data!. Now clear the map!");
-                marketDataMessageMap.clear();
-            }
-            marketDataMessageMap.put(fiInstrument, mdm);
-            if(marketDataMessageMap.size() == dukascopyInstrumentList.size()){
-                marketDataSender.sendObjectMessage(marketDataMessageMap);
-                marketDataMessageMap = new HashMap<com.mengruojun.common.domain.Instrument, MarketDataMessage>();
-            }
+      } else {  // time change
+        currentTenBarStartTime = askBar.getTime();
+        if (marketDataMessageMap.size() > 0) {
+          //理论上不会走到这一步
+          logger.error("Dukascopy Markder Data Feeder has error. marketDataMessageMap didn't collect all interested data!. Now clear the map!");
+          marketDataMessageMap.clear();
         }
-    }
 
-    public void onMessage(IMessage message) throws JFException {
-    }
+        marketDataMessageMap.clear();
+        marketDataMessageMap.put(fiInstrument, mdm);
+      }
 
-    public void onAccount(IAccount account) throws JFException {
+
     }
+  }
+
+  public void onMessage(IMessage message) throws JFException {
+  }
+
+  public void onAccount(IAccount account) throws JFException {
+  }
 }

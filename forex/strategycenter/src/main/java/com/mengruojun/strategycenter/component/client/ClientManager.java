@@ -43,7 +43,7 @@ public class ClientManager implements ApplicationListener {
     if (event instanceof MarketDataReceivedEvent) {
       synchronized (brokerClientMap) {
         Map<Instrument, MarketDataMessage> mdmMap = (HashMap<Instrument, MarketDataMessage>) event.getSource();
-        if (verifyMarketData(mdmMap)) {
+        if (verifyMarketDataPackage(mdmMap)) {
           Long endTime = getEndTime(mdmMap);
           marketDataManager.push(mdmMap);
           for (BrokerClient bc : brokerClientMap.values()) {
@@ -87,7 +87,7 @@ public class ClientManager implements ApplicationListener {
    *
    * @return return true if data is available;
    */
-  private boolean verifyMarketData(Map<Instrument, MarketDataMessage> mdmMap) {
+  private boolean verifyMarketDataPackage(Map<Instrument, MarketDataMessage> mdmMap) {
     Long openTime = null;
     TimeWindowType twt = null;
 

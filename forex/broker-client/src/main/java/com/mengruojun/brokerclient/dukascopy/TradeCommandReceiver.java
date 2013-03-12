@@ -58,10 +58,11 @@ public class TradeCommandReceiver{
                 Object msgObj = ((ObjectMessage) message).getObject();
                 if (msgObj instanceof List) {
                   logger.info("tcms size is " + ((List<TradeCommandMessage>) (msgObj)).size());
-                    for(TradeCommandMessage tcm : (List<TradeCommandMessage>) msgObj){
+                    /*for(TradeCommandMessage tcm : (List<TradeCommandMessage>) msgObj){
                         logger.info("TradeCommandMessage: " + tcm.toString());
-                      context.executeTask(new TradeTask(tcm));
-                    }
+
+                    }*/
+                  context.executeTask(new TradeTask((List<TradeCommandMessage>) msgObj));
                 }
             } catch (Exception ex) {
                 logger.error("", ex);
@@ -76,21 +77,22 @@ public class TradeCommandReceiver{
 
 
   private class TradeTask implements Callable<Object> {
-    private TradeCommandMessage tcm;
+    private List<TradeCommandMessage> tcmList;
 
-    public TradeTask(TradeCommandMessage tcm){
-      this.tcm = tcm;
+    public TradeTask(List<TradeCommandMessage> tcmList){
+      this.tcmList = tcmList;
     }
 
     @Override
     public Object call() throws Exception {
-      handleCommand(tcm);
+      for(TradeCommandMessage tcm : tcmList){
+        handleCommand(tcm);
+      }
       return null;
     }
 
     private void handleCommand(TradeCommandMessage tcm) throws JFException {
-      //if(!tcm.getInstrument().equals(new com.mengruojun.common.domain.Instrument("EUR/USD")))return;
-
+      logger.info("start to handle TradeCommandMessage to Dukascopy server" + tcm);
       String positionLabel = tcm.getPositionId();
       Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
       Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
@@ -138,7 +140,6 @@ public class TradeCommandReceiver{
         }
       }
       logger.info("sending TradeCommandMessage to Dukascopy server" + tcm);
-      //wait5sec();
     }
 
 
