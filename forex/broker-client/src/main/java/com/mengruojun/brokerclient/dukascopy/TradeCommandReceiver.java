@@ -21,71 +21,74 @@ import java.util.concurrent.Callable;
  * To receive trade command from client manager, then send them to dukascopy broker server
  */
 
-public class TradeCommandReceiver{
-    Logger logger = Logger.getLogger(this.getClass());
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-    {
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+public class TradeCommandReceiver {
+  Logger logger = Logger.getLogger(this.getClass());
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+
+  {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
+
+  public TradeCommandReceiver(String clientId, IContext context, JmsTemplate template, Destination destination) {
+    this.clientId = clientId;
+    this.context = context;
+    this.template = template;
+    this.destination = destination;
+  }
+
+  IContext context;
+  private JmsTemplate template;
+  private Destination destination;
+  private String clientId;
+
+  public void receive() {
+    while (true) {
+      try {
+        Message message = template.receive(destination);
+        if (message != null)
+          onMessage(message);
+        else
+          break;
+      } catch (Exception e) {
+        logger.error("", e);
+      }
+
     }
+  }
 
-    public TradeCommandReceiver(IContext context, JmsTemplate template, Destination destination) {
-        this.context = context;
-        this.template = template;
-        this.destination = destination;
-    }
-
-    IContext context;
-    private JmsTemplate template;
-    private Destination destination;
-    public void receive(){
-        while (true) {
-          try{
-            Message message = template.receive(destination);
-            if (message != null)
-              onMessage(message);
-            else
-              break;
-          } catch (Exception e){
-            logger.error("", e);
-          }
-
-        }
-    }
-    public void onMessage(Message message){
-
-        if (message instanceof ObjectMessage) {
-            try {
-                Object msgObj = ((ObjectMessage) message).getObject();
-                if (msgObj instanceof List) {
-                  logger.info("tcms size is " + ((List<TradeCommandMessage>) (msgObj)).size());
-                    /*for(TradeCommandMessage tcm : (List<TradeCommandMessage>) msgObj){
-                        logger.info("TradeCommandMessage: " + tcm.toString());
-
-                    }*/
-                  context.executeTask(new TradeTask((List<TradeCommandMessage>) msgObj));
-                }
-            } catch (Exception ex) {
-                logger.error("", ex);
-                throw new RuntimeException(ex);
+  public void onMessage(Message message) {
+    if (message instanceof ObjectMessage) {
+      try {
+        Object msgObj = ((ObjectMessage) message).getObject();
+        if (msgObj instanceof Map) {
+          Map<String, Object> tradeCommand = (Map<String, Object>) msgObj;
+          if (tradeCommand.get("clientId") != null && tradeCommand.get("clientId").equals(this.clientId)){
+            if(tradeCommand.get("tradeCommandList") instanceof List){
+              logger.info("tcms size is " + ((List<TradeCommandMessage>) (tradeCommand.get("tradeCommandList"))).size());
+              context.executeTask(new TradeTask((List<TradeCommandMessage>) tradeCommand.get("tradeCommandList")));
             }
-        } else {
-            logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actuall is " + message);
+          }
         }
+      } catch (Exception ex) {
+        logger.error("", ex);
+        throw new RuntimeException(ex);
+      }
+    } else {
+      logger.error("Message should be a ObjectMessage in MarketDataTopic, but the message actuall is " + message);
     }
-
-
+  }
 
 
   private class TradeTask implements Callable<Object> {
     private List<TradeCommandMessage> tcmList;
 
-    public TradeTask(List<TradeCommandMessage> tcmList){
+    public TradeTask(List<TradeCommandMessage> tcmList) {
       this.tcmList = tcmList;
     }
 
     @Override
     public Object call() throws Exception {
-      for(TradeCommandMessage tcm : tcmList){
+      for (TradeCommandMessage tcm : tcmList) {
         handleCommand(tcm);
       }
       return null;
@@ -100,7 +103,7 @@ public class TradeCommandReceiver{
       Double stopLossPrice = tcm.getStopLossPrice();
       Double takeProfitPrice = tcm.getTakeProfitPrice();
 
-      switch (tcm.getTradeCommandType()){
+      switch (tcm.getTradeCommandType()) {
         case openAtMarketPrice: {
           IEngine.OrderCommand longOrShort = tcm.getDirection() == Direction.Long ? IEngine.OrderCommand.BUY : IEngine.OrderCommand.SELL;
           IOrder order = context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
@@ -111,29 +114,29 @@ public class TradeCommandReceiver{
           IOrder order = context.getEngine().submitOrder(positionLabel, instrument, longOrShort, amount, openPrice, 5, stopLossPrice, takeProfitPrice);
           break;
         }
-        case cancel:{
+        case cancel: {
           IOrder order = context.getEngine().getOrder(positionLabel);
-          if(order != null){
+          if (order != null) {
             order.close();
           }
           break;
         }
-        case change:{
+        case change: {
           IOrder order = context.getEngine().getOrder(positionLabel);
-          if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED){
+          if (order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED) {
             order.setOpenPrice(openPrice);
           }
-          if(order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
-                  || order.getState() == IOrder.State.FILLED){
+          if (order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
+                  || order.getState() == IOrder.State.FILLED) {
             order.setRequestedAmount(amount);
             order.setStopLossPrice(stopLossPrice);
             order.setTakeProfitPrice(takeProfitPrice);
           }
           break;
         }
-        case close:{
+        case close: {
           IOrder order = context.getEngine().getOrder(positionLabel);
-          if(order != null){
+          if (order != null) {
             order.close(amount);
           }
           break;
@@ -143,8 +146,8 @@ public class TradeCommandReceiver{
     }
 
 
-    public void wait5sec(){//just waits 5 seconds - when we place an order
-      try  {
+    public void wait5sec() {//just waits 5 seconds - when we place an order
+      try {
         Thread.currentThread().sleep(5000); //wait 5 secs
       } catch (InterruptedException e) {
       }

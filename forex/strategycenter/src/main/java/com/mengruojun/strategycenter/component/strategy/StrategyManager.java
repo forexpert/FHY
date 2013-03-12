@@ -6,6 +6,7 @@ import com.mengruojun.strategycenter.domain.BrokerClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +38,10 @@ public class StrategyManager {
       if (strategy != null) {
         List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, endTime);
         if (tradeCommandMessageList != null) {
-          tradeCommandSender.sendObjectMessage(tradeCommandMessageList);
+          Map<String, Object> tradeCommand = new HashMap<String, Object>();
+          tradeCommand.put("clientId", bc.getClientId());
+          tradeCommand.put("tradeCommandList", tradeCommandMessageList);
+          tradeCommandSender.sendObjectMessage(tradeCommand);
         }
       }
   }

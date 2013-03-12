@@ -40,7 +40,7 @@ public class MsgRouterStrategy implements IStrategy {
   private IConsole console;
   Logger logger = Logger.getLogger(this.getClass());
   private List<Instrument> dukascopyInstrumentList = Arrays.asList(Instrument.values());
-
+  private String clientId = null;
 
   private TradeCommandReceiver tradeCommandReceiver;
 
@@ -70,7 +70,7 @@ public class MsgRouterStrategy implements IStrategy {
    * command to dukascopy server by Dukascopy JForex API
    */
   private void startTradeCommandListener() {
-    tradeCommandReceiver = new TradeCommandReceiver(context, jsmTemplate, jmsTopicTradeCommand);
+    tradeCommandReceiver = new TradeCommandReceiver(this.clientId, context, jsmTemplate, jmsTopicTradeCommand);
     new Thread() {
       public void run() {
         try {
@@ -90,6 +90,7 @@ public class MsgRouterStrategy implements IStrategy {
    */
   private void registerClient() throws JFException {
     ClientInfoMessage cim = DukascopyUtils.generateClientInfoMessage(BrokerType.DukascopyDemo, this.context, strategyName);
+    this.clientId = cim.getClientId();
     clientInfoSender.sendObjectMessage(cim);
   }
 
