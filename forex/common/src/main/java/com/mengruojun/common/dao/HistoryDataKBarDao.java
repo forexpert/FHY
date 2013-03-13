@@ -4,6 +4,7 @@ package com.mengruojun.common.dao;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.TimeWindowType;
+import org.hibernate.jdbc.Work;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  */
 public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
 
+  public void readAll(final Work work);
 
   /**
    * find the specified HistoryDataKBar and return null if not found;

@@ -8,11 +8,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.annotations.Table;
+import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -22,10 +26,14 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,6 +65,20 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
     }
   }
 
+
+  @Override
+  public void readAll(final Work work){
+    final String sql = "SELECT * FROM HistoryDataKBar ORDER BY openTime ASC";
+    this.getHibernateTemplate().executeFind(new HibernateCallback() {
+      @Override
+      public Object doInHibernate(Session session) throws HibernateException, SQLException {
+        Map<Instrument, HistoryDataKBar> mdmMap;
+        List<HistoryDataKBar> result = new ArrayList();
+        session.doWork(work);
+        return result;
+      }
+    });
+  }
 
   @Override
   public HistoryDataKBar find(long openTime, Instrument instrument, TimeWindowType timeWindowType) {
