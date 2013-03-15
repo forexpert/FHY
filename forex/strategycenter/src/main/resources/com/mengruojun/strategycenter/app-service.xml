@@ -22,6 +22,9 @@
     <import resource="classpath:com/mengruojun/common/db/app-common.xml"/>
     <!-- Activates scanning of @Repository and @Service -->
     <context:component-scan base-package="com.mengruojun.strategycenter"/>
+    <bean id="historyBackTestingProcessorThread" class="java.lang.Thread" init-method="start">
+        <constructor-arg ref="historyBackTestingProcessor" />
+    </bean>
 
     <!-- Add new DAOs here -->
 

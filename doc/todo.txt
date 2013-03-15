@@ -1,12 +1,48 @@
-1. user different processor to start different Dukascopy client, due to:
-    1) Dukascopy API can only return a static FXClient.
-    2) We only have up to three Dukascoy client in the system: one is price feeder, one is demo account testing, and one is real account.
-2. 周末非交易日时段数据如何处理
-3. 历史数据和现实数据如何结合起来
-  1) 显示数据
+1. put dukascopy client as JMS msg sender   --Done
+1.1 add a jms moudle which contains jms config and jms message domain class.
+
+1) account Info msg
+2) portfolio msg
+3) trade action msg
+
+2. In webConsole and Core module, put JMS msg subscriber. (DB, event facility)
+
+100. 参考currensee代码，把dukascopy client变成非单例的。(可能不需要了，已经是非单例的）
 
 
-4. Strategy实验田，如何和Strategy结合起来
-5. 目前，发送tradeCommand会有NPE错，并且会停止TCReceiver
+3. refine activemq/webConsole/core startup
+4. Simple strategy, Simple Performance showing on webConsole
+
+99. 新增其他broker的demo账户.像BI,FXCm的
+
+
+
+
+ tasks:
+
+
+
+=====================================================================================================================
+1. test sample strategy for other Bars Data   ---  done
+
+2. tradeAction for multiple clients and position management
+3. update broker client info  and reconcilidation. [how to Calculate amount, margin for different instruments?]
+
+4. add runtime computing indicators
+5. test strategy by using indicators
+6. strategy factory on history data
+7. use strategy from strategy factory
+6. polish all processors
+
+========================================================================================
+User Active rather than InActive Demo Account , otherwise, the data feed is inaccurated.
+
+
+
+
+模拟退火算法+
+遗传算法
+
+
 
 

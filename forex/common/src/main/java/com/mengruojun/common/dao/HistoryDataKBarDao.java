@@ -4,7 +4,10 @@ package com.mengruojun.common.dao;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.TimeWindowType;
+import org.hibernate.jdbc.Work;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -12,7 +15,20 @@ import java.util.List;
  *
  */
 public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
+  public interface ResultSetWork {
 
+    /**
+     * Usually, in ouside, the code looks like:
+     * <p/>
+     * while (rs.next()) {
+     * resultSetWork.doWork(rs);
+     * }
+     *
+     * So it means the passed in rs object must hasNext.
+     * @param rs is one instance of ResultSet
+     */
+    public void doWork(ResultSet rs) throws SQLException;
+  }
 
   /**
    * find the specified HistoryDataKBar and return null if not found;
@@ -43,4 +59,10 @@ public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
   void batchSave(List<HistoryDataKBar> bars);
 
   String getMysqlTimeZone();
+
+  /**
+   * work is a jdbc style to read data.
+   * @param resultSetWork rs
+   */
+  public void readAll(final ResultSetWork resultSetWork);
 }

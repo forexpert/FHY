@@ -8,11 +8,16 @@ import com.mengruojun.common.domain.enumerate.Currency;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -101,10 +106,17 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
 
     HistoryDataKBar latestBar = historyDataKBarDao.getLatestBarForPeriod(new Instrument(Currency.EUR, Currency.USD), TimeWindowType.S10);
     assertEquals(bar_2, latestBar);
+  }
 
 
-
-
-
+  @Test
+  public void testJDBCLoading() {
+    HistoryDataKBarDao.ResultSetWork resultSetWork  = new HistoryDataKBarDao.ResultSetWork() {
+      @Override
+      public void doWork(ResultSet rs) throws SQLException {
+        logger.info(rs.getInt(1));
+      }
+    };
+    historyDataKBarDao.readAll(resultSetWork);
   }
 }
