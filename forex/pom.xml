@@ -21,6 +21,7 @@
         <module>broker-client</module>
         <module>activemq</module>
         <module>strategycenter</module>
+        <module>farm</module>
     </modules>
 
 
