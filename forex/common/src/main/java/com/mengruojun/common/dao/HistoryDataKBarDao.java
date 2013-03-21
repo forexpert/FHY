@@ -16,7 +16,6 @@ import java.util.List;
  */
 public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
   public interface ResultSetWork {
-
     /**
      * Usually, in ouside, the code looks like:
      * <p/>
@@ -29,7 +28,6 @@ public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
      */
     public void doWork(ResultSet rs) throws SQLException;
   }
-
   /**
    * find the specified HistoryDataKBar and return null if not found;
    * @param startTime

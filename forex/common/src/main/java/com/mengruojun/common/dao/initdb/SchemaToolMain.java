@@ -19,7 +19,7 @@ public class SchemaToolMain {
   ApplicationContext context;
 
   private SchemaToolMain() {
-    context = new ClassPathXmlApplicationContext(new String[]{"classpath:/com/mengruojun/common/db/applicationContext-dao.xml"});
+    context = new ClassPathXmlApplicationContext(new String[]{"classpath:/com/mengruojun/common/db/app-common.xml"});
   }
 
   public void run(String[] args) {
