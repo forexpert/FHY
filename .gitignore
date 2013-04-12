@@ -2,3 +2,5 @@ target/
 *.iml
 .idea/
 classes/
+bin/log/
+forex/common/log/
