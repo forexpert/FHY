@@ -317,7 +317,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
   /**
    * use jdbc mode to save bars in a batch. if get any exception, than, use hibernate saving one row by one row;
    */
-  public void batchSave(final List<HistoryDataKBar> bars) {
+  public void batchSave(final List<HistoryDataKBar> bars) throws SQLException {
     //bacthSave_jdbcTemplate_BatchPreparedStatementSetter(bars);
     try{
 
@@ -325,6 +325,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
       bacthSave_jdbcTemplate_prepareStatement_longSql(bars);
     } catch (SQLException e){
       logger.error(e);
+      throw e;
     }
   }
 

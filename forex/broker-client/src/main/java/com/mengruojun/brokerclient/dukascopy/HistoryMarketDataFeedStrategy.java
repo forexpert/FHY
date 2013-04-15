@@ -114,7 +114,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       logger.info("saving" + kbars.size() + " bars end");
     } catch (Exception e){
       logger.error("", e);
-      logger.info("run again in 5 minutes:");
+      logger.error("run again in 5 minutes:");
       try {
         Thread.sleep(5*60*1000L);
       } catch (InterruptedException e1) {

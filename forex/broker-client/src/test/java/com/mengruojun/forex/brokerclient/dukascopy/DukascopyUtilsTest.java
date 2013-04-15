@@ -3,15 +3,16 @@ package com.mengruojun.forex.brokerclient.dukascopy;
 import com.dukascopy.api.Instrument;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.enumerate.Currency;
-import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * DukascopyUtilsTest
  */
-public class DukascopyUtilsTest extends TestCase{
+public class DukascopyUtilsTest{
     Logger logger = Logger.getLogger(this.getClass());
     @Test
     public void testInstrumentConversion(){

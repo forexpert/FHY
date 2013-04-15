@@ -108,7 +108,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     assertEquals(bar_2, latestBar);
   }
 
-
+  @Ignore
   @Test
   public void testJDBCLoading() {
     HistoryDataKBarDao.ResultSetWork resultSetWork  = new HistoryDataKBarDao.ResultSetWork() {

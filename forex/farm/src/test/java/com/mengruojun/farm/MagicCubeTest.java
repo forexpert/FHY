@@ -1,3 +1,5 @@
+package com.mengruojun.farm;
+
 import algorithm.simulatedannealing.magiccube.MagicCube;
 import algorithm.simulatedannealing.magiccube.MagicCube.*;
 import org.apache.log4j.Logger;

@@ -54,7 +54,7 @@ public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
    * use jdbc mode to save bars in a batch. if get any exception, than, use hibernate saving one row by one row;
    * @param bars
    */
-  void batchSave(List<HistoryDataKBar> bars);
+  void batchSave(List<HistoryDataKBar> bars) throws SQLException;
 
   String getMysqlTimeZone();
 
