@@ -91,7 +91,7 @@ public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringCont
     log.info("from:  " + sdf.format(new Date(1267401600000L)));
     log.info("to:  " + sdf.format(new Date(1267421590000L)));
 
-
+    assertNotSame(0, loadedTestBars.size());
     //test H4 bars
     for (HistoryDataKBar historyDataKBar : loadedTestBars) {
       Map<Instrument, MarketDataMessage> s10MdmMap = new HashMap<Instrument, MarketDataMessage>();

@@ -204,7 +204,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
    *
    * @param bars bars
    */
-  private void bacthSave_jdbcTemplate_prepareStatement_longSql(final List<HistoryDataKBar> bars) throws SQLException{
+  private void bacthSave_jdbcTemplate_prepareStatement_longSql(final List<HistoryDataKBar> bars) throws Exception {
     if(bars.size()==0) return;
     Connection conn = null;
     PreparedStatement ps = null;
@@ -254,6 +254,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
     } catch (Exception e) {
       logger.error("数据出错,已进行回滚", e);
       if(conn !=null) conn.rollback();
+      throw e;
     } finally {
       if(conn !=null){
         conn.commit();
@@ -317,7 +318,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
   /**
    * use jdbc mode to save bars in a batch. if get any exception, than, use hibernate saving one row by one row;
    */
-  public void batchSave(final List<HistoryDataKBar> bars) throws SQLException {
+  public void batchSave(final List<HistoryDataKBar> bars) throws Exception {
     //bacthSave_jdbcTemplate_BatchPreparedStatementSetter(bars);
     try{
 
