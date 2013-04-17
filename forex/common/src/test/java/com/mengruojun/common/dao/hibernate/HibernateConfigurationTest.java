@@ -24,7 +24,13 @@ public class HibernateConfigurationTest extends BaseDaoTestCase {
                 EntityPersister persister = (EntityPersister) o;
                 String className = persister.getEntityName();
                 log.debug("Trying select * from: " + className);
-                Query q = session.createQuery("from " + className + " c");
+              Query q = null;
+                if(className.contains("HistoryDataKBar")){
+                  q = session.createQuery("from " + className + " c where c.id =1000");
+                }else{
+                  q = session.createQuery("from " + className + " c");
+                }
+
                 q.iterate();
                 log.debug("ok: " + className);
             }

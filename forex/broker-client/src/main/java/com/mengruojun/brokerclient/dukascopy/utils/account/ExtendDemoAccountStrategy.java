@@ -28,13 +28,13 @@ import java.util.TimeZone;
  */
 @Service("extendDemoAccountStrategy")
 public class ExtendDemoAccountStrategy implements IStrategy {
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-  boolean firstTrade = false;
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+  boolean doneFirstTrade = false;
 
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
   }
-
+  private boolean isTest = false;
   private IEngine engine = null;
   private IContext context = null;
   private IIndicators indicators = null;
@@ -69,24 +69,27 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
   public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) throws JFException {
     if (instrument.equals(Instrument.EURUSD)) {
-      if (!firstTrade || period.equals(Period.WEEKLY)) {
+      if (!doneFirstTrade || period.equals(Period.WEEKLY)) {
         doMinimumTrade();
+        doneFirstTrade = true;
       }
-      closeOrders(engine.getOrders());
-
+      if(isTest){
+        this.context.stop();
+      }
     }
   }
 
-  private void closeOrders(List<IOrder> orders) throws JFException {
-    for(IOrder o: orders){
-      if(o.getState() == IOrder.State.FILLED || o.getState() == IOrder.State.OPENED){
-        o.close();
-      }
-    }
+  private void closeOrders(String orderLabel) throws JFException {
+    IOrder order = engine.getOrder(orderLabel);
+    order.close();
   }
 
   private void doMinimumTrade() throws JFException {
-    order = engine.submitOrder("extend_" + new Date().getTime(), Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
+    String label = "extend_" + sdf.format(new Date());
+    order = engine.submitOrder(label, Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
+    order.waitForUpdate(2000);
+    order.close();
+    order.waitForUpdate(2000);
   }
 
   public void onMessage(IMessage message) throws JFException {
@@ -94,5 +97,9 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
   public void onAccount(IAccount account) throws JFException {
     //registerClient();
+  }
+
+  public void setTest(boolean test) {
+    isTest = test;
   }
 }

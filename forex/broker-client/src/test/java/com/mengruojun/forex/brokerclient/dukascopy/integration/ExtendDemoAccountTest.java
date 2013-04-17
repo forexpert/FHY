@@ -2,6 +2,7 @@ package com.mengruojun.forex.brokerclient.dukascopy.integration;
 
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient;
+import com.mengruojun.brokerclient.dukascopy.utils.account.ExtendDemoAccountStrategy;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -38,9 +39,10 @@ public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringCont
 
   @Test
   public void testExtendDemoAccount() throws InterruptedException {
-
+    ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).setTest(true);
     dukascopyAutoExpandedDemoClient1.start();
-    //dukascopyAutoExpandedDemoClient2.start();
+    ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).setTest(true);
+    dukascopyAutoExpandedDemoClient2.start();
 
   }
 }

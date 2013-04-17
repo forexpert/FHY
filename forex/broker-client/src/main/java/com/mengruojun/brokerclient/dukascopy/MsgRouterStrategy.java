@@ -47,7 +47,6 @@ public class MsgRouterStrategy implements IStrategy {
   @Autowired
   private JMSSender clientInfoSender;
 
-
   @Autowired
   private JmsTemplate jsmTemplate;
   @Autowired
