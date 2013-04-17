@@ -2,6 +2,7 @@ package com.mengruojun.strategycenter.component.strategy;
 
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import com.mengruojun.jms.utils.JMSSender;
+import com.mengruojun.strategycenter.component.strategy.simple.SampleStrategy;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

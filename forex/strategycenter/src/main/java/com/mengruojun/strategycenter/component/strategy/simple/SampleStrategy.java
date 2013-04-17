@@ -1,4 +1,4 @@
-package com.mengruojun.strategycenter.component.strategy;
+package com.mengruojun.strategycenter.component.strategy.simple;
 
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
@@ -9,6 +9,7 @@ import com.mengruojun.common.domain.enumerate.TradeCommandType;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import com.mengruojun.strategycenter.component.marketdata.MarketDataManager;
+import com.mengruojun.strategycenter.component.strategy.BaseStrategy;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 
 import java.text.SimpleDateFormat;
@@ -21,7 +22,7 @@ import java.util.TimeZone;
 /**
  * A simpleStrategy just for test purpose
  */
-public class MAStrategy extends BaseStrategy {
+public class SampleStrategy extends BaseStrategy {
   /**
    * @See Dukascipy Sumbit Order's label javaDoc:
    * @param label user defined identifier for the order. Label must be unique for the given user account among the current orders.
@@ -33,7 +34,7 @@ public class MAStrategy extends BaseStrategy {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
   }
 
-  public MAStrategy() {
+  public SampleStrategy() {
 
   }
 
@@ -92,7 +93,7 @@ public class MAStrategy extends BaseStrategy {
 
       if(direction != null){
         // verify if money is enough
-        if (bc.getOpenPositions().size() < 100 && bc.getLeftMargin(currentPriceMap) > 0) {
+        if (bc.getOpenPositions().size() < 1 && bc.getLeftMargin(currentPriceMap) > 0) {
           TradeCommandMessage tcm = new TradeCommandMessage(currentTime);
 
           tcm.setPositionId("Test"+bc.getClientId() + "_" + instrument.getCurrency1()+instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime)));
