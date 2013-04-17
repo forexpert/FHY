@@ -149,6 +149,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
                 from_long += period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
               } else {         //continue last execution
                 from_long = db_latest.getOpenTime();
+                from_long += period.getInterval();
               }
               if (from_long < global_from_long) {
                 from_long = global_from_long;
@@ -160,7 +161,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
                   getHistoryData(period, instrument, from_long, to_long);
                   from_long = to_long + period.getInterval();
                 } else {// the remain history data  : The getBar method returns an IBar by shift. Shift of value 0 refers to the current candle that's not is not yet fully formed, 1 - latest fully formed candle, 2 - second to last candle.
-                  IBar prevBar = context.getHistory().getBar(instrument, period, OfferSide.BID, 1);
+                  IBar prevBar = context.getHistory().getBar(instrument, period, OfferSide.BID, 2);
                   if (prevBar != null && from_long <= prevBar.getTime()) {
                     getHistoryData(period, instrument, from_long, prevBar.getTime());
                   }
