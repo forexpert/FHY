@@ -43,8 +43,41 @@ public class StrategyManager {
           tradeCommand.put("clientId", bc.getClientId());
           tradeCommand.put("tradeCommandList", tradeCommandMessageList);
           tradeCommandSender.sendObjectMessage(tradeCommand);
+
+          //update local bc status. Normally, we think all the trade command could be executed immediately.
+          // But later we open an interface to reconcile the real status from Broker Server.
+
+          updateBrokerClientStatus(bc, tradeCommandMessageList, endTime);
         }
       }
+  }
+
+  /**
+   * update broker client's status, including:
+   * 0. pending orders execution determine
+   * 1. position status
+   * 2. account status
+   * @param bc BrokerClient
+   * @param tradeCommandMessageList tradeCommandMessageList
+   */
+  private void updateBrokerClientStatus(BrokerClient bc, List<TradeCommandMessage> tradeCommandMessageList, Long endTime) {
+    //0. pending orders execution determine
+    todo cmeng
+    for(TradeCommandMessage tcm : tradeCommandMessageList){
+      switch (tcm.getTradeCommandType()){
+        case openAtSetPrice: // this would result in a pending
+
+          break;
+        case openAtMarketPrice:
+          break;
+        case close:
+          break;
+        case cancel:
+          break;
+        case change:
+          break;
+      }
+    }
   }
 
 
