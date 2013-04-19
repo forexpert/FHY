@@ -33,6 +33,8 @@ public class TradeCommandMessage implements Serializable {
   Double closePrice;
   Double stopLossPrice;
   Double takeProfitPrice;
+  Double stopLossPriceInPips;
+  Double takeProfitPriceInPips;
   String positionId;
   private TradeCommandType tradeCommandType;
 
@@ -117,6 +119,22 @@ public class TradeCommandMessage implements Serializable {
 
   public void setTakeProfitPrice(Double takeProfitPrice) {
     this.takeProfitPrice = takeProfitPrice;
+  }
+
+  public Double getStopLossPriceInPips() {
+    return stopLossPriceInPips;
+  }
+
+  public void setStopLossPriceInPips(Double stopLossPriceInPips) {
+    this.stopLossPriceInPips = stopLossPriceInPips;
+  }
+
+  public Double getTakeProfitPriceInPips() {
+    return takeProfitPriceInPips;
+  }
+
+  public void setTakeProfitPriceInPips(Double takeProfitPriceInPips) {
+    this.takeProfitPriceInPips = takeProfitPriceInPips;
   }
 
   public String getPositionId() {

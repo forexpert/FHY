@@ -62,8 +62,6 @@ public class ExtendDemoAccountStrategy implements IStrategy {
     console.getOut().println("Stopped");
   }
 
-  IOrder order = null;
-
   public void onTick(Instrument instrument, ITick tick) throws JFException {
   }
 
@@ -86,7 +84,7 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
   private void doMinimumTrade() throws JFException {
     String label = "extend_" + sdf.format(new Date());
-    order = engine.submitOrder(label, Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
+    IOrder order = engine.submitOrder(label, Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
     order.waitForUpdate(2000);
     order.close();
     order.waitForUpdate(2000);

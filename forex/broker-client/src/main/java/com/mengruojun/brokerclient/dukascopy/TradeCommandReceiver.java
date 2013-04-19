@@ -116,7 +116,7 @@ public class TradeCommandReceiver {
         }
         case cancel: {
           IOrder order = context.getEngine().getOrder(positionLabel);
-          if (order != null) {
+          if (order != null && order.getState()== IOrder.State.OPENED) {
             order.close();
           }
           break;
@@ -125,10 +125,11 @@ public class TradeCommandReceiver {
           IOrder order = context.getEngine().getOrder(positionLabel);
           if (order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED) {
             order.setOpenPrice(openPrice);
-          }
-          if (order.getState() == IOrder.State.OPENED || order.getState() == IOrder.State.CREATED
-                  || order.getState() == IOrder.State.FILLED) {
+            order.setStopLossPrice(stopLossPrice);
+            order.setTakeProfitPrice(takeProfitPrice);
             order.setRequestedAmount(amount);
+          }
+          if (order.getState() == IOrder.State.FILLED) {
             order.setStopLossPrice(stopLossPrice);
             order.setTakeProfitPrice(takeProfitPrice);
           }

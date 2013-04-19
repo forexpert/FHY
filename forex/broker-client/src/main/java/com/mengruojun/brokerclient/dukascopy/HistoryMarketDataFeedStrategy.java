@@ -20,6 +20,7 @@ import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.service.HistoryMarketdataService;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.jms.domain.TradeCommandMessage;
@@ -63,8 +64,6 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
   private JMSSender clientInfoSender;
   @Autowired
   HistoryMarketdataService historyMarketdataService;
-
-  private String globalFromStr = "2010.03.01 00:00:00 +0000";
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;
@@ -136,7 +135,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           private void getAllHistoryData(Period period) throws JFException, ParseException {
             long intervalEachTimeForGetData = period.getInterval() * 9999; // 10000 rows each time
 
-            long global_from_long = sdf.parse(globalFromStr).getTime();
+            long global_from_long = TradingUtils.getGlobalTradingStartTime();
             for (Instrument instrument : dukascopyInstrumentList) {
               HistoryDataKBar db_latest = historyMarketdataService.getLatestBarForPeriod(
                       new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),

@@ -57,6 +57,7 @@ public class HistoryMarketDataFeedTestStrategy implements IStrategy {
   Period testPeriod;
   String testBar_start;
   String testBar_end;
+  Instrument instrument = Instrument.XAUUSD;
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;
@@ -66,7 +67,8 @@ public class HistoryMarketDataFeedTestStrategy implements IStrategy {
     console.getOut().println("Started");
     try {
       synchronized (serverBars){
-        serverBars.addAll(this.getAllHistoryData(Instrument.EURUSD, testPeriod, testBar_start, testBar_end));
+        //long timeTick = context.getDataService().getTimeOfFirstCandle(instrument, Period.TEN_SECS);
+        serverBars.addAll(this.getAllHistoryData(instrument, testPeriod, testBar_start, testBar_end));
         serverBars.notify();
       }
     } catch (Exception e) {

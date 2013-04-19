@@ -7,12 +7,15 @@ import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,154 +30,174 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BrokerClient {
 
-    public BrokerClient(BrokerType brokerType, String clientId, String strategyName, Double accountLeverage,
-                        Currency baseCurrency, Double startMoney, Double currentMoney, List<Position> openPositions,
-                        List<Position> pendingPositions, List<Position> closedPositions) {
-        this.brokerType = brokerType;
-        this.clientId = clientId;
-        StrategyName = strategyName;
-        this.accountLeverage = accountLeverage;
-        this.baseCurrency = baseCurrency;
-        this.startMoney = startMoney;
-        this.currentMoney = currentMoney;
-        this.openPositions = openPositions;
-        this.pendingPositions = pendingPositions;
-        this.closedPositions = closedPositions;
-    }
+  public BrokerClient(BrokerType brokerType, String clientId, String strategyName, Double accountLeverage,
+                      Currency baseCurrency, Double startMoney, Double currentMoney, List<Position> openPositions,
+                      List<Position> pendingPositions, List<Position> closedPositions) {
+    this.brokerType = brokerType;
+    this.clientId = clientId;
+    StrategyName = strategyName;
+    this.accountLeverage = accountLeverage;
+    this.baseCurrency = baseCurrency;
+    this.startMoney = startMoney;
+    this.currentMoney = currentMoney;
+    this.openPositions = openPositions;
+    this.pendingPositions = pendingPositions;
+    this.closedPositions = closedPositions;
+  }
 
-    private BrokerType brokerType;
-    private String clientId;
-    private String StrategyName;
-    private Double accountLeverage;
-    private Currency baseCurrency;
+  private BrokerType brokerType;
+  private String clientId;
+  private String StrategyName;
+  private Double accountLeverage;
+  private Currency baseCurrency;
 
-    private Double startMoney;
-    private Double currentMoney;
+  private Double startMoney;
+  private Double currentMoney;
 
 
-    /**
-     * Portfolio
-     */
-    private List<Position> openPositions = new ArrayList<Position>(); //todo init position list
-    private List<Position> pendingPositions = new ArrayList<Position>(); //todo init position list
-    private List<Position> closedPositions = new ArrayList<Position>(); //todo init position list
+  /**
+   * Portfolio
+   */
+  private List<Position> openPositions = new ArrayList<Position>(); //todo init position list
+  private List<Position> pendingPositions = new ArrayList<Position>(); //todo init position list
+  private List<Position> closedPositions = new ArrayList<Position>(); //todo init position list
 
-    /**
-     *   After strategy instance did the analysis on this client at a certain time point, it should add the analysis result into this map.
-     *   The analysis result should be a list of TradeCommandMessage. Even if the strategy doesn't want the client do any trade,
-     *   it should pass in list of TradeCommandMessage, which size is 0.
-     */
-    private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap =  new ConcurrentHashMap<Long, List<TradeCommandMessage>>();
+  /**
+   * After strategy instance did the analysis on this client at a certain time point, it should add the analysis result into this map.
+   * The analysis result should be a list of TradeCommandMessage. Even if the strategy doesn't want the client do any trade,
+   * it should pass in list of TradeCommandMessage, which size is 0.
+   */
+  private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap = new ConcurrentHashMap<Long, List<TradeCommandMessage>>();
 
   /**
    * Util method
    */
 
   /**
-   *
    * @param currentBars is a map for all subscribed instruments' ask close price
-   * @return  current left margin
+   * @return current left margin
    */
-  public Double getLeftMargin(Map<Instrument, HistoryDataKBar> currentBars){
+  public Double getLeftMargin(Map<Instrument, HistoryDataKBar> currentBars) {
     Double totalMargin = currentMoney;
-    return currentMoney- getUsedMargin(currentBars);
+    return currentMoney - getUsedMargin(currentBars);
 
   }
 
-  public Double getUsedMargin(Map<Instrument, HistoryDataKBar> currentBars){
+  public Double getUsedMargin(Map<Instrument, HistoryDataKBar> currentBars) {
     Double usedMargin = 0d;
-    for(Position p :openPositions){
+    for (Position p : openPositions) {
       Double closePrice = currentBars.get(p.getInstrument()).getOhlc().getAskClose();
       usedMargin += TradingUtils.calculateMargin(accountLeverage, closePrice, p, com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency));
     }
     return usedMargin;
   }
 
+  //============ Utility ==========
+  public Position getOpenPositionById(String id){
+    for(Position openPosition : openPositions){
+      if(openPosition.getPositionId().equals(id)){
+        return openPosition;
+      }
+    }
+    return null;
+  }
+
+  public Position getPendingPositionById(String id){
+    for(Position openPosition : pendingPositions){
+      if(openPosition.getPositionId().equals(id)){
+        return openPosition;
+      }
+    }
+    return null;
+  }
+
+  //=========getter and setter==============
+
   public BrokerType getBrokerType() {
-        return brokerType;
-    }
+    return brokerType;
+  }
 
-    public void setBrokerType(BrokerType brokerType) {
-        this.brokerType = brokerType;
-    }
+  public void setBrokerType(BrokerType brokerType) {
+    this.brokerType = brokerType;
+  }
 
-    public String getClientId() {
-        return clientId;
-    }
+  public String getClientId() {
+    return clientId;
+  }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
 
-    public String getStrategyName() {
-        return StrategyName;
-    }
+  public String getStrategyName() {
+    return StrategyName;
+  }
 
-    public void setStrategyName(String strategyName) {
-        StrategyName = strategyName;
-    }
+  public void setStrategyName(String strategyName) {
+    StrategyName = strategyName;
+  }
 
-    public Double getAccountLeverage() {
-        return accountLeverage;
-    }
+  public Double getAccountLeverage() {
+    return accountLeverage;
+  }
 
-    public void setAccountLeverage(Double accountLeverage) {
-        this.accountLeverage = accountLeverage;
-    }
+  public void setAccountLeverage(Double accountLeverage) {
+    this.accountLeverage = accountLeverage;
+  }
 
-    public Currency getBaseCurrency() {
-        return baseCurrency;
-    }
+  public Currency getBaseCurrency() {
+    return baseCurrency;
+  }
 
-    public void setBaseCurrency(Currency baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
+  public void setBaseCurrency(Currency baseCurrency) {
+    this.baseCurrency = baseCurrency;
+  }
 
-    public Double getStartMoney() {
-        return startMoney;
-    }
+  public Double getStartMoney() {
+    return startMoney;
+  }
 
-    public void setStartMoney(Double startMoney) {
-        this.startMoney = startMoney;
-    }
+  public void setStartMoney(Double startMoney) {
+    this.startMoney = startMoney;
+  }
 
-    public Double getCurrentMoney() {
-        return currentMoney;
-    }
+  public Double getCurrentMoney() {
+    return currentMoney;
+  }
 
-    public void setCurrentMoney(Double currentMoney) {
-        this.currentMoney = currentMoney;
-    }
+  public void setCurrentMoney(Double currentMoney) {
+    this.currentMoney = currentMoney;
+  }
 
-    public List<Position> getOpenPositions() {
-        return openPositions;
-    }
+  public List<Position> getOpenPositions() {
+    return openPositions;
+  }
 
-    public void setOpenPositions(List<Position> openPositions) {
-        this.openPositions = openPositions;
-    }
+  public void setOpenPositions(List<Position> openPositions) {
+    this.openPositions = openPositions;
+  }
 
-    public List<Position> getPendingPositions() {
-        return pendingPositions;
-    }
+  public List<Position> getPendingPositions() {
+    return pendingPositions;
+  }
 
-    public void setPendingPositions(List<Position> pendingPositions) {
-        this.pendingPositions = pendingPositions;
-    }
+  public void setPendingPositions(List<Position> pendingPositions) {
+    this.pendingPositions = pendingPositions;
+  }
 
-    public List<Position> getClosedPositions() {
-        return closedPositions;
-    }
+  public List<Position> getClosedPositions() {
+    return closedPositions;
+  }
 
-    public void setClosedPositions(List<Position> closedPositions) {
-        this.closedPositions = closedPositions;
-    }
+  public void setClosedPositions(List<Position> closedPositions) {
+    this.closedPositions = closedPositions;
+  }
 
-    public Map<Long, List<TradeCommandMessage>> getAnalyzedTradeCommandMap() {
-        return analyzedTradeCommandMap;
-    }
+  public Map<Long, List<TradeCommandMessage>> getAnalyzedTradeCommandMap() {
+    return analyzedTradeCommandMap;
+  }
 
-    public void setAnalyzedTradeCommandMap(Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap) {
-        this.analyzedTradeCommandMap = analyzedTradeCommandMap;
-    }
+  public void setAnalyzedTradeCommandMap(Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap) {
+    this.analyzedTradeCommandMap = analyzedTradeCommandMap;
+  }
 }

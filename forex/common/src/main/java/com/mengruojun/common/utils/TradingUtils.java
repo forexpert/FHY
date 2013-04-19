@@ -5,9 +5,13 @@ import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
+import org.apache.log4j.Logger;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,18 +21,31 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TradingUtils {
+  static Logger logger = Logger.getLogger(TradingUtils.class);
+  static SimpleDateFormat  sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
+  static {
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
+  public static Long getGlobalTradingStartTime(){
+    try {
+      return sdf.parse("2010.03.01 00:00:00 +0000").getTime();
+    } catch (ParseException e) {
+      logger.error("",e);
+    }
+    return null;
+  }
   public static Double getGolbalAmountUnit() {
     return 1000d;
   }
 
   public static List<Instrument> getInterestInstrumentList() {
     List<Instrument> list = new ArrayList<Instrument>();
+    //list.add(new Instrument(Currency.XAU, Currency.USD));  // exclude XAU/USD
     list.add(new Instrument(Currency.EUR, Currency.USD));
     list.add(new Instrument(Currency.USD, Currency.JPY));
     list.add(new Instrument(Currency.AUD, Currency.USD));
     list.add(new Instrument(Currency.XAG, Currency.USD));
-    list.add(new Instrument(Currency.XAU, Currency.USD));
     list.add(new Instrument(Currency.GBP, Currency.USD));
     // Note, if you want to add more interesting instrument, to calculate margin, you should also add currency1/yourAccountBaseCurrency
     return list;
@@ -74,11 +91,11 @@ public class TradingUtils {
    * @param direction direction
    * @return TakeProfit price
    */
-  public static Double getTPPrice(Double pips, HistoryDataKBar lastBar, Direction direction) {
+  public static Double getTPPrice(Double pips, Double openPrice, Direction direction, Instrument instrument) {
     if(direction == Direction.Long){
-      return lastBar.getOhlc().getBidClose() + pips * lastBar.getInstrument().getPipsValue();
+      return openPrice + pips * instrument.getPipsValue();
     } else if(direction == Direction.Short){
-      return lastBar.getOhlc().getAskClose() - pips * lastBar.getInstrument().getPipsValue();
+      return openPrice - pips * instrument.getPipsValue();
     }
     return null;
   }
@@ -86,15 +103,15 @@ public class TradingUtils {
   /**
    * input what pips do you want to stop lost,
    * @param pips pips
-   * @param lastBar HistoryDataKBar
+   * @param openPrice openPrice
    * @param direction direction
    * @return StopLost price
    */
-  public static Double getSLPrice(Double pips, HistoryDataKBar lastBar, Direction direction) {
+  public static Double getSLPrice(Double pips, Double openPrice, Direction direction, Instrument instrument) {
     if(direction == Direction.Long){
-      return lastBar.getOhlc().getBidClose() - pips * lastBar.getInstrument().getPipsValue();
+      return openPrice - pips * instrument.getPipsValue();
     } else if(direction == Direction.Short){
-      return lastBar.getOhlc().getAskClose() + pips * lastBar.getInstrument().getPipsValue();
+      return openPrice + pips * instrument.getPipsValue();
     }
     return null;
   }

@@ -93,7 +93,7 @@ public class SampleStrategy extends BaseStrategy {
 
       if(direction != null){
         // verify if money is enough
-        if (bc.getOpenPositions().size() < 1 && bc.getLeftMargin(currentPriceMap) > 0) {
+        if (bc.getOpenPositions().size() < 10 && bc.getLeftMargin(currentPriceMap) > 0) {
           TradeCommandMessage tcm = new TradeCommandMessage(currentTime);
 
           tcm.setPositionId("Test"+bc.getClientId() + "_" + instrument.getCurrency1()+instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime)));
@@ -102,9 +102,17 @@ public class SampleStrategy extends BaseStrategy {
           tcm.setTradeCommandType(TradeCommandType.openAtMarketPrice);
           tcm.setDirection(direction);
 
-          tcm.setOpenPrice(0d);
-          tcm.setTakeProfitPrice(TradingUtils.getTPPrice(TradingUtils.getGlobalTPInPips(), currentPriceMap.get(instrument), tcm.getDirection()));
-          tcm.setStopLossPrice(TradingUtils.getSLPrice(TradingUtils.getGlobalSLInPips(), currentPriceMap.get(instrument), tcm.getDirection()));
+          Double intendOpenPrice = null;
+          if(direction == Direction.Long){
+            intendOpenPrice = currentPriceMap.get(instrument).getOhlc().getAskClose();
+          } else {
+            intendOpenPrice = currentPriceMap.get(instrument).getOhlc().getBidClose();
+          }
+          tcm.setOpenPrice(intendOpenPrice);
+          tcm.setTakeProfitPrice(TradingUtils.getTPPrice(TradingUtils.getGlobalTPInPips(), intendOpenPrice, tcm.getDirection(), instrument));
+          tcm.setTakeProfitPriceInPips(TradingUtils.getGlobalTPInPips());
+          tcm.setStopLossPrice(TradingUtils.getSLPrice(TradingUtils.getGlobalSLInPips(), intendOpenPrice, tcm.getDirection(), instrument));
+          tcm.setStopLossPriceInPips(TradingUtils.getGlobalTPInPips());
           tcmList.add(tcm);
         }
       }

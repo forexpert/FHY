@@ -15,6 +15,8 @@ import java.util.List;
  *
  */
 public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
+
+
   public interface ResultSetWork {
     /**
      * Usually, in ouside, the code looks like:
@@ -62,5 +64,5 @@ public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
    * work is a jdbc style to read data.
    * @param resultSetWork rs
    */
-  public void readAll(final ResultSetWork resultSetWork);
+  public void readS10BarsByTimeRangeOrderByOpenTime(Long startTime, Long endTime, final ResultSetWork resultSetWork);
 }

@@ -16,14 +16,19 @@
         </property>
     </bean>
     <import resource="classpath:com/mengruojun/common/db/app-common.xml"/>
+    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
     <!-- Activates scanning of @Autowired -->
     <context:annotation-config/>
 
 
-
+    <context:component-scan base-package="com.mengruojun.strategycenter.component.historyBackTesting"/>
     <!-- Add new DAOs here -->
 
     <!-- Add new Managers here -->
     <bean id="marketDataManager" class="com.mengruojun.strategycenter.component.marketdata.MarketDataManager"/>
+    <bean id="tradeCommandSender" class="com.mengruojun.jms.utils.JMSSender">
+        <property name="template" ref="jmsTemplate" />
+        <property name="destination" ref="jmsTopicTradeCommand" />
+    </bean>
 
 </beans>

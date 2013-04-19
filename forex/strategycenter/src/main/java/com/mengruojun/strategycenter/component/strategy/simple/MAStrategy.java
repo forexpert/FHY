@@ -26,11 +26,11 @@ public class MAStrategy extends BaseStrategy {
   /**
    * @See Dukascipy Sumbit Order's label javaDoc:
    * @param label user defined identifier for the order. Label must be unique for the given user account among the current orders.
-   * 			Allowed characters: letters, numbers and "_". Label must have at most 256 characters.
+   * Allowed characters: letters, numbers and "_". Label must have at most 256 characters.
    */
-  static  SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 
-  static{
+  static {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
   }
 
@@ -53,7 +53,7 @@ public class MAStrategy extends BaseStrategy {
       HistoryDataKBar m10 = MarketDataManager.getKBarByEndTime_OnlySearch(currentTime, instrument, TimeWindowType.M10);
       Direction direction = null;
 
-      if(m1 ==null || m5 == null || m10 ==null)return tcmList;
+      if (m1 == null || m5 == null || m10 == null) return tcmList;
 
       if (m1.getOhlc().getAskClose() >= m1.getOhlc().getAskOpen()
               && m5.getOhlc().getAskClose() >= m5.getOhlc().getAskOpen()
@@ -69,28 +69,32 @@ public class MAStrategy extends BaseStrategy {
         direction = Direction.Short;
       }
 
-      if(direction != null){
+      if (direction != null) {
         // verify if money is enough
-        if (bc.getOpenPositions().size() < 100 && bc.getLeftMargin(currentPriceMap) > 0) {
+        if (bc.getOpenPositions().size() < 1 && bc.getLeftMargin(currentPriceMap) > 0) {
           TradeCommandMessage tcm = new TradeCommandMessage(currentTime);
 
-          tcm.setPositionId("Test"+bc.getClientId() + "_" + instrument.getCurrency1()+instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime)));
+          tcm.setPositionId("Test" + bc.getClientId() + "_" + instrument.getCurrency1() + instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime)));
           tcm.setAmount(TradingUtils.getMinAmount(instrument));
           tcm.setInstrument(instrument);
           tcm.setTradeCommandType(TradeCommandType.openAtMarketPrice);
           tcm.setDirection(direction);
 
-          tcm.setOpenPrice(0d);
-          tcm.setTakeProfitPrice(TradingUtils.getTPPrice(TradingUtils.getGlobalTPInPips(), currentPriceMap.get(instrument), tcm.getDirection()));
-          tcm.setStopLossPrice(TradingUtils.getSLPrice(TradingUtils.getGlobalSLInPips(), currentPriceMap.get(instrument), tcm.getDirection()));
+          Double intendOpenPrice = null;
+          if (direction == Direction.Long) {
+            intendOpenPrice = currentPriceMap.get(instrument).getOhlc().getAskClose();
+          } else {
+            intendOpenPrice = currentPriceMap.get(instrument).getOhlc().getBidClose();
+          }
+          tcm.setOpenPrice(intendOpenPrice);
+          tcm.setTakeProfitPrice(TradingUtils.getTPPrice(TradingUtils.getGlobalTPInPips(), intendOpenPrice, tcm.getDirection(), instrument));
+          tcm.setTakeProfitPriceInPips(TradingUtils.getGlobalTPInPips());
+          tcm.setStopLossPrice(TradingUtils.getSLPrice(TradingUtils.getGlobalSLInPips(), intendOpenPrice, tcm.getDirection(), instrument));
+          tcm.setStopLossPriceInPips(TradingUtils.getGlobalTPInPips());
           tcmList.add(tcm);
         }
       }
-
-
-
     }
-
 
 
     return tcmList;

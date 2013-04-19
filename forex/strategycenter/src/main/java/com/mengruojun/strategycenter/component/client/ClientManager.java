@@ -75,7 +75,7 @@ public class ClientManager implements ApplicationListener {
 
   }
 
-  private Long getEndTime(Map<Instrument, MarketDataMessage> mdmMap) {
+  public static Long getEndTime(Map<Instrument, MarketDataMessage> mdmMap) {
     for (MarketDataMessage mdm : mdmMap.values()) {
       return mdm.getStartTime() + mdm.getTimeWindowType().getTimeInMillis();
     }
@@ -87,7 +87,7 @@ public class ClientManager implements ApplicationListener {
    *
    * @return return true if data is available;
    */
-  private boolean verifyMarketDataPackage(Map<Instrument, MarketDataMessage> mdmMap) {
+  public static boolean verifyMarketDataPackage(Map<Instrument, MarketDataMessage> mdmMap) {
     Long openTime = null;
     TimeWindowType twt = null;
 

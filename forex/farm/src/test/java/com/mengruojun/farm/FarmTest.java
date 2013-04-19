@@ -9,6 +9,7 @@ import java.util.Map;
 import static junit.framework.Assert.*;
 
 public class FarmTest{
+  Double a;
   Logger logger = Logger.getLogger(this.getClass());
   @Test
   public void MapTest(){
@@ -24,5 +25,13 @@ public class FarmTest{
       logger.info(entry.getValue());
     }
   }
+
+  @Test
+  public void DoubleTest(){
+    logger.info(a);
+    assertNull(a);
+  }
+
+
 
 }

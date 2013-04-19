@@ -24,6 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,13 +64,13 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
    * | id   | version | closeTime     | currency1 | currency2 | askClose | askHigh | askLow | askOpen | askVolume | bidClose | bidHigh | bidLow  | bidOpen | bidVolume | openTime      | timeWindowType |
    */
   @Override
-  public void readAll(final ResultSetWork resultSetWork) {
+  public void readS10BarsByTimeRangeOrderByOpenTime(Long startTime, Long endTime, final ResultSetWork resultSetWork) {
 
-    final String sql = "SELECT id,version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime    ,timeWindowType  FROM HistoryDataKBar ORDER BY openTime ASC";
+    final String sql = "SELECT id,version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime    ,timeWindowType  " +
+            "FROM HistoryDataKBar where timeWindowType = 'S10' ORDER BY openTime ASC";
     this.getHibernateTemplate().executeFind(new HibernateCallback() {
       @Override
       public Object doInHibernate(Session session) throws HibernateException, SQLException {
-        Map<Instrument, HistoryDataKBar> mdmMap;
 
         List<HistoryDataKBar> result = new ArrayList();
         session.doWork(new Work() {

@@ -5,6 +5,7 @@ import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.Currency;
+import com.mengruojun.common.utils.TradingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
@@ -108,7 +109,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     assertEquals(bar_2, latestBar);
   }
 
-  @Ignore
+
   @Test
   public void testJDBCLoading() {
     HistoryDataKBarDao.ResultSetWork resultSetWork  = new HistoryDataKBarDao.ResultSetWork() {
@@ -117,6 +118,6 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
         logger.info(rs.getInt(1));
       }
     };
-    historyDataKBarDao.readAll(resultSetWork);
+    historyDataKBarDao.readS10BarsByTimeRangeOrderByOpenTime(TradingUtils.getGlobalTradingStartTime(), TradingUtils.getGlobalTradingStartTime() + 1000*30,resultSetWork);
   }
 }

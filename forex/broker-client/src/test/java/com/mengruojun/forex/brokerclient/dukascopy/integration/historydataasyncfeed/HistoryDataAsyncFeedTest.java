@@ -1,11 +1,11 @@
-package com.mengruojun.forex.brokerclient.dukascopy.integration;
+package com.mengruojun.forex.brokerclient.dukascopy.integration.historydataasyncfeed;
 
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient;
 import com.mengruojun.common.domain.HistoryDataKBar;
-import com.mengruojun.forex.brokerclient.dukascopy.integration.HistoryMarketDataFeedTestStrategy;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,29 +25,29 @@ import java.util.List;
 
 @ContextConfiguration(
         locations = {"classpath:/app-test.xml"})
-public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringContextTests {
+public class HistoryDataAsyncFeedTest extends AbstractTransactionalJUnit4SpringContextTests {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Autowired
   DukascopyTradeClient dukascopyHistoryMarketDataFeedClient;
   @Autowired
-  HistoryMarketDataFeedTestStrategy historyMarketDataFeedTestStrategy;
+  HistoryMarketDataAsyncFeedTestStrategy historyMarketDataAsyncFeedTestStrategy;
   final List<HistoryDataKBar> kBarsFromDukascopyServer = new ArrayList<HistoryDataKBar>();
   @Before
   public void setUp() {
   }
-
+  @Ignore
   @Test
   public void testGetHistoryBarsFromDukascopyServer() throws InterruptedException {
 
-    String start="2011.01.01 00:00:00 +0000";
-    String end="2011.01.02 01:00:00 +0000";
-    historyMarketDataFeedTestStrategy.setServerBars(kBarsFromDukascopyServer);
-    historyMarketDataFeedTestStrategy.setTestBar_start(start);
-    historyMarketDataFeedTestStrategy.setTestBar_end(end);
-    historyMarketDataFeedTestStrategy.setTestPeriod(Period.TEN_SECS);
+    String start="2011.01.09 00:00:00 +0000";
+    String end="2011.01.10 01:00:00 +0000";
+    historyMarketDataAsyncFeedTestStrategy.setServerBars(kBarsFromDukascopyServer);
+    historyMarketDataAsyncFeedTestStrategy.setTestBar_start(start);
+    historyMarketDataAsyncFeedTestStrategy.setTestBar_end(end);
+    historyMarketDataAsyncFeedTestStrategy.setTestPeriod(Period.TEN_SECS);
 
-    dukascopyHistoryMarketDataFeedClient.setStrategy(historyMarketDataFeedTestStrategy);
+    dukascopyHistoryMarketDataFeedClient.setStrategy(historyMarketDataAsyncFeedTestStrategy);
     new Thread(){
       public void run(){
         dukascopyHistoryMarketDataFeedClient.start();
@@ -58,9 +58,6 @@ public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringC
       kBarsFromDukascopyServer.wait();
       logger.info("verify the data in kBarsFromDukascopyServer");
       logger.info("kBarsFromDukascopyServer size is " + kBarsFromDukascopyServer.size());
-      for(HistoryDataKBar kbar : kBarsFromDukascopyServer){
-        logger.info(kbar.toString());
-      }
 
     }
 
