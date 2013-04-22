@@ -26,10 +26,11 @@ import java.util.TimeZone;
  * This is a Dukascopy extendDemoAccountStrategy. It will open a position and close it when it starts, and will do it again once a week(at Monday 00:00:00);
  * So that we can use the demo account without expiration.
  */
-@Service("extendDemoAccountStrategy")
+
 public class ExtendDemoAccountStrategy implements IStrategy {
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
   boolean doneFirstTrade = false;
+  boolean openFirstTrade = false;
 
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -67,12 +68,19 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
   public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) throws JFException {
     if (instrument.equals(Instrument.EURUSD)) {
-      if (!doneFirstTrade || period.equals(Period.WEEKLY)) {
+      if (!openFirstTrade || period.equals(Period.WEEKLY)) {
         doMinimumTrade();
-        doneFirstTrade = true;
+        openFirstTrade = true;
       }
+    }
+
+    if (instrument.equals(Instrument.EURUSD) && period == Period.TEN_SECS) {
       if(isTest){
-        this.context.stop();
+        for (IOrder order : engine.getOrders()) {
+          order.close();
+
+          doneFirstTrade = true;
+        }
       }
     }
   }
@@ -86,8 +94,6 @@ public class ExtendDemoAccountStrategy implements IStrategy {
     String label = "extend_" + sdf.format(new Date());
     IOrder order = engine.submitOrder(label, Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
     order.waitForUpdate(2000);
-    order.close();
-    order.waitForUpdate(2000);
   }
 
   public void onMessage(IMessage message) throws JFException {
@@ -99,5 +105,9 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
   public void setTest(boolean test) {
     isTest = test;
+  }
+
+  public boolean isDoneFirstTrade() {
+    return doneFirstTrade;
   }
 }
