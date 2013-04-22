@@ -7,15 +7,9 @@ import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
-import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Currency;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,7 +29,7 @@ public class BrokerClient {
                       List<Position> pendingPositions, List<Position> closedPositions) {
     this.brokerType = brokerType;
     this.clientId = clientId;
-    StrategyName = strategyName;
+    this.strategyName = strategyName;
     this.accountLeverage = accountLeverage;
     this.baseCurrency = baseCurrency;
     this.startMoney = startMoney;
@@ -47,7 +41,7 @@ public class BrokerClient {
 
   private BrokerType brokerType;
   private String clientId;
-  private String StrategyName;
+  private String strategyName;
   private Double accountLeverage;
   private Currency baseCurrency;
 
@@ -67,8 +61,9 @@ public class BrokerClient {
    * The analysis result should be a list of TradeCommandMessage. Even if the strategy doesn't want the client do any trade,
    * it should pass in list of TradeCommandMessage, which size is 0.
    */
-  private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap = new ConcurrentHashMap<Long, List<TradeCommandMessage>>();
+  private Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap = Collections.synchronizedSortedMap(new TreeMap<Long, List<TradeCommandMessage>>());
 
+  public static final long ANALYZED_TRADE_MAP_MAX_NUM=20;
   /**
    * Util method
    */
@@ -130,11 +125,11 @@ public class BrokerClient {
   }
 
   public String getStrategyName() {
-    return StrategyName;
+    return strategyName;
   }
 
   public void setStrategyName(String strategyName) {
-    StrategyName = strategyName;
+    this.strategyName = strategyName;
   }
 
   public Double getAccountLeverage() {

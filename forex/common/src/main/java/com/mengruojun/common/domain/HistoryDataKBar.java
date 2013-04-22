@@ -4,8 +4,10 @@ package com.mengruojun.common.domain;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,12 +16,14 @@ import java.util.Set;
  *
  */
 @Entity
-@Table(name = "HistoryDataKBar",
-        uniqueConstraints={@UniqueConstraint(columnNames={"openTime","currency1","currency2","timeWindowType"})})
-public class HistoryDataKBar extends GeneratedIdBaseEntity {
-
-
+@Table(name = "HistoryDataKBar1")
+public class HistoryDataKBar{
   private static final long serialVersionUID = -1943659317753245831L;
+  @Version
+  @SuppressWarnings({"UnusedDeclaration"})
+  private long version;
+
+
 
   /**
    * Like EUR/USD, USD/JPY and etc
@@ -29,7 +33,7 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
 
   @Enumerated(EnumType.STRING)
   private TimeWindowType timeWindowType;
-
+  @Id
   private Long openTime;
   private Long closeTime;
 
@@ -103,6 +107,12 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
     this.ohlc = ohlc;
   }
 
+
+  /** helpful for displaying if an entity's update was successful */
+  public long getVersion(){
+    return version;
+  }
+
     // override method
 
   @Override
@@ -135,4 +145,3 @@ public class HistoryDataKBar extends GeneratedIdBaseEntity {
     return super.hashCode();
   }
 }
-

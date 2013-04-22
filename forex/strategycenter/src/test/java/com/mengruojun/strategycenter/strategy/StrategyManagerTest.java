@@ -51,7 +51,7 @@ public class StrategyManagerTest extends AbstractTransactionalJUnit4SpringContex
   }
 
   String startTime = "2011.01.01 00:00:00 +0000";
-  String endTime = "2011.03.01 00:00:10 +0000";
+  String endTime = "2012.03.01 00:00:10 +0000";
 
 
   @Autowired

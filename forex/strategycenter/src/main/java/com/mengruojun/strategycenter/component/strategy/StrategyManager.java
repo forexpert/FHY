@@ -65,6 +65,17 @@ public class StrategyManager {
   }
 
   /**
+   * move p from open positions to close positions
+   * update account balance and equity
+   * @param p
+   */
+  protected synchronized void closePositionForBrokerClient(BrokerClient bc, Position p, Long closeTime, Double closePrice, Double closeAmount) {
+
+
+
+  }
+
+  /**
    * pending orders && SL&TP execution determine
    *
    * @param bc      BrokerClient
@@ -72,6 +83,9 @@ public class StrategyManager {
    *                //todo cmeng unit test
    */
   protected synchronized void updateBrokerClientPendingPositions(BrokerClient bc, Long endTime) {
+    // todo cmeng check margin call
+
+
     List<Position> pendingToOpenPositions = new ArrayList<Position>();
 
     for (Position pendingPosition : bc.getPendingPositions()) {
@@ -116,6 +130,7 @@ public class StrategyManager {
             openPosition.setCloseReason(Position.CloseReason.Reach_ST);
             openPosition.setClosePrice(Math.min(slPrice, last_s10.getOhlc().getBidHigh()));
             openToClosePositions.add(openPosition);
+
           }
         }
 

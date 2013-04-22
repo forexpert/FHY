@@ -8,14 +8,17 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.JdbcAccessor;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -36,16 +39,18 @@ import java.util.Map;
  * @author <a href="mailto:bwnoll@gmail.com">Bryan Noll</a>
  */
 @Repository
-public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar, Long> implements HistoryDataKBarDao {
+public class HistoryDataKBarDaoImpl implements HistoryDataKBarDao {
   Logger logger = Logger.getLogger(this.getClass());
 
   /**
    * Constructor to create a Generics-based version using Role as the entity
    */
   public HistoryDataKBarDaoImpl() {
-    super(HistoryDataKBar.class);
+
   }
 
+  private HibernateTemplate hibernateTemplate;
+  private SessionFactory sessionFactory;
   //private HibernateTemplate hibernateTemplate;
   private JdbcTemplate jdbcTemplate;
 
@@ -58,7 +63,25 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
       jdbcTemplate = new JdbcTemplate(dataSource);
     }
   }
+  public HibernateTemplate getHibernateTemplate() {
+    return this.hibernateTemplate;
+  }
 
+  public SessionFactory getSessionFactory() {
+    return this.sessionFactory;
+  }
+
+  @Autowired
+  @Required
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+    this.hibernateTemplate = new HibernateTemplate(sessionFactory);
+  }
+
+
+  public HistoryDataKBar save(HistoryDataKBar kbar){
+    return (HistoryDataKBar) hibernateTemplate.merge(kbar);
+  }
 
   /**
    * | id   | version | closeTime     | currency1 | currency2 | askClose | askHigh | askLow | askOpen | askVolume | bidClose | bidHigh | bidLow  | bidOpen | bidVolume | openTime      | timeWindowType |
@@ -67,7 +90,7 @@ public class HistoryDataKBarDaoImpl extends GenericDaoHibernate<HistoryDataKBar,
   public void readS10BarsByTimeRangeOrderByOpenTime(Long startTime, Long endTime, final ResultSetWork resultSetWork) {
 
     final String sql = "SELECT id,version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime    ,timeWindowType  " +
-            "FROM HistoryDataKBar where timeWindowType = 'S10' ORDER BY openTime ASC";
+            "FROM HistoryDataKBar where openTime >="+startTime+" and openTime <"+endTime+" and timeWindowType = 'S10' ORDER BY openTime ASC";
     this.getHibernateTemplate().executeFind(new HibernateCallback() {
       @Override
       public Object doInHibernate(Session session) throws HibernateException, SQLException {

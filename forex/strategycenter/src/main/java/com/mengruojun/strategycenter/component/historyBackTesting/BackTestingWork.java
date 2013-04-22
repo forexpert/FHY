@@ -47,9 +47,10 @@ public class BackTestingWork implements HistoryDataKBarDao.ResultSetWork{
 
     if(lastBarOpenTime != null && lastBarOpenTime != rs.getLong("openTime")) { // bars with new openTime will coming
       if(mdmMap !=null){
-        logger.error("There are something wrong in the data flow", new Exception());
+        dataHandler.handle(mdmMap);
+        mdmMap = null;
       }
-      mdmMap = null;
+
       mdmMap = new HashMap<Instrument, MarketDataMessage>();
       lastBarOpenTime = rs.getLong("openTime");
 
@@ -63,10 +64,10 @@ public class BackTestingWork implements HistoryDataKBarDao.ResultSetWork{
     Instrument instrument = new Instrument(Currency.fromJDKCurrency(java.util.Currency.getInstance(rs.getString("currency1"))),
             Currency.fromJDKCurrency(java.util.Currency.getInstance(rs.getString("currency2"))));
     mdmMap.put(instrument, mdm);
-    if(mdmMap.size() == MarketDataManager.interestInstrumentList.size()){
+    /*if(mdmMap.size() == MarketDataManager.interestInstrumentList.size()){
       dataHandler.handle(mdmMap);
       mdmMap = null;
-    }
+    }*/
 
 
   }

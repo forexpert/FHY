@@ -37,7 +37,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
 
   {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    logger.info("clientDataReceiver started");
+    logger.info("HistoryDataKBarDaoTest started");
   }
 
   @Autowired
@@ -57,7 +57,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
 
   @Test
   public void getBar() {
-    assertFalse(historyDataKBarDao.exists(0L));
+    assertFalse(historyDataKBarDao.find(0L,new Instrument(Currency.EUR, Currency.USD),TimeWindowType.S10) ==null);
   }
 
   @Test
@@ -91,7 +91,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
             sdf.parse(startTime).getTime(), sdf.parse(endTime).getTime(), new OHLC(2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d, 2d));
     bar = historyDataKBarDao.save(bar);
 
-    HistoryDataKBar bar2 = historyDataKBarDao.get(bar.getId());
+    HistoryDataKBar bar2 = historyDataKBarDao.find(bar.getOpenTime(),bar.getInstrument(),bar.getTimeWindowType());
     assertEquals(bar2.getOpenTime(), sdf.parse(startTime).getTime(), 0);
 
     HistoryDataKBar bar3 = historyDataKBarDao.find(sdf.parse(startTime).getTime(), new Instrument(Currency.EUR, Currency.USD), TimeWindowType.S10);

@@ -57,7 +57,7 @@ public class HistoryMarketDataFeedTestStrategy implements IStrategy {
   Period testPeriod;
   String testBar_start;
   String testBar_end;
-  Instrument instrument = Instrument.XAUUSD;
+  Instrument instrument = Instrument.EURUSD;
 
   public void onStart(final IContext context) throws JFException {
     this.context = context;

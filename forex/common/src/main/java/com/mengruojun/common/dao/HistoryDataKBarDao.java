@@ -14,8 +14,10 @@ import java.util.List;
  * HistoryDataKBar Data Access Object (GenericDao) interface.
  *
  */
-public interface HistoryDataKBarDao extends GenericDao<HistoryDataKBar, Long> {
+public interface HistoryDataKBarDao  {
 
+
+  HistoryDataKBar save(HistoryDataKBar kbar);
 
   public interface ResultSetWork {
     /**
