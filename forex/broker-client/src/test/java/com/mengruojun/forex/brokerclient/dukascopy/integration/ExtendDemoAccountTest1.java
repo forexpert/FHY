@@ -1,9 +1,7 @@
 package com.mengruojun.forex.brokerclient.dukascopy.integration;
 
-import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient;
 import com.mengruojun.brokerclient.dukascopy.utils.account.ExtendDemoAccountStrategy;
-import com.mengruojun.common.domain.HistoryDataKBar;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * We use Dukascopy client to feed the history data. Usually we feed 10s period data, then computing all kinds of period bars,
@@ -27,24 +22,23 @@ import static junit.framework.Assert.*;
 
 @ContextConfiguration(
         locations = {"classpath:/com/mengruojun/brokerclient/app.xml"})
-public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringContextTests {
+public class ExtendDemoAccountTest1 extends AbstractTransactionalJUnit4SpringContextTests {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Autowired
-  DukascopyTradeClient dukascopyAutoExpandedDemoClient1;
+  DukascopyTradeClient dukascopyAutoExpandedDemoClient2;
 
   @Before
   public void setUp() {
   }
-
   @Test
-  public void testExtendDemoAccount() throws InterruptedException {
-    ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).setTest(true);
-    dukascopyAutoExpandedDemoClient1.start();
+  public void testExtendDemoAccount2() throws InterruptedException {
+    ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).setTest(true);
+    dukascopyAutoExpandedDemoClient2.start();
 
     long maxWaitTime = 60 * 1000L;
     long onceWaitTime = 5* 1000L;
-    while(!(((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).isDoneFirstTrade())
+    while(!(((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).isDoneFirstTrade())
             ) {
       Thread.sleep(onceWaitTime);
       maxWaitTime -= onceWaitTime;
@@ -52,7 +46,7 @@ public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringCont
         break;
       }
     }
-    assertTrue((((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).isDoneFirstTrade()));
+    assertTrue((((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).isDoneFirstTrade()));
 
   }
 }
