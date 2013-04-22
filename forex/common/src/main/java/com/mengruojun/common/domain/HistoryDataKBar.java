@@ -16,7 +16,7 @@ import java.util.Set;
  *
  */
 @Entity
-@Table(name = "HistoryDataKBar1")
+@Table(name = "HistoryDataKBar")
 public class HistoryDataKBar{
   private static final long serialVersionUID = -1943659317753245831L;
   @Version

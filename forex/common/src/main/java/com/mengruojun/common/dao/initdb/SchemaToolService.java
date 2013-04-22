@@ -4,12 +4,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.JdbcAccessor;
 import org.springframework.orm.hibernate3.HibernateSystemException;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,19 +28,19 @@ import java.util.Map;
 public class SchemaToolService {
   private static final Log log = LogFactory.getLog(SchemaToolService.class);
   //private HibernateTemplate hibernateTemplate;
-  private NamedParameterJdbcTemplate jdbcTemplate;
 
   @Autowired
   private org.springframework.orm.hibernate3.LocalSessionFactoryBean sessionFactory;
+
+  private JdbcTemplate jdbcTemplate;
 
   /**
    * @param dataSource the jdbc data source
    */
   @Autowired
   public final void setDataSource(@Qualifier("dataSource") DataSource dataSource) {
-    if (jdbcTemplate == null || dataSource != ((JdbcAccessor) jdbcTemplate.getJdbcOperations()).getDataSource()) {
-      jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-
+    if (jdbcTemplate == null || dataSource != ((JdbcAccessor) jdbcTemplate.getDataSource()).getDataSource()) {
+      jdbcTemplate = new JdbcTemplate(dataSource);
     }
   }
 
@@ -88,11 +92,42 @@ public class SchemaToolService {
     // add more production data here
   }
 
+  private void resetPK(){
+    String searchPK = "SELECT count(*) FROM information_schema.table_constraints c \n" +
+            "JOIN information_schema.key_column_usage t\n" +
+            "USING (constraint_name, table_schema, table_name)\n" +
+            "WHERE c.constraint_type='PRIMARY KEY'\n" +
+            "AND c.table_schema='ForexInvest'\n" +
+            "AND c.table_name='HistoryDataKBar';";
+
+    String resetPK = "ALTER TABLE HistoryDataKBar CHANGE COLUMN timeWindowType timeWindowType  VARCHAR(255) NOT NULL\n" +
+            ", DROP PRIMARY KEY \n" +
+            ", ADD PRIMARY KEY ( openTime , timeWindowType, currency1, currency2) ;";
+    try{
+      final StringBuffer pkNum = new StringBuffer();
+      jdbcTemplate.query(searchPK,new Object[]{},
+              new RowCallbackHandler() {
+                public void processRow(ResultSet rs) throws SQLException {
+                  pkNum.append(rs.getInt(1));
+                }
+              });
+      if(!pkNum.toString().equals("4")){  // need to resetPK
+        jdbcTemplate.update(resetPK);
+      }
+
+    }catch (Exception e) {
+      log.warn("reset PK exception");
+    }
+  }
+
 
   /**
    * Setup basic test data
    */
   private void baseDataInit() {
+
+    resetPK();
+
     try {
 
       Map<String, Object> params = new HashMap<String, Object>();
