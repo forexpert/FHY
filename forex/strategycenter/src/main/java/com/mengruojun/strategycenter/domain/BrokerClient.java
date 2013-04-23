@@ -4,13 +4,12 @@ package com.mengruojun.strategycenter.domain;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.Position;
-import com.mengruojun.common.domain.enumerate.BrokerType;
+import com.mengruojun.common.domain.enumerate.*;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 
 import java.util.*;
-
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Currency;
 
 /**
  * This class presents broker clients but only used for client manager.
@@ -24,16 +23,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BrokerClient {
 
+  /**
+   * It means, if trade 1 million USD/JPY, 33 dollars commission will be charged.
+   * E.g. buy EUR/USD 0.001M at 1.3000; it will take 0.001*1,000,000 *1.3 /1000000 * 33=0.0429 dollars
+   */
+  private double commissionPerM = 33;
+
   public BrokerClient(BrokerType brokerType, String clientId, String strategyName, Double accountLeverage,
-                      Currency baseCurrency, Double startMoney, Double currentMoney, List<Position> openPositions,
+                      Currency baseCurrency, Double startBalance, Double currentBalance, List<Position> openPositions,
                       List<Position> pendingPositions, List<Position> closedPositions) {
     this.brokerType = brokerType;
     this.clientId = clientId;
     this.strategyName = strategyName;
     this.accountLeverage = accountLeverage;
     this.baseCurrency = baseCurrency;
-    this.startMoney = startMoney;
-    this.currentMoney = currentMoney;
+    this.startBalance = startBalance;
+    this.currentBalance = currentBalance;
     this.openPositions = openPositions;
     this.pendingPositions = pendingPositions;
     this.closedPositions = closedPositions;
@@ -45,8 +50,8 @@ public class BrokerClient {
   private Double accountLeverage;
   private Currency baseCurrency;
 
-  private Double startMoney;
-  private Double currentMoney;
+  private Double startBalance;
+  private Double currentBalance;
 
 
   /**
@@ -73,8 +78,8 @@ public class BrokerClient {
    * @return current left margin
    */
   public Double getLeftMargin(Map<Instrument, HistoryDataKBar> currentBars) {
-    Double totalMargin = currentMoney;
-    return currentMoney - getUsedMargin(currentBars);
+    Double totalMargin = currentBalance;
+    return currentBalance - getUsedMargin(currentBars);
 
   }
 
@@ -88,6 +93,37 @@ public class BrokerClient {
   }
 
   //============ Utility ==========
+
+  public Double getEquity(Map<Instrument, HistoryDataKBar> currentBars){
+    double equity = currentBalance;
+    return equity + getTotalUnRealizedPAndL(currentBars);
+  }
+
+
+  public Double getOpenCommission(Position p, Map<Instrument, HistoryDataKBar> currentBars){
+    Double tradingVolume = 0d;
+    if (p.getInstrument().getCurrency1() != com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency)) {
+      tradingVolume = currentBars.get(p.getInstrument()).getOhlc().getAskClose() * p.getAmount() * TradingUtils.getGolbalAmountUnit() ;
+    } else {
+      tradingVolume =  p.getAmount() * TradingUtils.getGolbalAmountUnit() ;
+    }
+    return tradingVolume  /1000000.0 * 33.0 /2; // /2 means split commission for open and close
+  }
+
+  public Double getClosedCommission(Position p, Map<Instrument, HistoryDataKBar> currentBars){
+    return getOpenCommission(p, currentBars);
+  }
+  private double getTotalUnRealizedPAndL(Map<Instrument, HistoryDataKBar> currentBars) {
+    double unrealizedPL = 0;
+    for(Position openPosition : openPositions){
+      TradingUtils.assertStat(openPosition.getStatus() == PositionStatus.OPEN);
+      if(openPosition.getDirection() == Direction.Long){
+        unrealizedPL += TradingUtils.calculateOpenPnL(openPosition, currentBars, com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency));
+      }
+    }
+    return unrealizedPL;
+  }
+
   public Position getOpenPositionById(String id){
     for(Position openPosition : openPositions){
       if(openPosition.getPositionId().equals(id)){
@@ -148,20 +184,20 @@ public class BrokerClient {
     this.baseCurrency = baseCurrency;
   }
 
-  public Double getStartMoney() {
-    return startMoney;
+  public Double getStartBalance() {
+    return startBalance;
   }
 
-  public void setStartMoney(Double startMoney) {
-    this.startMoney = startMoney;
+  public void setStartBalance(Double startBalance) {
+    this.startBalance = startBalance;
   }
 
-  public Double getCurrentMoney() {
-    return currentMoney;
+  public Double getCurrentBalance() {
+    return currentBalance;
   }
 
-  public void setCurrentMoney(Double currentMoney) {
-    this.currentMoney = currentMoney;
+  public void setCurrentBalance(Double currentBalance) {
+    this.currentBalance = currentBalance;
   }
 
   public List<Position> getOpenPositions() {
@@ -194,5 +230,13 @@ public class BrokerClient {
 
   public void setAnalyzedTradeCommandMap(Map<Long, List<TradeCommandMessage>> analyzedTradeCommandMap) {
     this.analyzedTradeCommandMap = analyzedTradeCommandMap;
+  }
+
+  public double getCommissionPerM() {
+    return commissionPerM;
+  }
+
+  public void setCommissionPerM(double commissionPerM) {
+    this.commissionPerM = commissionPerM;
   }
 }

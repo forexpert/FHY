@@ -52,9 +52,9 @@ public class BackTestingStrategyManager extends StrategyManager {
       //analyze tradeCommand and send them to broker server
       List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, endTime);
       if (tradeCommandMessageList != null) {
-        Map<String, Object> tradeCommand = new HashMap<String, Object>();
-        tradeCommand.put("clientId", bc.getClientId());
-        tradeCommand.put("tradeCommandList", tradeCommandMessageList);
+        //Map<String, Object> tradeCommand = new HashMap<String, Object>();
+        //tradeCommand.put("clientId", bc.getClientId());
+        //tradeCommand.put("tradeCommandList", tradeCommandMessageList);
 
         // Since we use mock trading , no need to send tradeCommand. Comment out the next line:
         // tradeCommandSender.sendObjectMessage(tradeCommand);

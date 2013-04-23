@@ -1,6 +1,7 @@
 package com.mengruojun.strategycenter.component.strategy;
 
 import com.mengruojun.common.domain.HistoryDataKBar;
+import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.Direction;
@@ -64,15 +65,22 @@ public class StrategyManager {
     }
   }
 
-  /**
-   * move p from open positions to close positions
-   * update account balance and equity
-   * @param p
-   */
-  protected synchronized void closePositionForBrokerClient(BrokerClient bc, Position p, Long closeTime, Double closePrice, Double closeAmount) {
-
-
-
+  protected synchronized void marginCutCheck(BrokerClient bc, Long endTime){
+    // check margin cut  -- margin cut is complex to implement, since there is factor named weekend leverage.
+    // But for now --, to use back testing,
+    // let's simply think the margin call will happen if the equity is less than the balance's 0.3 times.
+    Map<Instrument, HistoryDataKBar> allLastBars = MarketDataManager.getAllInterestInstrumentS10Bars(endTime);
+    if(bc.getEquity(allLastBars) < bc.getCurrentBalance()*0.3) {   // margin call, close all positions
+      for(Position openPosition : bc.getOpenPositions()){
+        openPosition.setStatus(PositionStatus.CLOSED);
+        openPosition.setCloseTime(endTime - 1);
+        openPosition.setCloseReason(Position.CloseReason.ReachMarginCut);
+        openPosition.setClosePrice(allLastBars.get(openPosition.getInstrument()).getOhlc().getAskClose());
+        bc.getClosedPositions().add(openPosition);
+        bc.setCurrentBalance(bc.getStartBalance()-bc.getClosedCommission(openPosition, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
+      }
+      bc.getOpenPositions().clear();
+    }
   }
 
   /**
@@ -80,11 +88,10 @@ public class StrategyManager {
    *
    * @param bc      BrokerClient
    * @param endTime endTime
-   *                //todo cmeng unit test
    */
   protected synchronized void updateBrokerClientPendingPositions(BrokerClient bc, Long endTime) {
-    // todo cmeng check margin call
 
+    marginCutCheck(bc, endTime);
 
     List<Position> pendingToOpenPositions = new ArrayList<Position>();
 
@@ -171,14 +178,17 @@ public class StrategyManager {
     for (Position p : pendingToOpenPositions) {
       bc.getPendingPositions().remove(p);
       bc.getOpenPositions().add(p);
-      logger.info("updateBrokerClientPendingPositions: [endTime is " + endTime + "], [open position from pending order: " + p.getPositionId() + " ]");
+      // apply commission
+      bc.setCurrentBalance(bc.getStartBalance()-bc.getOpenCommission(p, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
+      logger.debug("updateBrokerClientPendingPositions: [endTime is " + endTime + "], [open position from pending order: " + p.getPositionId() + " ]");
     }
 
     //move opening to close
     for (Position p : openToClosePositions) {
       bc.getOpenPositions().remove(p);
       bc.getClosedPositions().add(p);
-      logger.info("updateBrokerClientPendingPositions: [endTime is " + endTime + "], [close position" + p.getPositionId() + ", reason + " +  p.getCloseReason() + " ]");
+      bc.setCurrentBalance(bc.getStartBalance()-bc.getClosedCommission(p, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
+      logger.debug("updateBrokerClientPendingPositions: [endTime is " + endTime + "], [close position" + p.getPositionId() + ", reason + " + p.getCloseReason() + " ]");
     }
   }
 
@@ -188,18 +198,15 @@ public class StrategyManager {
    * <p/>
    * 1. position status
    * 2. account status
-   * * //todo cmeng unit test
    *
    * @param bc                      BrokerClient
    * @param tradeCommandMessageList tradeCommandMessageList
    * @param endTime                 endTime
    */
   protected synchronized void updateBrokerClientStatus(BrokerClient bc, List<TradeCommandMessage> tradeCommandMessageList, Long endTime) {
-    //1. position status
-
     for (TradeCommandMessage tcm : tradeCommandMessageList) {
 
-      logger.info("updateBrokerClientStatus: [endTime is " + endTime + "], [TradeCommandType is " + tcm.getTradeCommandType() + "]");
+      logger.debug("updateBrokerClientStatus: [endTime is " + endTime + "], [TradeCommandType is " + tcm.getTradeCommandType() + "]");
       switch (tcm.getTradeCommandType()) {
         case openAtSetPrice: // this would result in a pending
           Position newPending = new Position();
@@ -226,6 +233,7 @@ public class StrategyManager {
           newOpen.setInstrument(tcm.getInstrument());
 
           bc.getOpenPositions().add(newOpen);
+          bc.setCurrentBalance(bc.getStartBalance()-bc.getOpenCommission(newOpen, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
 
           break;
         case close:
@@ -238,6 +246,7 @@ public class StrategyManager {
               toBeClose.setCloseTime(endTime + 1);
               bc.getOpenPositions().remove(toBeClose);
               bc.getClosedPositions().add(toBeClose);
+              bc.setCurrentBalance(bc.getStartBalance()-bc.getClosedCommission(toBeClose, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
             } else if (originalAmount.compareTo(toBeClosedAmount) > 0) { // partial close
               Position newClosed = new Position();
               newClosed.setPositionId(tcm.getPositionId() + "_partial_close");
@@ -248,7 +257,7 @@ public class StrategyManager {
               newClosed.setAmount(toBeClosedAmount);
               newClosed.setDirection(toBeClose.getDirection());
               bc.getClosedPositions().add(newClosed);
-
+              bc.setCurrentBalance(bc.getStartBalance()-bc.getClosedCommission(newClosed, MarketDataManager.getAllInterestInstrumentS10Bars(endTime)));
               toBeClose.setAmount(originalAmount - toBeClosedAmount);
 
             } else {

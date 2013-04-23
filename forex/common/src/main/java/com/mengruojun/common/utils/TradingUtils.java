@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -62,9 +63,7 @@ public class TradingUtils {
    * @return position margin
    */
   public static Double calculateMargin(Double accountLeverage, Double closePrice, Position p, Currency baseCurrency) {
-    if (baseCurrency != Currency.USD) {
-      throw new RuntimeException("The baseCurrency is not USD!");
-    }
+   TradingUtils.assertStat(baseCurrency==Currency.USD, "\"The baseCurrency is not USD!\"");
     if (p.getInstrument().getCurrency1() != baseCurrency) {
       if (!getInterestInstrumentList().contains(new Instrument(p.getInstrument().getCurrency1(), baseCurrency))) {
         throw new RuntimeException("No related instrument data found! (" + new Instrument(p.getInstrument().getCurrency1(), baseCurrency) + ")");
@@ -74,8 +73,102 @@ public class TradingUtils {
     } else {
       return p.getAmount() * TradingUtils.getGolbalAmountUnit() / accountLeverage;
     }
+  }
 
+  /**
+   * @param position - the ForexPosition that Open PnL should be calculated for
+   * @param currentPrices - a map of current PriceQuotes by Instrument.  Required for cases in which the
+   *              base currency of the account is not part of the instrument.
+   * @param baseCurrency - a Currency object representing the base currency of the account the
+   *              trade is occurring under - required for when the base currency of the account
+   *              is not involved in the position.
+   * @return a double representing the unrealized gain/loss (aka Open Profit/Loss).
+   */
+  public static double calculateOpenPnL(Position position, Map<Instrument, HistoryDataKBar> currentPrices, Currency baseCurrency)
+  {
+    double openPnL = 0.0d;
+    // Check to see that the instrument of the ForexPosition
+    // contains the base currency of the brokerage account...  If not - locate the intermediary instrument.
+    // For example:  the position instrument is AUD/NZD and the account base currency is in USD.
+    // This means in order to calculate the PnL on the position, an intermediate position
+    // of USD/AUD will have to be calculated.
+    if(position.getInstrument() == null)
+    {
+      logger.warn("Unable to calculate Open PnL for position: " + position.getId() + " Instrument is null!");
+      return openPnL;
+    }
 
+    if(position.getAmount() == null)
+    {
+      logger.warn("Unable to calculate Open PnL for position: " + position.getId() + " Size is null!");
+      return openPnL;
+    }
+
+    if(position.getDirection() == null)
+    {
+      logger.warn("Unable to calculate Open PnL for position: " + position.getId() + " Direction is null!");
+      return openPnL;
+    }
+
+    if(position.getOpenPrice() == null)
+    {
+      logger.warn("Unable to calculate Open PnL for position: " + position.getId() + " Open Price is null!");
+      return openPnL;
+    }
+
+    HistoryDataKBar instrumentPriceBar = currentPrices.get(position.getInstrument());
+
+    HistoryDataKBar conversionPriceBar = null;
+    if(baseCurrency != position.getInstrument().getCurrency1() && baseCurrency != position.getInstrument().getCurrency2()){
+      Instrument conversionInstrument = new Instrument(baseCurrency, position.getInstrument().getCurrency2());
+      conversionPriceBar = currentPrices.get(conversionInstrument);
+    }
+
+    return calculateOpenPnL(position.getAmount(), position.getDirection(), position.getOpenPrice(), instrumentPriceBar,
+            conversionPriceBar, baseCurrency);
+  }
+
+  private static double calculateOpenPnL(Double amount, Direction direction, Double openPrice,
+                                  HistoryDataKBar instrumentPriceBar, HistoryDataKBar conversionPriceBar,Currency baseCurrency) {
+
+    Double openPnL;
+
+    //  Standard PnL calculation.  This is in the second currency of the instrument
+    if(direction == Direction.Long)
+    {
+      openPnL = amount * TradingUtils.getGolbalAmountUnit() * (instrumentPriceBar.getOhlc().getBidClose() - openPrice);
+    }
+    else
+    {
+      openPnL = amount * TradingUtils.getGolbalAmountUnit() * (openPrice - instrumentPriceBar.getOhlc().getAskClose());
+    }
+
+    // simple case -- pips is already in base currency
+    if (baseCurrency == instrumentPriceBar.getInstrument().getCurrency2())
+      return openPnL;
+
+    // if the base currency is the first currency of the instrument, we need to
+    // divide pips by ask price to get pips in base currency
+    if (instrumentPriceBar.getInstrument().getCurrency1() == baseCurrency)
+    {
+      openPnL = openPnL / instrumentPriceBar.getOhlc().getAskClose();
+      return openPnL;
+    }
+
+    if (conversionPriceBar == null)
+      throw new IllegalArgumentException("need a conversion price when computing instrument " + conversionPriceBar.getInstrument() +
+              " into P/L of base currency " + baseCurrency);
+
+    if(baseCurrency == conversionPriceBar.getInstrument().getCurrency1())
+    {
+      // use the 'ask'
+      openPnL = openPnL / conversionPriceBar.getOhlc().getAskClose();
+    } else
+    {
+      // use the 'bid'
+      openPnL = openPnL * conversionPriceBar.getOhlc().getBidClose();
+    }
+    return openPnL;
   }
 
   public static Double getMinAmount(Instrument instrument) {
@@ -87,7 +180,7 @@ public class TradingUtils {
   /**
    * input what pips do you want to take profit
    * @param pips pips
-   * @param lastBar HistoryDataKBar
+   * @param openPrice openPrice
    * @param direction direction
    * @return TakeProfit price
    */
@@ -121,5 +214,16 @@ public class TradingUtils {
   }
   public static Double getGlobalSLInPips() {
     return 100.0d;
+  }
+
+  public static void assertStat(boolean condition, String errorMsg){
+    if(!condition){
+      RuntimeException re = new RuntimeException(errorMsg);
+      logger.error("", re);
+      throw re;
+    }
+  }
+  public static void assertStat(boolean condition){
+    assertStat(condition, "assertStat error");
   }
 }

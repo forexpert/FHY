@@ -15,7 +15,7 @@ public class Position extends GeneratedIdBaseEntity {
     Reach_ST,
     Reach_TP,
     Manually,
-    ReachMarginCall,
+    ReachMarginCut,
     Other
   }
   private static final long serialVersionUID = 1L;
