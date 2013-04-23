@@ -71,110 +71,108 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
     indicators = context.getIndicators();
     this.console = context.getConsole();
     console.getOut().println("Started");
-    new Thread() {
+    /*new Thread() {
       public void run() {
         context.executeTask(new Callable() {   // use asyn mode to get history data to avoid the warning mes like
           // 'Strategy thread queue overloaded with tasks. Ticks in queue - 2, bars - 0, other tasks - 838'
           @Override
-          public Object call() throws Exception {
-            try {
-              this.getAllHistoryData(Period.TEN_SECS);
-            } catch (Exception e) {
-              logger.error("", e);
-            }
-            return null;
-          }
+          public Object call() throws Exception {*/
+    try {
+      this.getAllHistoryData(Period.TEN_SECS);
+    } catch (Exception e) {
+      logger.error("", e);
+    }
+           /* return null;
+          }*/
 
-          private void getHistoryData(Period period, Instrument instrument, long from_long, long to_long) throws JFException, ParseException {
-            try {
 
-              logger.info("Getting History Data: Instrument-->" + instrument +
-                      ";  from-->" + sdf.format(new Date(from_long)) +
-                      ";  to-->" + sdf.format(new Date(to_long))
-              );
-              List<IBar> askbars = context.getHistory().getBars(instrument, period, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
-              List<IBar> bidbars = context.getHistory().getBars(instrument, period, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
-              logger.info("Getting ends");
-
-              //kbars which will be inserted.
-              List<HistoryDataKBar> kbars = new ArrayList<HistoryDataKBar>();
-              for (int i = 0; i < askbars.size(); i++) {
-                IBar askBar = askbars.get(i);
-                IBar bidBar = bidbars.get(i);
-                if (askBar.getTime() != bidBar.getTime()) {
-                  logger.error("askBars doesn't match bidBars");
-                  throw new RuntimeException("askBars doesn't match bidBars");
-                }
-
-                TimeWindowType twt = DukascopyUtils.convertPeriodToTimeWindowType(period);
-                MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
-                        askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
-                        bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
-                        askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
-                        instrument.getSecondaryCurrency(), twt);
-                HistoryDataKBar kbar = mdm.convertToHistorydataKBar();
-                //historyMarketdataService.handle(kbar);
-                kbars.add(kbar);
-              }
-              logger.info("saving" + kbars.size() + " bars start");
-              historyMarketdataService.handle(kbars);
-              logger.info("saving" + kbars.size() + " bars end");
-            } catch (Exception e) {
-              logger.error("", e);
-              logger.error("run again in 5 minutes:");
-              try {
-                Thread.sleep(5 * 60 * 1000L);
-              } catch (InterruptedException e1) {
-                logger.error("", e1);
-              }
-              getHistoryData(period, instrument, from_long, to_long);
-            }
-
-          }
-
-          private void getAllHistoryData(Period period) throws JFException, ParseException {
-            long intervalEachTimeForGetData = period.getInterval() * 9999; // 10000 rows each time
-
-            long global_from_long = TradingUtils.getGlobalTradingStartTime();
-            for (Instrument instrument : dukascopyInstrumentList) {
-              HistoryDataKBar db_latest = historyMarketdataService.getLatestBarForPeriod(
-                      new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),
-                      DukascopyUtils.convertPeriodToTimeWindowType(period)
-              );
-
-              long from_long = 0;
-              if (db_latest == null) {
-                from_long = context.getDataService().getTimeOfFirstCandle(instrument, period);
-                from_long += period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
-              } else {         //continue last execution
-                from_long = db_latest.getOpenTime();
-                from_long += period.getInterval();
-              }
-              if (from_long < global_from_long) {
-                from_long = global_from_long;
-              }
-
-              while (true) {
-                if (new Date().getTime() > (from_long + intervalEachTimeForGetData)) {
-                  long to_long = from_long + intervalEachTimeForGetData;
-                  getHistoryData(period, instrument, from_long, to_long);
-                  from_long = to_long + period.getInterval();
-                } else {// the remain history data  : The getBar method returns an IBar by shift. Shift of value 0 refers to the current candle that's not is not yet fully formed, 1 - latest fully formed candle, 2 - second to last candle.
-                  IBar prevBar = context.getHistory().getBar(instrument, period, OfferSide.BID, 2);
-                  if (prevBar != null && from_long <= prevBar.getTime()) {
-                    getHistoryData(period, instrument, from_long, prevBar.getTime());
-                  }
-                  break;
-                }
-              }
-            }
-          }
-        });
-      }
-    }.start();
-
+    //);
     logger.info("Strategy onStart Method Called");
+  }
 
+  private void getHistoryData(Period period, Instrument instrument, long from_long, long to_long) throws JFException, ParseException {
+    try {
+
+      logger.info("Getting History Data: Instrument-->" + instrument +
+              ";  from-->" + sdf.format(new Date(from_long)) +
+              ";  to-->" + sdf.format(new Date(to_long))
+      );
+      List<IBar> askbars = context.getHistory().getBars(instrument, period, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
+      List<IBar> bidbars = context.getHistory().getBars(instrument, period, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
+      logger.info("Getting ends");
+
+      //kbars which will be inserted.
+      List<HistoryDataKBar> kbars = new ArrayList<HistoryDataKBar>();
+      for (int i = 0; i < askbars.size(); i++) {
+        IBar askBar = askbars.get(i);
+        IBar bidBar = bidbars.get(i);
+        if (askBar.getTime() != bidBar.getTime()) {
+          logger.error("askBars doesn't match bidBars");
+          throw new RuntimeException("askBars doesn't match bidBars");
+        }
+
+        TimeWindowType twt = DukascopyUtils.convertPeriodToTimeWindowType(period);
+        MarketDataMessage mdm = new MarketDataMessage(askBar.getTime(),
+                askBar.getOpen(), askBar.getHigh(), askBar.getLow(), askBar.getClose(),
+                bidBar.getOpen(), bidBar.getHigh(), bidBar.getLow(), bidBar.getClose(),
+                askBar.getVolume(), bidBar.getVolume(), instrument.getPrimaryCurrency(),
+                instrument.getSecondaryCurrency(), twt);
+        HistoryDataKBar kbar = mdm.convertToHistorydataKBar();
+        //historyMarketdataService.handle(kbar);
+        kbars.add(kbar);
+      }
+      logger.info("saving" + kbars.size() + " bars start");
+      historyMarketdataService.handle(kbars);
+      logger.info("saving" + kbars.size() + " bars end");
+    } catch (Exception e) {
+      logger.error("", e);
+      logger.error("run again in 5 minutes:");
+      try {
+        Thread.sleep(5 * 60 * 1000L);
+      } catch (InterruptedException e1) {
+        logger.error("", e1);
+      }
+      getHistoryData(period, instrument, from_long, to_long);
+    }
+
+  }
+
+  private void getAllHistoryData(Period period) throws JFException, ParseException {
+    long intervalEachTimeForGetData = period.getInterval() * 9999; // 10000 rows each time
+
+    long global_from_long = TradingUtils.getGlobalTradingStartTime();
+    for (Instrument instrument : dukascopyInstrumentList) {
+      HistoryDataKBar db_latest = historyMarketdataService.getLatestBarForPeriod(
+              new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),
+              DukascopyUtils.convertPeriodToTimeWindowType(period)
+      );
+
+      long from_long = 0;
+      if (db_latest == null) {
+        from_long = context.getDataService().getTimeOfFirstCandle(instrument, period);
+        from_long += period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
+      } else {         //continue last execution
+        from_long = db_latest.getOpenTime();
+        from_long += period.getInterval();
+      }
+      if (from_long < global_from_long) {
+        from_long = global_from_long;
+      }
+
+      while (true) {
+        if (new Date().getTime() - 1000 * intervalEachTimeForGetData > (from_long + intervalEachTimeForGetData)) {
+          long to_long = from_long + intervalEachTimeForGetData;
+          getHistoryData(period, instrument, from_long, to_long);
+          from_long = to_long + period.getInterval();
+        } else {// the remain history data  : The getBar method returns an IBar by shift. Shift of value 0 refers to the current candle that's not is not yet fully formed, 1 - latest fully formed candle, 2 - second to last candle.
+          IBar prevBar = context.getHistory().getBar(instrument, period, OfferSide.BID, 2);
+          if (prevBar != null && from_long <= prevBar.getTime()) {
+            getHistoryData(period, instrument, from_long, prevBar.getTime());
+          }
+          break;
+        }
+      }
+    }
   }
 
 

@@ -57,7 +57,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
 
   @Test
   public void getBar() {
-    assertFalse(historyDataKBarDao.find(0L,new Instrument(Currency.EUR, Currency.USD),TimeWindowType.S10) ==null);
+    assertFalse(historyDataKBarDao.find(0L,new Instrument(Currency.EUR, Currency.USD),TimeWindowType.S10) !=null);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     HistoryDataKBarDao.ResultSetWork resultSetWork  = new HistoryDataKBarDao.ResultSetWork() {
       @Override
       public void doWork(ResultSet rs) throws SQLException {
-        logger.info(rs.getInt(1));
+        logger.info(rs.getLong("openTime"));
       }
     };
     historyDataKBarDao.readS10BarsByTimeRangeOrderByOpenTime(TradingUtils.getGlobalTradingStartTime(), TradingUtils.getGlobalTradingStartTime() + 1000*30,resultSetWork);

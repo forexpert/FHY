@@ -31,6 +31,7 @@ public class ExtendDemoAccountTest1 extends AbstractTransactionalJUnit4SpringCon
   @Before
   public void setUp() {
   }
+
   @Test
   public void testExtendDemoAccount2() throws InterruptedException {
     ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).setTest(true);

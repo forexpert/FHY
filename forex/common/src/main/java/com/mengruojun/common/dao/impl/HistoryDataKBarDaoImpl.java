@@ -89,7 +89,7 @@ public class HistoryDataKBarDaoImpl implements HistoryDataKBarDao {
   @Override
   public void readS10BarsByTimeRangeOrderByOpenTime(Long startTime, Long endTime, final ResultSetWork resultSetWork) {
 
-    final String sql = "SELECT id,version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime    ,timeWindowType  " +
+    final String sql = "SELECT version,closeTime,currency1,currency2,askClose,askHigh,askLow,askOpen,askVolume,bidClose,bidHigh,bidLow,bidOpen,bidVolume,openTime    ,timeWindowType  " +
             "FROM HistoryDataKBar where openTime >="+startTime+" and openTime <"+endTime+" and timeWindowType = 'S10' ORDER BY openTime ASC";
     this.getHibernateTemplate().executeFind(new HibernateCallback() {
       @Override
@@ -100,7 +100,9 @@ public class HistoryDataKBarDaoImpl implements HistoryDataKBarDao {
           @Override
           public void execute(Connection conn) throws SQLException {
             PreparedStatement ps = null;
-            ps = conn.prepareStatement(sql);
+            ps = conn.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
+            ps.setFetchSize(Integer.MIN_VALUE);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
               resultSetWork.doWork(rs);

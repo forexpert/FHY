@@ -32,7 +32,7 @@ public class BackTestingWork implements HistoryDataKBarDao.ResultSetWork{
   @Override
   /**
    * rs data structure
-   * | id   | version | closeTime     | currency1 | currency2 |
+   *  version | closeTime     | currency1 | currency2 |
    *
    * askClose | askHigh | askLow | askOpen | askVolume |
    * bidClose | bidHigh | bidLow | bidOpen | bidVolume |
