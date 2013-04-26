@@ -71,6 +71,8 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
     log.info(sdf.parse("2010.03.01 04:00:00 +0000").getTime());
     log.info(sdf.parse("2010.03.01 03:00:00 +0000").getTime());
     log.info(sdf.parse("2011.01.05 04:26:40 +0000").getTime());
+    log.info(sdf.parse("2011.01.01 00:00:00 +0000").getTime());
+    log.info(sdf.parse("2012.01.01 00:00:10 +0000").getTime());
   }
 
     @Test

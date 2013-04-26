@@ -14,10 +14,7 @@ import com.mengruojun.strategycenter.component.historyBackTesting.BackTestingStr
 import com.mengruojun.strategycenter.component.historyBackTesting.HistoryBackTestingProcessor;
 import com.mengruojun.strategycenter.component.marketdata.MarketDataManager;
 import com.mengruojun.strategycenter.component.strategy.BaseStrategy;
-import com.mengruojun.strategycenter.component.strategy.StrategyManager;
-import com.mengruojun.strategycenter.component.strategy.simple.SampleStrategy;
 import com.mengruojun.strategycenter.domain.BrokerClient;
-import junit.extensions.TestSetup;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,27 +48,34 @@ public class StrategyManagerTest extends AbstractTransactionalJUnit4SpringContex
   }
 
   String startTime = "2011.01.01 00:00:00 +0000";
-  String endTime = "2011.01.02 00:00:10 +0000";
+  String endTime = "2012.01.01 00:00:10 +0000";
 
 
   @Autowired
   HistoryBackTestingProcessor historyBackTestingProcessor;
   @Autowired
   HistoryDataKBarDao historyDataKBarDao;
-
+  BrokerClient testBrokerClient;
   @Before
   public void setUp() {
 
     historyBackTestingProcessor.setBackTestingStrategyManager(new UnitTestStrategyManager());
-    historyBackTestingProcessor.addClient(
-            new BrokerClient(BrokerType.MockBroker, "unitTest", "sample",
+    testBrokerClient = new BrokerClient(BrokerType.MockBroker, "unitTest", "sample",
             200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
-            new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>()));
+            new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
+    historyBackTestingProcessor.addClient(testBrokerClient);
   }
 
   @Test
   public void testStrategyAndStrategyManager() throws ParseException {
     historyBackTestingProcessor.oneTurnTest(sdf.parse(startTime).getTime(), sdf.parse(endTime).getTime());
+    verifyResult();
+  }
+
+  private void verifyResult() {
+
+
+
   }
 }
 
@@ -111,44 +115,6 @@ class UnitTestStrategyManager extends BackTestingStrategyManager {
         // But later we open an interface to reconcile the real status from Broker Server.
         updateBrokerClientStatus(bc, tradeCommandMessageList, endTime);
       }
-
-      //todo     In each brackets pairs, verify the open/pending/close position size, positionId
-      //  And verify the account equity/balance
-      if(endTime == 1L) { //expected open a pending order    A
-
-      }
-      if(endTime == 1L) { //expected open a market order     B
-
-      }
-      if(endTime == 1L) { //expected open a market order     C
-
-      }
-
-      if(endTime == 1L) { //expected A to be opened since the market price has reached the pending condition
-
-      }
-
-      if(endTime == 1L) { //expected close A by manually
-
-      }
-
-      if(endTime == 1L) { //expected B closed by reaching SL
-
-      }
-
-      if(endTime == 1L) { //expected B closed by reaching TP
-
-      }
-
-      if(endTime == 1L) { //open a market position, pending position, then cancel them
-
-      }
-
-      if(endTime == 1L) { //open a market position, pending position, then change them
-
-      }
-
-
     }
   }
 }
@@ -172,10 +138,41 @@ class TradeCommandTestStrategy extends BaseStrategy {
 
   @Override
   public List<TradeCommandMessage> OnAnalysis(BrokerClient bc, long currentTime) {
-    return factor1(bc, currentTime);
+    return tradeRuleFundamentalTest(bc, currentTime);
   }
 
-  public List<TradeCommandMessage> factor1(BrokerClient bc, long currentTime) {
+  /**
+   * Only test for open orders, positions, close positions(full and partial), cancel orders, change orders, change ST/TP orders,
+   * Margin cut, Reach ST/TP and so on about Trade Rule Fundamental.
+   * @param bc BrokerClient
+   * @param currentTime long
+   * @return
+   */
+
+
+  private List<TradeCommandMessage> tradeRuleFundamentalTest(BrokerClient bc, long currentTime) {
+    String currentTimeStr = sdf.format(new Date(currentTime));
+
+    List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
+    /**
+     String startTime = "2011.01.01 00:00:00 +0000";
+     String endTime = "2012.01.01 00:00:10 +0000";
+
+     */
+    if(currentTimeStr.equals("2011.01.30 22:00:00 +0000")) {   //open EURUSD 0.05 m  at market
+
+    }
+
+    if(currentTimeStr.equals("2011.01.30 22:00:00 +0000")) {   //open EURUSD 0.05 m  at market
+
+    }
+
+
+
+    return tcmList;
+
+  }
+  private List<TradeCommandMessage> factor(BrokerClient bc, long currentTime) {
     List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
     Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
 
