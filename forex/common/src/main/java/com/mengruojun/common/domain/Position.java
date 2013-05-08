@@ -4,6 +4,7 @@ import com.mengruojun.common.domain.enumerate.Currency;
 import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.common.domain.enumerate.PositionStatus;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -106,6 +107,16 @@ public class Position extends GeneratedIdBaseEntity {
   public Double getStopLossInPips() {
     return stopLossInPips;
   }
+  @Transient
+  public Double getStopLossPrice() {
+    return (stopLossInPips==0.0||stopLossInPips==null)?null:
+            (openPrice==null?null:
+                    (direction == Direction.Long
+                            ?openPrice - stopLossInPips*this.instrument.getPipsValue()
+                            :openPrice + stopLossInPips*this.instrument.getPipsValue()
+                    )
+            );
+  }
 
   public void setStopLossInPips(Double stopLossInPips) {
     this.stopLossInPips = stopLossInPips;
@@ -113,6 +124,16 @@ public class Position extends GeneratedIdBaseEntity {
 
   public Double getTakeProfitInPips() {
     return takeProfitInPips;
+  }
+  @Transient
+  public Double getTakeProfitPrice() {
+    return (takeProfitInPips==0.0||takeProfitInPips==null)?null:
+            (openPrice==null?null:
+                    (direction == Direction.Long
+                            ?openPrice + takeProfitInPips*this.instrument.getPipsValue()
+                            :openPrice - takeProfitInPips*this.instrument.getPipsValue()
+                    )
+            );
   }
 
   public void setTakeProfitInPips(Double takeProfitInPips) {

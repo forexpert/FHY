@@ -23,14 +23,15 @@ import java.util.TimeZone;
  */
 public class TradingUtils {
   static Logger logger = Logger.getLogger(TradingUtils.class);
-  static SimpleDateFormat  sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-
+  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+  public static final Double commissionPerM = 33.0d; //USD
   static {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+    DATE_FORMAT.setTimeZone(TradingUtils.GMT);
   }
   public static Long getGlobalTradingStartTime(){
     try {
-      return sdf.parse("2010.03.01 00:00:00 +0000").getTime();
+      return DATE_FORMAT.parse("2010.03.01 00:00:00 +0000").getTime();
     } catch (ParseException e) {
       logger.error("",e);
     }
@@ -171,6 +172,67 @@ public class TradingUtils {
     return openPnL;
   }
 
+  public static double calculateRealizedPnL(Position position, Map<Instrument, HistoryDataKBar> currentPrices, Currency baseCurrency){
+
+
+    Double amount = position.getAmount();
+    Direction direction = position.getDirection();
+    Double openPrice = position.getOpenPrice();
+    Double closePrice = position.getClosePrice();
+    HistoryDataKBar instrumentPriceBar = currentPrices.get(position.getInstrument());
+    HistoryDataKBar conversionPriceBar = null;
+    if(baseCurrency != position.getInstrument().getCurrency1() && baseCurrency != position.getInstrument().getCurrency2()){
+      Instrument conversionInstrument = new Instrument(baseCurrency, position.getInstrument().getCurrency2());
+      conversionPriceBar = currentPrices.get(conversionInstrument);
+    }
+
+
+    Double realizedPnL;
+
+    //  Standard PnL calculation.  This is in the second currency of the instrument
+    if(direction == Direction.Long)
+    {
+      realizedPnL = amount * TradingUtils.getGolbalAmountUnit() * (closePrice - openPrice);
+    }
+    else
+    {
+      realizedPnL = amount * TradingUtils.getGolbalAmountUnit() * (openPrice - closePrice);
+    }
+
+    // simple case -- pips is already in base currency
+    if (baseCurrency == instrumentPriceBar.getInstrument().getCurrency2())
+      return realizedPnL;
+
+    // if the base currency is the first currency of the instrument, we need to
+    // divide pips by ask price to get pips in base currency
+    if (instrumentPriceBar.getInstrument().getCurrency1() == baseCurrency)
+    {
+      realizedPnL = realizedPnL / instrumentPriceBar.getOhlc().getAskClose();
+      return realizedPnL;
+    }
+
+    if (conversionPriceBar == null)
+      throw new IllegalArgumentException("need a conversion price when computing instrument " + conversionPriceBar.getInstrument() +
+              " into P/L of base currency " + baseCurrency);
+
+    if(baseCurrency == conversionPriceBar.getInstrument().getCurrency1())
+    {
+      // use the 'ask'
+      realizedPnL = realizedPnL / conversionPriceBar.getOhlc().getAskClose();
+    } else
+    {
+      // use the 'bid'
+      realizedPnL = realizedPnL * conversionPriceBar.getOhlc().getBidClose();
+    }
+    return realizedPnL;
+
+  }
+
+  /**
+   *
+   * @param instrument
+   * @return unit is K
+   */
   public static Double getMinAmount(Instrument instrument) {
     if (instrument.equals(new Instrument("XAU/USD"))) return 0.001;
     if (instrument.equals(new Instrument("XAG/USD"))) return 0.05;

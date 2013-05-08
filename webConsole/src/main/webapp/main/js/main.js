@@ -9,6 +9,7 @@ YAHOO.namespace('ForexInvest.Main');
     var mainComp = {};
     var systemMonitorTabId = 'systemMonitor';
     var clientManagerTabId = 'clientManager';
+    var marketDataTabId = 'marketData';
     YAHOO.ForexInvest.Main = {
         mainComp : mainComp,
         init : function () {
@@ -65,6 +66,15 @@ YAHOO.namespace('ForexInvest.Main');
 
             }));
 
+            //Create the Chart tab
+            mainComp.tabView.addTab(new YAHOO.widget.Tab({
+                //Inject a span for the icon
+                label : '<span></span>Market Data Chart',
+                id : marketDataTabId,
+                content : '<div id="' + marketDataTabId +'-tabContainer"></div>'
+
+            }));
+
             mainComp.tabView.on('activeTabChange', function (ev) {
                 //Tabs have changed
                 if (ev.newValue.get('id') == systemMonitorTabId) {
@@ -72,6 +82,9 @@ YAHOO.namespace('ForexInvest.Main');
                 }
                 if (ev.newValue.get('id') == clientManagerTabId) {
                     YAHOO.ForexInvest.Main.initClientManagerTab();
+                }
+                if (ev.newValue.get('id') == marketDataTabId) {
+                    YAHOO.ForexInvest.Main.initMarketDataTab();
                 }
                 //Resize to fit the new content
                 mainComp.layout.resize();
@@ -93,6 +106,11 @@ YAHOO.namespace('ForexInvest.Main');
         initClientManagerTab : function () {  //clientManagerTabId
             //Dom.get("systemMonitorTabContainer").innerHTML += " Test";
             //todo cmeng
+        },
+        initMarketDataTab: function () {  //clientManagerTabId
+            var tabContainer = Dom.get(marketDataTabId +'-tabContainer');
+            tabContainer.innerHTML = '';
+            new YAHOO.ForexInvest.Chart(tabContainer).init();
         }
 
     };

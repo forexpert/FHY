@@ -3,13 +3,13 @@ package com.mengruojun.jms.domain;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.enumerate.Direction;
 import com.mengruojun.common.domain.enumerate.TradeCommandType;
+import com.mengruojun.common.utils.TradingUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * TradeCommandMessage
@@ -18,10 +18,7 @@ public class TradeCommandMessage implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   Instrument instrument = null; //new Instrument(Currency.EUR, Currency.USD);
   Direction direction;
@@ -31,10 +28,8 @@ public class TradeCommandMessage implements Serializable {
   Double amount;
   Double openPrice;
   Double closePrice;
-  Double stopLossPrice;
-  Double takeProfitPrice;
-  Double stopLossPriceInPips;
-  Double takeProfitPriceInPips;
+  Double stopLossInPips;
+  Double takeProfitInPips;
   String positionId;
   private TradeCommandType tradeCommandType;
 
@@ -46,7 +41,6 @@ public class TradeCommandMessage implements Serializable {
   private Long analyzeTime;
 
   public TradeCommandMessage(Long analyzeTime) {
-
     this.analyzeTime = analyzeTime;
   }
 
@@ -60,7 +54,7 @@ public class TradeCommandMessage implements Serializable {
             .append("amount", this.amount)
             .append("openPrice", this.openPrice)
             .append("closePrice", closePrice)
-            .append("stopLossPrice", takeProfitPrice)
+            .append("stopLossInPips", stopLossInPips)
             .append("tradeCommandType", tradeCommandType);
     return sb.toString();
   }
@@ -105,36 +99,20 @@ public class TradeCommandMessage implements Serializable {
     this.closePrice = closePrice;
   }
 
-  public Double getStopLossPrice() {
-    return stopLossPrice;
+  public Double getStopLossInPips() {
+    return stopLossInPips;
   }
 
-  public void setStopLossPrice(Double stopLossPrice) {
-    this.stopLossPrice = stopLossPrice;
+  public void setStopLossInPips(Double stopLossInPips) {
+    this.stopLossInPips = stopLossInPips;
   }
 
-  public Double getTakeProfitPrice() {
-    return takeProfitPrice;
+  public Double getTakeProfitInPips() {
+    return takeProfitInPips;
   }
 
-  public void setTakeProfitPrice(Double takeProfitPrice) {
-    this.takeProfitPrice = takeProfitPrice;
-  }
-
-  public Double getStopLossPriceInPips() {
-    return stopLossPriceInPips;
-  }
-
-  public void setStopLossPriceInPips(Double stopLossPriceInPips) {
-    this.stopLossPriceInPips = stopLossPriceInPips;
-  }
-
-  public Double getTakeProfitPriceInPips() {
-    return takeProfitPriceInPips;
-  }
-
-  public void setTakeProfitPriceInPips(Double takeProfitPriceInPips) {
-    this.takeProfitPriceInPips = takeProfitPriceInPips;
+  public void setTakeProfitInPips(Double takeProfitInPips) {
+    this.takeProfitInPips = takeProfitInPips;
   }
 
   public String getPositionId() {

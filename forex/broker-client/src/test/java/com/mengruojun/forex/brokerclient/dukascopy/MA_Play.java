@@ -31,6 +31,7 @@ package com.mengruojun.forex.brokerclient.dukascopy;
 
 import com.dukascopy.api.*;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
+import com.mengruojun.common.utils.TradingUtils;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -46,10 +47,7 @@ public class MA_Play implements IStrategy {
     private double[] ma1 = new double[Instrument.values().length];
     private IConsole console;
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 

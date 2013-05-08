@@ -104,11 +104,15 @@ public class HistoryDataKBarDaoImpl implements HistoryDataKBarDao {
             ps.setFetchSize(Integer.MIN_VALUE);
 
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-              resultSetWork.doWork(rs);
+            try{
+              while (rs.next()) {
+                resultSetWork.doWork(rs);
+              }
+            }finally {
+              rs.close();
+              ps.close();
             }
-            rs.close();
-            ps.close();
+
           }
         });
         return result;

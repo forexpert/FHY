@@ -1,6 +1,7 @@
 package com.mengruojun.common;
 
 import com.mengruojun.common.domain.TimeWindowType;
+import com.mengruojun.common.utils.TradingUtils;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -19,11 +20,7 @@ import static junit.framework.Assert.assertEquals;
  */
 public class TimeWindowTypeTest {
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   @Test
   public void getLastAvailableEndTimeTest() throws ParseException {

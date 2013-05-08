@@ -5,6 +5,7 @@ import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,13 +32,10 @@ import static org.junit.Assert.assertEquals;
 public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringContextTests {
   Log log = LogFactory.getLog(MarketDataManagerTest.class);
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   List<HistoryDataKBar> loadedTestBars = new ArrayList<HistoryDataKBar>();
 
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
 
   @Autowired
   HistoryDataKBarDao historyDataKBarDao;

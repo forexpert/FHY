@@ -3,18 +3,15 @@ package com.mengruojun.brokerclient.dukascopy;
 import com.dukascopy.api.*;
 import com.dukascopy.api.Instrument;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
-import com.mengruojun.common.domain.*;
 import com.mengruojun.common.domain.enumerate.Direction;
-import com.mengruojun.jms.domain.ClientInfoMessage;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
 import org.apache.log4j.Logger;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.stereotype.Service;
 
 import javax.jms.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Queue;
 import java.util.concurrent.Callable;
 
 /**
@@ -23,11 +20,7 @@ import java.util.concurrent.Callable;
 
 public class TradeCommandReceiver {
   Logger logger = Logger.getLogger(this.getClass());
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   public TradeCommandReceiver(String clientId, IContext context, JmsTemplate template, Destination destination) {
     this.clientId = clientId;
@@ -100,8 +93,8 @@ public class TradeCommandReceiver {
       Instrument instrument = DukascopyUtils.toDukascopyInstrument(tcm.getInstrument());
       Double amount = DukascopyUtils.toDukascopyAmountFromK(tcm.getAmount());
       Double openPrice = tcm.getOpenPrice();
-      Double stopLossPrice = tcm.getStopLossPrice();
-      Double takeProfitPrice = tcm.getTakeProfitPrice();
+      Double stopLossPrice = TradingUtils.getSLPrice(tcm.getStopLossInPips(), openPrice, tcm.getDirection(), tcm.getInstrument())  ;
+      Double takeProfitPrice = TradingUtils.getTPPrice(tcm.getTakeProfitInPips(), openPrice, tcm.getDirection(), tcm.getInstrument()) ;
 
       switch (tcm.getTradeCommandType()) {
         case openAtMarketPrice: {

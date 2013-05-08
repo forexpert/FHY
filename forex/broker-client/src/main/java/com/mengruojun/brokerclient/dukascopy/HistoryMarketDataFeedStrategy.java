@@ -43,11 +43,7 @@ import java.util.concurrent.Callable;
  */
 @Service("historyMarketDataFeedStrategy")
 public class HistoryMarketDataFeedStrategy implements IStrategy {
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   private IEngine engine = null;
   private IContext context = null;

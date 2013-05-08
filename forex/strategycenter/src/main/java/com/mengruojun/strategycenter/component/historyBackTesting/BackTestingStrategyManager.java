@@ -1,6 +1,7 @@
 package com.mengruojun.strategycenter.component.historyBackTesting;
 
 import com.mengruojun.common.domain.HistoryDataKBar;
+import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.Direction;
@@ -18,9 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,8 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BackTestingStrategyManager extends StrategyManager {
   Logger logger = Logger.getLogger(this.getClass());
 
-  private Map<String, BaseStrategy> strategyMap = new ConcurrentHashMap<String, BaseStrategy>();
-
   public BackTestingStrategyManager() {
     init();
   }
@@ -39,7 +40,8 @@ public class BackTestingStrategyManager extends StrategyManager {
   /**
    * init strategyMap by registering strategies, which are all instances of Base Strategy
    */
-  private void init() {
+  @Override
+  protected void init() {
     strategyMap.put("sample", new SampleStrategy());
   }
 
@@ -49,6 +51,10 @@ public class BackTestingStrategyManager extends StrategyManager {
     if (strategy != null) {
       //pending orders && SL&TP execution determine
       updateBrokerClientPendingPositions(bc, endTime);
+      recordEquityForBrokerClient(bc,endTime);
+
+      verifyCurrentBrokerClientStatus(bc, endTime);
+
       //analyze tradeCommand and send them to broker server
       List<TradeCommandMessage> tradeCommandMessageList = strategy.analysis(bc, endTime);
       if (tradeCommandMessageList != null) {
@@ -63,6 +69,23 @@ public class BackTestingStrategyManager extends StrategyManager {
         // But later we open an interface to reconcile the real status from Broker Server.
         updateBrokerClientStatus(bc, tradeCommandMessageList, endTime);
       }
+    }
+  }
+
+  /**
+   *  do nothing. but child class(unit test) can implement this method to do any verification.
+   */
+  protected void verifyCurrentBrokerClientStatus(BrokerClient bc, Long endTime) {
+    //do nothing
+  }
+
+  private void recordEquityForBrokerClient(BrokerClient bc, Long endTime) {
+    Calendar cal = Calendar.getInstance(TradingUtils.GMT);
+    cal.setTimeInMillis(endTime);
+    if(cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0 ){ //one day's start
+      Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(endTime);
+      bc.recordEquity(endTime, currentPriceMap);
+      logger.info(bc.getEquity(currentPriceMap));
     }
   }
 

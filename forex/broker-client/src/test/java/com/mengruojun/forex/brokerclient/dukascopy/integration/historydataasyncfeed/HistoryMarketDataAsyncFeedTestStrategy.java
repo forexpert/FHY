@@ -22,6 +22,7 @@ import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.service.HistoryMarketdataService;
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Service("historyMarketDataAsyncFeedTestStrategy")
 public class HistoryMarketDataAsyncFeedTestStrategy implements IStrategy {
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  static{
+    sdf.setTimeZone(TradingUtils.GMT);
   }
 
   private IEngine engine = null;

@@ -1,5 +1,7 @@
 package com.mengruojun.common.domain;
 
+import com.mengruojun.common.utils.TradingUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,10 +21,10 @@ public enum TimeWindowType {
   D1(24 * 3600 * 1000);
 
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  static{
+    sdf.setTimeZone(TradingUtils.GMT);
   }
 
   private long timeInMillis;
@@ -78,7 +80,7 @@ public enum TimeWindowType {
    * @return
    */
   public static Long getLastAvailableEndTime(TimeWindowType twt, Long endTime) {
-    Calendar calender = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+    Calendar calender = Calendar.getInstance(TradingUtils.GMT);
     calender.setTimeInMillis(endTime);
 
     switch (twt){

@@ -25,10 +25,9 @@ import java.util.TimeZone;
 public class MarketDataReceiver implements MessageListener, ApplicationContextAware {
     Logger logger = Logger.getLogger(this.getClass());
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+    static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
     {
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
       logger.info("marketDataReceiver started");
     }
 

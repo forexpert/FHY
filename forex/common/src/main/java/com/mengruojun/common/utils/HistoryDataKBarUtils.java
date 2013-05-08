@@ -17,10 +17,10 @@ import java.util.TimeZone;
 public class HistoryDataKBarUtils {
   static Logger logger = Logger.getLogger(HistoryDataKBarUtils.class);
 
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  static {
+    sdf.setTimeZone(TradingUtils.GMT);
   }
 
   /**
@@ -28,12 +28,14 @@ public class HistoryDataKBarUtils {
    * @param list  list
    * @param barPropertyName possible value getAskClose, getBidClose, getAskXXX, getBidXXX.
    * @return Double[]
-   * @throws NoSuchMethodException  NoSuchMethodException
-   * @throws java.lang.reflect.InvocationTargetException InvocationTargetException
-   * @throws IllegalAccessException IllegalAccessException
    */
-  public static Double[] getPropertyArray(List<HistoryDataKBar> list, String barPropertyName){
-     return (Double[]) getPropertyList(list, barPropertyName).toArray();
+  public static double[] getPropertyArray(List<HistoryDataKBar> list, String barPropertyName){
+    List<Double> values = getPropertyList(list, barPropertyName);
+    double[] re = new double[values.size()];
+    for(int i=0;i<values.size();i++){
+      re[i] = values.get(i);
+    }
+     return re;
   }
 
   public static List<Double> getPropertyList(List<HistoryDataKBar> list, String barPropertyName){

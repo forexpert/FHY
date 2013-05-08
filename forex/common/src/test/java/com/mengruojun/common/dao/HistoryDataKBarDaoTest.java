@@ -36,7 +36,7 @@ public class HistoryDataKBarDaoTest extends BaseDaoTestCase {
   SimpleDateFormat sdf_gmt8 = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
 
   {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+    sdf.setTimeZone(TradingUtils.GMT);
     logger.info("HistoryDataKBarDaoTest started");
   }
 

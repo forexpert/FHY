@@ -1,5 +1,6 @@
 package com.mengruojun.strategycenter.component.jmsreceiver;
 
+import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.ClientInfoMessage;
 import com.mengruojun.jms.domain.MarketDataMessage;
 import com.mengruojun.strategycenter.springevent.ClientRegisterEvent;
@@ -31,9 +32,8 @@ import java.util.TimeZone;
 @Service("clientDataReceiver")
 public class ClientDataReceiver implements MessageListener, ApplicationContextAware {
     Logger logger = Logger.getLogger(this.getClass());
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+    static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
     {
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
       logger.info("clientDataReceiver started");
     }
 

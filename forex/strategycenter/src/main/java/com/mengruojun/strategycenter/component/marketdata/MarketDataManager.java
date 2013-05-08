@@ -6,19 +6,27 @@ import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
 import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
+import com.mengruojun.common.domain.enumerate.KBarAttributeType;
+import com.mengruojun.common.domain.enumerate.KBarAttributeKey;
 import com.mengruojun.common.utils.HistoryDataKBarUtils;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -41,7 +49,7 @@ public class MarketDataManager {
    * For Each computing the max last level data size is only 6;
    * 2. But we also need to compute indicators. So let's keep 100 here;
    */
-  private long eachKBarMapMaxSize = 100;
+  private static long eachKBarMapMaxSize = 100;
 
   public static Map<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>> kbarMap;
 
@@ -147,6 +155,32 @@ public class MarketDataManager {
     }
     return bars;
   }
+  /* <key,Value> is <KBarAttributeKey, Double>  */
+  private static NavigableMap<KBarAttributeKey, Double> kBarAttributeCache = new TreeMap<KBarAttributeKey, Double>();
+  public static Object getKBarAttributes(Long endTime, Instrument instrument,
+                                         TimeWindowType twt, KBarAttributeType attributeType){
+    KBarAttributeKey key = new KBarAttributeKey(attributeType,instrument, twt, endTime);
+    if(kBarAttributeCache.get(key) != null){
+      return kBarAttributeCache.get(key);
+    } else {
+      Double value = computeAttributeValue(key);
+      if(kBarAttributeCache.size()>=eachKBarMapMaxSize) {
+        kBarAttributeCache.remove(kBarAttributeCache.firstKey());
+      }
+      kBarAttributeCache.put(key, value);
+      return value;
+    }
+  }
+
+  private static Double computeAttributeValue(KBarAttributeKey key) {
+    if(key.getType()==KBarAttributeType.EMA_5){
+
+
+    }
+    return null;
+
+  }
+
 
   /**
    * return KBar from memory  by giving startTime, instrument and timeWidowType
@@ -236,6 +270,7 @@ public class MarketDataManager {
       ohlc.setAskVolume(askVolume);
 
       ohlc.setBidOpen(nextLevelFirst.getOhlc().getBidOpen());
+      Arrays.asList((HistoryDataKBarUtils.getPropertyList(nextLevelList, "getBidHigh")));
       ohlc.setBidHigh(Collections.max((HistoryDataKBarUtils.getPropertyList(nextLevelList, "getBidHigh"))));
       ohlc.setBidLow(Collections.min((HistoryDataKBarUtils.getPropertyList(nextLevelList, "getBidLow"))));
       ohlc.setBidClose(nextLevelEnd.getOhlc().getBidClose());

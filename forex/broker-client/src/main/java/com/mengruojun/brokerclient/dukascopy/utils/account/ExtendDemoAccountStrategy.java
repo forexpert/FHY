@@ -14,6 +14,7 @@ import com.dukascopy.api.Instrument;
 import com.dukascopy.api.JFException;
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
+import com.mengruojun.common.utils.TradingUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,12 @@ import java.util.TimeZone;
  */
 
 public class ExtendDemoAccountStrategy implements IStrategy {
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
   boolean doneFirstTrade = false;
   boolean openFirstTrade = false;
 
-  {
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+  static{
+    sdf.setTimeZone(TradingUtils.GMT);
   }
   private boolean isTest = false;
   private IEngine engine = null;

@@ -27,7 +27,8 @@ public class BrokerClient {
    * It means, if trade 1 million USD/JPY, 33 dollars commission will be charged.
    * E.g. buy EUR/USD 0.001M at 1.3000; it will take 0.001*1,000,000 *1.3 /1000000 * 33=0.0429 dollars
    */
-  private double commissionPerM = 33;
+  private double commissionPerM = TradingUtils.commissionPerM;
+  private LinkedHashMap<Long, Double> equityRecord = new LinkedHashMap<Long, Double>();
 
   public BrokerClient(BrokerType brokerType, String clientId, String strategyName, Double accountLeverage,
                       Currency baseCurrency, Double startBalance, Double currentBalance, List<Position> openPositions,
@@ -94,6 +95,10 @@ public class BrokerClient {
 
   //============ Utility ==========
 
+  public void recordEquity(Long recordTime, Map<Instrument, HistoryDataKBar> currentBars){
+    this.equityRecord.put(recordTime, getEquity(currentBars));
+  }
+
   public Double getEquity(Map<Instrument, HistoryDataKBar> currentBars){
     double equity = currentBalance;
     return equity + getTotalUnRealizedPAndL(currentBars);
@@ -107,7 +112,7 @@ public class BrokerClient {
     } else {
       tradingVolume =  p.getAmount() * TradingUtils.getGolbalAmountUnit() ;
     }
-    return tradingVolume  /1000000.0 * 33.0 /2; // /2 means split commission for open and close
+    return tradingVolume  /1000000.0 * commissionPerM /2.0; // /2 means split commission for open and close
   }
 
   public Double getClosedCommission(Position p, Map<Instrument, HistoryDataKBar> currentBars){
@@ -117,9 +122,7 @@ public class BrokerClient {
     double unrealizedPL = 0;
     for(Position openPosition : openPositions){
       TradingUtils.assertStat(openPosition.getStatus() == PositionStatus.OPEN);
-      if(openPosition.getDirection() == Direction.Long){
-        unrealizedPL += TradingUtils.calculateOpenPnL(openPosition, currentBars, com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency));
-      }
+      unrealizedPL += TradingUtils.calculateOpenPnL(openPosition, currentBars, com.mengruojun.common.domain.enumerate.Currency.fromJDKCurrency(baseCurrency));
     }
     return unrealizedPL;
   }

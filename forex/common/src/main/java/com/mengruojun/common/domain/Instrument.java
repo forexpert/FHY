@@ -23,6 +23,12 @@ import static com.mengruojun.common.utils.ValidationUtils.validateNotNull;
 public class Instrument implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  public final static Instrument EURUSD = new Instrument(Currency.EUR, Currency.USD);
+  public final static Instrument AUDUSD = new Instrument(Currency.AUD, Currency.USD);
+  public final static Instrument GBPUSD = new Instrument(Currency.GBP, Currency.USD);
+  public final static Instrument XAGUSD = new Instrument(Currency.XAG, Currency.USD);
+  public final static Instrument USDJPY = new Instrument(Currency.USD, Currency.JPY);
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Currency currency1;
