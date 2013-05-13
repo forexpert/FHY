@@ -89,6 +89,20 @@ public class HistoryMarketdataService {
     }
 
   }
+/*
+  *//**
+   * save giving kbar first, if "duplicated row exception", catch and log it;
+   * @param kbar
+   *//*
+  public void directSave(HistoryDataKBar kbar){
+    try {
+      historyDataKBarDao.save(kbar);
+      logger.debug("Saved a Kbar: " + kbar.toString());
+    } catch (Exception e) {
+      logger.error("there might be already one duplicated record", e);
+
+    }
+  }*/
 
   public HistoryDataKBar getLatestBarForPeriod(Instrument instrument, TimeWindowType timeWindowType) {
     return historyDataKBarDao.getLatestBarForPeriod(instrument, timeWindowType);

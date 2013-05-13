@@ -124,7 +124,7 @@ All the TA functions are simple mathematical function. You provides the inputs w
         &outBeg, &outNbElement, &buffer[0] );
         Of course, the input is overwritten, but this capability diminish needs for temporary memory allocation for certain application. You can assume this capability is true for all TA functions.
 
-
+        The lookback function indicates how many inputs are consume before the first output can be calculated. Example: A simple moving average (SMA) of period 10 will have a lookback of 9
 
 */
 
@@ -272,6 +272,7 @@ public class CoreTest extends TestCase {
     assertEquals(output[1], 1.5);
 
     lookback = lib.maxLookback(2);
+    assertEquals(1, lookback);
   }
 
   public final static double FLT_EPSILON = 1.192092896e-07;

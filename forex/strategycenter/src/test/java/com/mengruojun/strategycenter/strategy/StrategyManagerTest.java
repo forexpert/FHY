@@ -44,7 +44,7 @@ public class StrategyManagerTest extends AbstractTransactionalJUnit4SpringContex
   public static double MONEY_ERROR_RANGE = 0.01;
   public static double QUOTE_ERROR_RANGE = 0.00001;
 
-  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   static {
     sdf.setTimeZone(TradingUtils.GMT);
@@ -573,8 +573,10 @@ class TradeCommandTestStrategy extends BaseStrategy {
 
   @Override
   public List<TradeCommandMessage> OnAnalysis(BrokerClient bc, long currentTime) {
+    //return factor1(bc,currentTime);
     try {
       return tradeRuleFundamentalTest(bc, currentTime);
+
     } catch (ParseException e) {
       logger.error("", e);
     }

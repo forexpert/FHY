@@ -6,7 +6,7 @@ import com.mengruojun.common.domain.TimeWindowType;
 /**
  * HistoryData Kbar Attribute class, is similar to an emun. but allowed to insert by creating instance.
  */
-public class KBarAttributeKey {
+public class KBarAttributeKey implements Comparable<KBarAttributeKey> {
 
   private KBarAttributeType type;
   private Instrument instrument;
@@ -75,5 +75,28 @@ public class KBarAttributeKey {
 
   public void setEndTime(Long endTime) {
     this.endTime = endTime;
+  }
+
+  @Override
+  public int compareTo(KBarAttributeKey o) {
+    if (this.endTime < o.getEndTime()) {
+      return -1;
+    } else if (this.endTime > o.getEndTime()) {
+      return 1;
+    } else{ // endTimes equal to each other
+      if(this.getInstrument().compareTo(o.getInstrument()) != 0) {
+        return this.getInstrument().compareTo(o.getInstrument());
+      } else{  // instruments are identical
+        if(this.getTwt().compareTo(o.getTwt())!=0){
+          return this.getTwt().compareTo(o.getTwt());
+        } else {  // Time Window Type are identical
+          if(this.getType().compareTo(o.getType()) !=0){
+            return this.getType().compareTo(o.getType());
+          } else{ //property type are the same
+            return 0; // all attributes are the same , to the two object are the same
+          }
+        }
+      }
+    }
   }
 }

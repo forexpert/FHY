@@ -40,6 +40,7 @@ public class DukascopyUtils {
       if(period == Period.ONE_MIN) return TimeWindowType.M1;
       if(period == Period.FIVE_MINS) return TimeWindowType.M5;
       if(period == Period.TEN_MINS) return TimeWindowType.M10;
+      if(period == Period.THIRTY_MINS) return TimeWindowType.M30;
       if(period == Period.ONE_HOUR) return TimeWindowType.H1;
       if(period == Period.FOUR_HOURS) return TimeWindowType.H4;
       if(period == Period.DAILY) return TimeWindowType.D1;

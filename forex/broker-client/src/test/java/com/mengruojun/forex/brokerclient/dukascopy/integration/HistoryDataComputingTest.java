@@ -1,5 +1,6 @@
 package com.mengruojun.forex.brokerclient.dukascopy.integration;
 
+import com.dukascopy.api.Instrument;
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient;
 import com.mengruojun.common.domain.HistoryDataKBar;
@@ -46,6 +47,7 @@ public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringC
     historyMarketDataFeedTestStrategy.setTestBar_start(start);
     historyMarketDataFeedTestStrategy.setTestBar_end(end);
     historyMarketDataFeedTestStrategy.setTestPeriod(Period.TEN_SECS);
+    historyMarketDataFeedTestStrategy.setInstrument(Instrument.EURUSD);
 
     dukascopyHistoryMarketDataFeedClient.setStrategy(historyMarketDataFeedTestStrategy);
     new Thread(){

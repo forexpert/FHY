@@ -56,6 +56,7 @@ public class HistoryBackTestingProcessor implements Runnable{
    * After that, this turn is over.
    */
   public void oneTurnTest(Long startTime, Long endTime){
+    clientList = Collections.synchronizedList(new ArrayList<BrokerClient>());
     BackTestingWork btw = new BackTestingWork();
     btw.setDataHandler(new DataHandler() {
       @Override

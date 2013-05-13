@@ -21,11 +21,7 @@ public enum TimeWindowType {
   D1(24 * 3600 * 1000);
 
 
-  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
-
-  static{
-    sdf.setTimeZone(TradingUtils.GMT);
-  }
+  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
 
   private long timeInMillis;
 
@@ -83,8 +79,16 @@ public enum TimeWindowType {
     Calendar calender = Calendar.getInstance(TradingUtils.GMT);
     calender.setTimeInMillis(endTime);
 
+    boolean isDLT = TimeZone.getTimeZone("America/Los_Angeles").inDaylightTime(new Date(endTime));
+    boolean isLastEndTimeInFriday =  (calender.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) &&
+           ( (isDLT && calender.get(Calendar.HOUR_OF_DAY)==21) ||
+            ((!isDLT) &&calender.get(Calendar.HOUR_OF_DAY)==22));
+
     switch (twt){
       case D1:
+        if(isLastEndTimeInFriday){
+            calender.add(Calendar.DAY_OF_MONTH,1);
+        }
         calender.set(Calendar.HOUR_OF_DAY, 0);
         calender.set(Calendar.MINUTE, 0);
         calender.set(Calendar.SECOND, 0);
@@ -94,6 +98,10 @@ public enum TimeWindowType {
         calender.set(Calendar.HOUR_OF_DAY, calender.get(Calendar.HOUR_OF_DAY)/4*4);
         calender.set(Calendar.MINUTE, 0);
         calender.set(Calendar.SECOND, 0);
+
+        if(isLastEndTimeInFriday){
+          calender.add(Calendar.HOUR_OF_DAY,4);
+        }
         break;
 
       case H1:

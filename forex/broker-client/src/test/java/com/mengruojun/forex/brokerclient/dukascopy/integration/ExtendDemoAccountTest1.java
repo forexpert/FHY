@@ -4,6 +4,7 @@ import com.mengruojun.brokerclient.dukascopy.DukascopyTradeClient;
 import com.mengruojun.brokerclient.dukascopy.utils.account.ExtendDemoAccountStrategy;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,7 +32,7 @@ public class ExtendDemoAccountTest1 extends AbstractTransactionalJUnit4SpringCon
   @Before
   public void setUp() {
   }
-
+  @Ignore
   @Test
   public void testExtendDemoAccount2() throws InterruptedException {
     ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient2.getStrategy()).setTest(true);

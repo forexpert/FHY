@@ -20,7 +20,7 @@ import static com.mengruojun.common.utils.ValidationUtils.validateNotNull;
  * Trade Instrument, like EUR/USD
  */
 @Embeddable
-public class Instrument implements Serializable {
+public class Instrument implements Serializable,Comparable<Instrument> {
   private static final long serialVersionUID = 1L;
 
   public final static Instrument EURUSD = new Instrument(Currency.EUR, Currency.USD);

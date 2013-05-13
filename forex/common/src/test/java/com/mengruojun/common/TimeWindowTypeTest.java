@@ -20,7 +20,10 @@ import static junit.framework.Assert.assertEquals;
  */
 public class TimeWindowTypeTest {
 
-  static SimpleDateFormat sdf = TradingUtils.DATE_FORMAT;
+  static SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+  static {
+    sdf.setTimeZone(TradingUtils.GMT);
+  }
 
   @Test
   public void getLastAvailableEndTimeTest() throws ParseException {

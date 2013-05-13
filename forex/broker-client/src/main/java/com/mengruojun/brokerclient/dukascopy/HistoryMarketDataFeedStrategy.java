@@ -17,6 +17,7 @@ import com.dukascopy.api.OfferSide;
 import com.dukascopy.api.Period;
 import com.mengruojun.brokerclient.dukascopy.utils.DukascopyUtils;
 import com.mengruojun.common.domain.HistoryDataKBar;
+import com.mengruojun.common.domain.OHLC;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.service.HistoryMarketdataService;
@@ -74,7 +75,19 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           @Override
           public Object call() throws Exception {*/
     try {
+
       this.getAllHistoryData(Period.TEN_SECS);
+      this.getAllHistoryData(Period.TWENTY_SECS);
+      this.getAllHistoryData(Period.THIRTY_SECS);
+      this.getAllHistoryData(Period.ONE_MIN);
+      this.getAllHistoryData(Period.FIVE_MINS);
+      this.getAllHistoryData(Period.TEN_MINS);
+      this.getAllHistoryData(Period.THIRTY_MINS);
+      this.getAllHistoryData(Period.ONE_HOUR);
+      this.getAllHistoryData(Period.FOUR_HOURS);
+      this.getAllHistoryData(Period.DAILY);
+
+
     } catch (Exception e) {
       logger.error("", e);
     }
@@ -91,7 +104,8 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
 
       logger.info("Getting History Data: Instrument-->" + instrument +
               ";  from-->" + sdf.format(new Date(from_long)) +
-              ";  to-->" + sdf.format(new Date(to_long))
+              ";  to-->" + sdf.format(new Date(to_long)) +
+              "; period-->" + period
       );
       List<IBar> askbars = context.getHistory().getBars(instrument, period, OfferSide.ASK, Filter.WEEKENDS, from_long, to_long);
       List<IBar> bidbars = context.getHistory().getBars(instrument, period, OfferSide.BID, Filter.WEEKENDS, from_long, to_long);
@@ -138,15 +152,25 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
 
     long global_from_long = TradingUtils.getGlobalTradingStartTime();
     for (Instrument instrument : dukascopyInstrumentList) {
-      HistoryDataKBar db_latest = historyMarketdataService.getLatestBarForPeriod(
+
+      logger.info("start to get all historyData for " + instrument + ", period is " + period);
+
+      logger.info("Get lastest such type bar start ...");
+
+      HistoryDataKBar db_latest;
+      db_latest = historyMarketdataService.getLatestBarForPeriod(
               new com.mengruojun.common.domain.Instrument(instrument.getPrimaryCurrency() + "/" + instrument.getSecondaryCurrency()),
               DukascopyUtils.convertPeriodToTimeWindowType(period)
       );
 
+      logger.info("Get lastest such type bar end !");
       long from_long = 0;
       if (db_latest == null) {
         from_long = context.getDataService().getTimeOfFirstCandle(instrument, period);
         from_long += period.getInterval(); //avoid exception, we skip the first bar. it seems that getTimeOfFirstCandle returns the first Bar's endtime;
+        if(instrument.equals(Instrument.XAGUSD)){
+          from_long = sdf.parse("2010.11.12 00:00:00 +0000").getTime();
+        }
       } else {         //continue last execution
         from_long = db_latest.getOpenTime();
         from_long += period.getInterval();
@@ -156,7 +180,7 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       }
 
       while (true) {
-        if (new Date().getTime() - 1000 * intervalEachTimeForGetData > (from_long + intervalEachTimeForGetData)) {
+        if (new Date().getTime() - period.getInterval() > (from_long + intervalEachTimeForGetData)) {
           long to_long = from_long + intervalEachTimeForGetData;
           getHistoryData(period, instrument, from_long, to_long);
           from_long = to_long + period.getInterval();
@@ -170,7 +194,6 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
       }
     }
   }
-
 
   private String ibarToString(IBar ibar) {
     return "IBar: [" + ibar.getTime() + "] [OHLC is " + ibar.getOpen() + ", " + ibar.getHigh()

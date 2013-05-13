@@ -11,24 +11,21 @@ import com.mengruojun.common.domain.enumerate.KBarAttributeKey;
 import com.mengruojun.common.utils.HistoryDataKBarUtils;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.MarketDataMessage;
-import org.apache.commons.collections.map.LinkedMap;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Queue;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * this MarketData is used for live data management
@@ -51,9 +48,10 @@ public class MarketDataManager {
    */
   private static long eachKBarMapMaxSize = 100;
 
-  public static Map<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>> kbarMap;
+  private static Map<Instrument, Map<TimeWindowType, TreeMap<Long, HistoryDataKBar>>> kbarMap;
 
   public static List<Instrument> interestInstrumentList = TradingUtils.getInterestInstrumentList();
+
   {
     initKbarMap();
   }
@@ -62,12 +60,16 @@ public class MarketDataManager {
    * init KbarMap;
    */
   private void initKbarMap() {
-    kbarMap = new ConcurrentHashMap<Instrument, Map<TimeWindowType, Queue<HistoryDataKBar>>>();
+    kbarMap = new ConcurrentHashMap<Instrument, Map<TimeWindowType, TreeMap<Long, HistoryDataKBar>>>();
     for (Instrument instrument : interestInstrumentList) {
-      Map<TimeWindowType, Queue<HistoryDataKBar>> twtBars = new ConcurrentHashMap<TimeWindowType, Queue<HistoryDataKBar>>();
+      Map<TimeWindowType, TreeMap<Long, HistoryDataKBar>> twtBars = new ConcurrentHashMap<TimeWindowType, TreeMap<Long, HistoryDataKBar>>();
 
       for (TimeWindowType twt : TimeWindowType.values()) {
-        Queue<HistoryDataKBar> openTimeBars = new ConcurrentLinkedQueue<HistoryDataKBar>();
+        /*
+          The key of Long is HistoryDataKBar's openTime
+        */
+
+        TreeMap<Long, HistoryDataKBar> openTimeBars = new TreeMap<Long, HistoryDataKBar>();
         twtBars.put(twt, openTimeBars);
       }
       kbarMap.put(instrument, twtBars);
@@ -89,7 +91,7 @@ public class MarketDataManager {
       Long openTime = kbar.getOpenTime();
       TimeWindowType timeWindowType = kbar.getTimeWindowType();
 
-      putKBarIntoMap(kbar, instrument , timeWindowType);
+      putKBarIntoMap(kbar, instrument, timeWindowType);
 
       //calculate all Bars right now
       calculateAllBar(openTime + timeWindowType.getTimeInMillis(), instrument);
@@ -105,66 +107,87 @@ public class MarketDataManager {
    * @param instrument instrument
    */
   private void calculateAllBar(Long endTime, Instrument instrument) {
-    for(TimeWindowType twt : TimeWindowType.values()){
-      if(twt != TimeWindowType.S10){
+
+    for (TimeWindowType twt : TimeWindowType.values()) {
+      if (twt != TimeWindowType.S10) {
         getKBarByEndTime(endTime, instrument, twt);
       }
     }
+
+    //debug  -- tobe remove
+    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+    cal.setTime(new Date(endTime));
+    /*if(cal.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY){
+      MarketDataManager.kbarMap.size();
+    }*/
+
+    if(cal.get(Calendar.DAY_OF_WEEK)==Calendar.MONDAY){
+      MarketDataManager.kbarMap.size();
+    }
+
+    //debug  -- to be remove
   }
 
 
-  private void putKBarIntoMap(HistoryDataKBar kbar, Instrument instrument , TimeWindowType timeWindowType) {
-    if(kbar == null) return;
-    Queue<HistoryDataKBar> longTimeBars = kbarMap.get(instrument).get(timeWindowType);
+  private void putKBarIntoMap(HistoryDataKBar kbar, Instrument instrument, TimeWindowType timeWindowType) {
+    if (kbar == null) return;
+    TreeMap<Long, HistoryDataKBar> longTimeBars = kbarMap.get(instrument).get(timeWindowType);
 
     while (longTimeBars.size() >= eachKBarMapMaxSize) {
-      longTimeBars.poll();
+      longTimeBars.remove(longTimeBars.firstKey());
     }
-    longTimeBars.offer(kbar);
+    longTimeBars.put(kbar.getOpenTime(), kbar);
   }
 
   /**
    * return KBar from memory  by giving startTime, instrument and timeWidowType
    * if not find, return null. This is ONLY SEARCH.
-   * @see MarketDataManager#getKBarByEndTime
    *
-   * @param endTime endTime
-   * @param instrument instrument
+   * @param endTime        endTime
+   * @param instrument     instrument
    * @param timeWindowType timeWindowType
    * @return HistoryDataKBar
+   * @see MarketDataManager#getKBarByEndTime
    */
   public static HistoryDataKBar getKBarByEndTime_OnlySearch(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
 
-    endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType,endTime);
+    endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType, endTime);
 
-    Queue<HistoryDataKBar> longTimeBars = kbarMap.get(instrument).get(timeWindowType);
-    for (HistoryDataKBar kBar : longTimeBars) {
-      if (kBar.getOpenTime() == endTime - timeWindowType.getTimeInMillis()) {
-        return kBar;
-      }
-    }
-    return null;
+    TreeMap<Long, HistoryDataKBar> longTimeBars = kbarMap.get(instrument).get(timeWindowType);
+    return longTimeBars.get(endTime - timeWindowType.getTimeInMillis());
   }
 
 
-  public static Map<Instrument, HistoryDataKBar> getAllInterestInstrumentS10Bars(Long endTime){
+  public static Map<Instrument, HistoryDataKBar> getAllInterestInstrumentS10Bars(Long endTime) {
     Map<Instrument, HistoryDataKBar> bars = new HashMap<Instrument, HistoryDataKBar>();
-    for(Instrument instrument: interestInstrumentList){
+    for (Instrument instrument : interestInstrumentList) {
       HistoryDataKBar bar = getKBarByEndTime_OnlySearch(endTime, instrument, TimeWindowType.S10);
-      if(bar != null) bars.put(instrument, bar);
+      if (bar != null) bars.put(instrument, bar);
     }
     return bars;
   }
+
   /* <key,Value> is <KBarAttributeKey, Double>  */
-  private static NavigableMap<KBarAttributeKey, Double> kBarAttributeCache = new TreeMap<KBarAttributeKey, Double>();
-  public static Object getKBarAttributes(Long endTime, Instrument instrument,
-                                         TimeWindowType twt, KBarAttributeType attributeType){
-    KBarAttributeKey key = new KBarAttributeKey(attributeType,instrument, twt, endTime);
-    if(kBarAttributeCache.get(key) != null){
+  private static TreeMap<KBarAttributeKey, Double> kBarAttributeCache = new TreeMap<KBarAttributeKey, Double>();
+
+  /**
+   * it will return the property of a certain kar which ends with endTime
+   *
+   * @param endTime       endTime
+   * @param instrument    instrument
+   * @param twt           twt
+   * @param attributeType attributeType
+   * @return
+   */
+  public static Double getKBarAttributes(Long endTime, Instrument instrument,
+                                         TimeWindowType twt, KBarAttributeType attributeType) {
+    Long realEndTime = TimeWindowType.getLastAvailableEndTime(twt, endTime);
+    KBarAttributeKey key = new KBarAttributeKey(attributeType, instrument, twt, realEndTime);
+    if (kBarAttributeCache.get(key) != null) {
       return kBarAttributeCache.get(key);
     } else {
       Double value = computeAttributeValue(key);
-      if(kBarAttributeCache.size()>=eachKBarMapMaxSize) {
+      if (kBarAttributeCache.size() >= eachKBarMapMaxSize) {
         kBarAttributeCache.remove(kBarAttributeCache.firstKey());
       }
       kBarAttributeCache.put(key, value);
@@ -173,41 +196,42 @@ public class MarketDataManager {
   }
 
   private static Double computeAttributeValue(KBarAttributeKey key) {
-    if(key.getType()==KBarAttributeType.EMA_5){
-
-
-    }
-    return null;
-
+    return PropertyCal.cal(key, kbarMap.get(key.getInstrument()).get(key.getTwt()));
   }
 
 
   /**
    * return KBar from memory  by giving startTime, instrument and timeWidowType
-   * if not find, insert one if it is able to calcuated
+   * if not find, insert one if it is able to calculated
    *
-   * @param endTime endTime
-   * @param instrument instrument
+   * @param endTime        endTime
+   * @param instrument     instrument
    * @param timeWindowType timeWindowType
    * @return HistoryDataKBar
    */
   private HistoryDataKBar getKBarByEndTime(Long endTime, Instrument instrument, TimeWindowType timeWindowType) {
 
-    endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType,endTime);
+    endTime = TimeWindowType.getLastAvailableEndTime(timeWindowType, endTime);
 
-    Queue<HistoryDataKBar> longTimeBars = kbarMap.get(instrument).get(timeWindowType);
-    for (HistoryDataKBar kBar : longTimeBars) {
-      if (kBar.getOpenTime() == endTime - timeWindowType.getTimeInMillis()) {
-        return kBar;
-      }
+    TreeMap<Long, HistoryDataKBar> openTimeBars = kbarMap.get(instrument).get(timeWindowType);
+    if (openTimeBars.get(endTime - timeWindowType.getTimeInMillis()) != null) {
+      return openTimeBars.get(endTime - timeWindowType.getTimeInMillis());
     }
-    // if not found, then calculate
+    // if not found, then find in DB
+    /*HistoryDataKBar thisLevelInDB = historyDataKBarDao.find(endTime-timeWindowType.getTimeInMillis(), instrument,timeWindowType);
+    if(thisLevelInDB !=null){
+      putKBarIntoMap(thisLevelInDB, instrument, timeWindowType);
+      return thisLevelInDB;
+    }*/
+
+
+    // if not found, then calculate   // the calculation has some problem for D1 level when it is sunday and friday.
     TimeWindowType nextLevelTWT = TimeWindowType.getNextLevel(timeWindowType);
     if (nextLevelTWT != null) {
       Long openTime = endTime - timeWindowType.getTimeInMillis();
       List<HistoryDataKBar> nextLevelBars = getBars(openTime, endTime - nextLevelTWT.getTimeInMillis(), instrument, nextLevelTWT);
       HistoryDataKBar thisLevel = buildKBarFromNextLevelBars(nextLevelBars, timeWindowType, openTime);
-      putKBarIntoMap(thisLevel, instrument , timeWindowType);
+      putKBarIntoMap(thisLevel, instrument, timeWindowType);
       return thisLevel;
     } else return null;
   }
@@ -243,15 +267,14 @@ public class MarketDataManager {
    * @return HistoryDataKBar
    */
   private HistoryDataKBar buildKBarFromNextLevelBars(List<HistoryDataKBar> nextLevelList, TimeWindowType timeWindowType, Long openTime) {
-    if(nextLevelList==null || nextLevelList.isEmpty()) return null;
+    if (nextLevelList == null || nextLevelList.isEmpty()) return null;
 
     HistoryDataKBar nextLevelFirst = nextLevelList.get(0);
     HistoryDataKBar nextLevelEnd = nextLevelList.get(nextLevelList.size() - 1);
 
     //Instrument instrument, TimeWindowType timeWindowType, Long openTime, Long closeTime, OHLC ohlc
     // verify input data
-    if (nextLevelFirst.getInstrument().equals(nextLevelEnd.getInstrument()) &&
-            (nextLevelEnd.getCloseTime() - nextLevelFirst.getOpenTime() == timeWindowType.getTimeInMillis())) {
+    if (nextLevelFirst.getInstrument().equals(nextLevelEnd.getInstrument())) {
       HistoryDataKBar kbar = new HistoryDataKBar();
       kbar.setInstrument(nextLevelFirst.getInstrument());
       kbar.setOpenTime(openTime);
