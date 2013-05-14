@@ -46,7 +46,7 @@ public class MarketDataManager {
    * For Each computing the max last level data size is only 6;
    * 2. But we also need to compute indicators. So let's keep 100 here;
    */
-  private static long eachKBarMapMaxSize = 100;
+  private static long eachKBarMapMaxSize = 500;
 
   private static Map<Instrument, Map<TimeWindowType, TreeMap<Long, HistoryDataKBar>>> kbarMap;
 

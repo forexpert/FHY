@@ -67,6 +67,7 @@ public class StrategyManagerTest extends AbstractTransactionalJUnit4SpringContex
     testBrokerClient = new BrokerClient(BrokerType.MockBroker, "unitTest", "sample",
             200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
             new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
+    historyBackTestingProcessor.clearClient();
     historyBackTestingProcessor.addClient(testBrokerClient);
   }
 
