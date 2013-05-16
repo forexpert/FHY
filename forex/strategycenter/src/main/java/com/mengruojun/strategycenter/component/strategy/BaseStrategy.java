@@ -68,8 +68,8 @@ public abstract class BaseStrategy {
     tcm.setInstrument(instrument);
     tcm.setAmount(amount);
     tcm.setDirection(direction);
-    tcm.setTakeProfitInPips(stInPips);
-    tcm.setStopLossInPips(tpInPips);
+    tcm.setTakeProfitInPips(tpInPips);
+    tcm.setStopLossInPips(stInPips);
     return tcm;
   }
   protected  TradeCommandMessage openPendingPositionTCM(long analyzeTime,
@@ -82,8 +82,8 @@ public abstract class BaseStrategy {
     tcm.setAmount(amount);
     tcm.setOpenPrice(openPrice);
     tcm.setDirection(direction);
-    tcm.setTakeProfitInPips(stInPips);
-    tcm.setStopLossInPips(tpInPips);
+    tcm.setTakeProfitInPips(tpInPips);
+    tcm.setStopLossInPips(stInPips);
     return tcm;
   }
   protected  TradeCommandMessage closePositionAtMarketPriceTCM(long analyzeTime,String positionLabel,Double amount){

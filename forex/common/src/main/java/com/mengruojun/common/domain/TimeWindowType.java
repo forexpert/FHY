@@ -66,7 +66,67 @@ public enum TimeWindowType {
   }
 
   public boolean canEndWithTime(long endTime) {
-    // todo  cmeng
+    Calendar calender = Calendar.getInstance(TradingUtils.GMT);
+    calender.setTimeInMillis(endTime);
+    boolean isDLT = TimeZone.getTimeZone("America/Los_Angeles").inDaylightTime(new Date(endTime));
+    boolean isLastEndTimeInFriday =  (calender.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) &&
+            ( (isDLT && calender.get(Calendar.HOUR_OF_DAY)==21) ||
+                    ((!isDLT) &&calender.get(Calendar.HOUR_OF_DAY)==22));
+
+    switch (this){
+      case D1:
+        if(isLastEndTimeInFriday){
+          return true;
+        }
+        calender.set(Calendar.HOUR_OF_DAY, 0);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+        return calender.get(Calendar.HOUR_OF_DAY)==0 &&
+                calender.get(Calendar.MINUTE)==0 &&
+                calender.get(Calendar.SECOND)==0;
+
+
+      case H4 :
+        if(isLastEndTimeInFriday){
+          return true;
+        }
+
+        calender.set(Calendar.HOUR_OF_DAY, calender.get(Calendar.HOUR_OF_DAY)/4*4);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+
+        return calender.get(Calendar.HOUR_OF_DAY)%4==0 &&
+                calender.get(Calendar.MINUTE)==0 &&
+                calender.get(Calendar.SECOND)==0;
+
+      case H1:
+        return calender.get(Calendar.MINUTE)==0 &&
+                calender.get(Calendar.SECOND)==0;
+
+      case M30:
+        return calender.get(Calendar.MINUTE)%30==0 &&
+                calender.get(Calendar.SECOND)==0;
+
+      case M10:
+        return calender.get(Calendar.MINUTE)%10==0 &&
+                calender.get(Calendar.SECOND)==0;
+
+      case M5:
+        return calender.get(Calendar.MINUTE)%5==0 &&
+                calender.get(Calendar.SECOND)==0;
+      case M1:
+        return calender.get(Calendar.SECOND)==0;
+      case S30:
+        return calender.get(Calendar.SECOND)%30==0;
+      case S20:
+        return calender.get(Calendar.SECOND)%30==0;
+      case S10:
+        return calender.get(Calendar.SECOND)%10==0;
+      default:
+        break;
+    }
+
+
     return false;
   }
 

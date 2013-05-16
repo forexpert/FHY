@@ -183,7 +183,7 @@ public class MarketDataManager {
                                          TimeWindowType twt, KBarAttributeType attributeType) {
     Long realEndTime = TimeWindowType.getLastAvailableEndTime(twt, endTime);
     KBarAttributeKey key = new KBarAttributeKey(attributeType, instrument, twt, realEndTime);
-    if (kBarAttributeCache.get(key) != null) {
+    if (kBarAttributeCache.containsKey(key)) {
       return kBarAttributeCache.get(key);
     } else {
       Double value = computeAttributeValue(key);

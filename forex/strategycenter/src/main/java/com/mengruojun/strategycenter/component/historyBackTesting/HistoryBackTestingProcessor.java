@@ -80,7 +80,12 @@ public class HistoryBackTestingProcessor implements Runnable{
 
     isInTesting = true;
     try{
-      historyDataKBarDao.readS10BarsByTimeRangeOrderByOpenTime(startTime, endTime, btw);
+      long start = startTime;
+      while(start + 2*30*24*3600*1000L< endTime){
+        historyDataKBarDao.readS10BarsByTimeRangeOrderByOpenTime(start, start + 2*30*24*3600*1000L, btw);
+        start = start + 2*30*24*3600*1000L;
+      }
+      historyDataKBarDao.readS10BarsByTimeRangeOrderByOpenTime(start, endTime, btw);
     }catch (Exception e){
       logger.error("", e);
     }
@@ -94,7 +99,8 @@ public class HistoryBackTestingProcessor implements Runnable{
 
 
 
-  @Override
+
+    @Override
   public void run() {
 
   }

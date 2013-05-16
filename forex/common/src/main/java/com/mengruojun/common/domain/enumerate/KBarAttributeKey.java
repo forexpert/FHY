@@ -79,6 +79,7 @@ public class KBarAttributeKey implements Comparable<KBarAttributeKey> {
 
   @Override
   public int compareTo(KBarAttributeKey o) {
+    if(this.equals(o))return 0;
     if (this.endTime < o.getEndTime()) {
       return -1;
     } else if (this.endTime > o.getEndTime()) {
