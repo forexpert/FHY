@@ -2,29 +2,21 @@ package com.mengruojun.strategycenter.component.historyBackTesting;
 
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
-import com.mengruojun.common.domain.Position;
-import com.mengruojun.common.domain.TimeWindowType;
-import com.mengruojun.common.domain.enumerate.Direction;
-import com.mengruojun.common.domain.enumerate.PositionStatus;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
-import com.mengruojun.jms.utils.JMSSender;
 import com.mengruojun.strategycenter.component.marketdata.MarketDataManager;
 import com.mengruojun.strategycenter.component.strategy.BaseStrategy;
 import com.mengruojun.strategycenter.component.strategy.StrategyManager;
 import com.mengruojun.strategycenter.component.strategy.simple.SampleStrategy;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -42,7 +34,10 @@ public class BackTestingStrategyManager extends StrategyManager {
    */
   @Override
   protected void init() {
-    strategyMap.put("sample", new SampleStrategy());
+  }
+
+  public void addStrategy(String strategyName, BaseStrategy baseStrategy){
+    strategyMap.put(strategyName, baseStrategy);
   }
 
 
@@ -51,7 +46,7 @@ public class BackTestingStrategyManager extends StrategyManager {
     if (strategy != null) {
       //pending orders && SL&TP execution determine
       updateBrokerClientPendingPositions(bc, endTime);
-      recordEquityForBrokerClient(bc,endTime);
+      recordPerformanceInfoForBrokerClient(bc, endTime);
 
       verifyCurrentBrokerClientStatus(bc, endTime);
 
@@ -78,14 +73,15 @@ public class BackTestingStrategyManager extends StrategyManager {
   protected void verifyCurrentBrokerClientStatus(BrokerClient bc, Long endTime) {
     //do nothing
   }
-
-  private void recordEquityForBrokerClient(BrokerClient bc, Long endTime) {
+  DecimalFormat df1 = new DecimalFormat("####.00");
+  private void recordPerformanceInfoForBrokerClient(BrokerClient bc, Long endTime) {
     Calendar cal = Calendar.getInstance(TradingUtils.GMT);
     cal.setTimeInMillis(endTime);
     if(cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0 ){ //one day's start
       Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(endTime);
       bc.recordEquity(endTime, currentPriceMap);
-      logger.info(bc.getEquity(currentPriceMap));
+      logger.info("Equity of " + bc.getClientId() + " is " +
+              df1.format(bc.getEquity(currentPriceMap)) + " [Time " + TradingUtils.DATE_FORMAT.format(new Date(endTime))  + "]");
     }
   }
 

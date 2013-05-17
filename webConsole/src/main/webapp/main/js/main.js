@@ -17,7 +17,7 @@ YAHOO.namespace('ForexInvest.Main');
                 minWidth : 1000,
                 units : [
                     { position : 'top', height : 45, resize : false, body : 'top1' },
-                    { position : 'right', width : 300, body : 'right1', header : 'Logger Console', gutter : '0 5 0 5px', minWidth : 190 },
+                   /* { position : 'right', width : 300, body : 'right1', header : 'Logger Console', gutter : '0 5 0 5px', minWidth : 190 },*/
                     { position : 'left', width : 0, resize : true, body : 'left1', gutter : '0 5 0 5px', minWidth : 0 },
                     { position : 'center', gutter : '0 5px 0 2' }
                 ]
@@ -33,7 +33,7 @@ YAHOO.namespace('ForexInvest.Main');
             //On render, load tabview.js and button.js
             mainComp.layout.on('render', function () {
                 YAHOO.ForexInvest.Main.initTabs();
-                //YAHOO.ForexInvest.Main.layout.getUnitByPosition('right').collapse();
+                /*mainComp.layout.getUnitByPosition('right').collapse();*/
                 setTimeout(function () {
                     YAHOO.util.Dom.setStyle(document.body, 'visibility', 'visible');
                     mainComp.layout.resize();
@@ -110,7 +110,9 @@ YAHOO.namespace('ForexInvest.Main');
         initMarketDataTab: function () {  //clientManagerTabId
             var tabContainer = Dom.get(marketDataTabId +'-tabContainer');
             tabContainer.innerHTML = '';
-            new YAHOO.ForexInvest.Chart(tabContainer).init();
+            //new YAHOO.ForexInvest.Chart(tabContainer).init();
+            new YAHOO.ForexInvest.PerformanceTab(tabContainer).init();
+
         }
 
     };

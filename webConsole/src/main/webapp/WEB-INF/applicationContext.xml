@@ -11,13 +11,21 @@
             <list>
                 <value>classpath:/com/mengruojun/common/global.properties</value>
                 <value>classpath:/com/mengruojun/jms/jms.properties</value>
+                <value>classpath:/com/mengruojun/common/db/jdbc.properties</value>
             </list>
         </property>
     </bean>
 
+
+    <import resource="classpath:com/mengruojun/jms/jms-spring.xml"/>
+    <import resource="classpath:/com/mengruojun/strategycenter/app-service.xml"/>
     <!-- 配置JMS连接工厂 -->
     <bean id="systemMonitorService" class="com.mengruojun.webconsole.service.SystemMonitorService">
         <property name="jmsPort" value="${activemq.port}" />
+    </bean>
+    <bean id="tradeCommandSender" class="com.mengruojun.jms.utils.JMSSender">
+        <property name="template" ref="jmsTemplate" />
+        <property name="destination" ref="jmsTopicTradeCommand" />
     </bean>
     <!-- Activates scanning of @Autowired -->
    <!-- <context:annotation-config/>

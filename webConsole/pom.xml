@@ -234,6 +234,16 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.directwebremoting</groupId>
+            <artifactId>dwr</artifactId>
+            <version>3.0.M1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
             <version>${spring.security.version}</version>
@@ -318,6 +328,11 @@
         <dependency>
             <groupId>com.mengruojun.forex</groupId>
             <artifactId>jms-pom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mengruojun.forex</groupId>
+            <artifactId>strategy-center-pom</artifactId>
             <version>${project.version}</version>
         </dependency>
 

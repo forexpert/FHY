@@ -115,4 +115,12 @@ public class HistoryBackTestingProcessor implements Runnable{
   public void setBackTestingStrategyManager(BackTestingStrategyManager backTestingStrategyManager) {
     this.backTestingStrategyManager = backTestingStrategyManager;
   }
+
+  public List<BrokerClient> getClientList() {
+    return clientList;
+  }
+
+  public boolean isInTesting() {
+    return isInTesting;
+  }
 }

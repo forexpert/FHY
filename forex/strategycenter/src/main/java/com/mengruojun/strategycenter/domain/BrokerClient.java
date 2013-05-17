@@ -242,4 +242,21 @@ public class BrokerClient {
   public void setCommissionPerM(double commissionPerM) {
     this.commissionPerM = commissionPerM;
   }
+
+  public PerformanceData getPerformanceData() {
+    PerformanceData pd = new PerformanceData();
+    pd.setTestClientName(this.getClientId());
+    pd.setStrategyname(this.getStrategyName());
+    pd.setClosePositions(this.getClosedPositions());
+
+    List<PerformanceData.EquityRecord> ers = new ArrayList<PerformanceData.EquityRecord>();
+    for (Iterator<Long> it =  equityRecord.keySet().iterator();it.hasNext();) {
+      Long key = it.next();
+      PerformanceData.EquityRecord er = new PerformanceData.EquityRecord(key, equityRecord.get(key));
+      ers.add(er);
+    }
+    pd.setEquityRecords(ers);
+
+    return pd;
+  }
 }

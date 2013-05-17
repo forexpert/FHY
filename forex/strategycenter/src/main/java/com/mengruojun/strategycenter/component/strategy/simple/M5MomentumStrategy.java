@@ -27,15 +27,15 @@ public class M5MomentumStrategy extends BaseStrategy {
     this.targetInstrument = targetInstrument;
   }
 
-  private Instrument targetInstrument;
+  protected  Instrument targetInstrument;
 
   public void setTargetInstrument(Instrument targetInstrument) {
     this.targetInstrument = targetInstrument;
   }
 
-  Direction ema20ConditionPerfer = null;
-  int countForNUM_PASS_MACD_BAR_CROSS = 0;
-  private final static int NUM_PASS_MACD_BAR_CROSS = 5;
+  protected Direction ema20ConditionPerfer = null;
+  protected int countForNUM_PASS_MACD_BAR_CROSS = 0;
+  protected final static int NUM_PASS_MACD_BAR_CROSS = 5;
 
   /**
    * Which should be implemented by subclasses.
@@ -60,7 +60,7 @@ public class M5MomentumStrategy extends BaseStrategy {
     return tcmList;
   }
 
-  private List<TradeCommandMessage>  closePositionAnalysis(BrokerClient bc, long currentTime) {
+  protected List<TradeCommandMessage>  closePositionAnalysis(BrokerClient bc, long currentTime) {
     Instrument instrument = targetInstrument;
     Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
     List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
@@ -91,7 +91,7 @@ public class M5MomentumStrategy extends BaseStrategy {
   }
 
 
-  private List<TradeCommandMessage> openPositionAnalysis(BrokerClient bc,long currentTime) {
+  protected List<TradeCommandMessage> openPositionAnalysis(BrokerClient bc,long currentTime) {
     Instrument instrument = targetInstrument;
     Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
     List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
@@ -108,8 +108,6 @@ public class M5MomentumStrategy extends BaseStrategy {
     Double lastEMA20Price = MarketDataManager.getKBarAttributes(lastBarTime, instrument, TimeWindowType.M5, KBarAttributeType.EMA_20);
     Double lastMACDHistgram = MarketDataManager.getKBarAttributes(lastBarTime, instrument, TimeWindowType.M5, KBarAttributeType.MACD_12_26_9_hist);
 
-
-    boolean ema20 = determineEma20(currentAskClose, currentEMA20Price, lastAskClose, lastEMA20Price, currentTime);
     if (determineEma20(currentAskClose, currentEMA20Price, lastAskClose, lastEMA20Price, currentTime) &&
             determineMACD(currentMACDHistgram, lastMACDHistgram, currentTime)) {
       //start to open a position
@@ -121,7 +119,7 @@ public class M5MomentumStrategy extends BaseStrategy {
 
       // verify if money is enough
       if (bc.getOpenPositions().size() < 10 && bc.getLeftMargin(currentPriceMap) > 0) {
-        String positionId = "M5MomentumStrategy" + bc.getClientId() + "_" + instrument.getCurrency1() + instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime));
+        String positionId = this.getClass().getSimpleName() +"_"+ bc.getClientId() + "_" + instrument.getCurrency1() + instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime));
         TradeCommandMessage tcm1 = this.openPositionAtMarketPriceTCM(currentTime, "HasTP_" + positionId, instrument,
                 TradingUtils.getMinAmount(instrument) * 5, perferDirection, slPips, slPips);
         TradeCommandMessage tcm2 = this.openPositionAtMarketPriceTCM(currentTime, "HasNoTP_" + positionId, instrument,
@@ -141,7 +139,7 @@ public class M5MomentumStrategy extends BaseStrategy {
 
   }
 
-  private boolean determineMACD(Double currentMACDHistgram, Double lastMACDHistgram, long currentTime) {
+  protected boolean determineMACD(Double currentMACDHistgram, Double lastMACDHistgram, long currentTime) {
     if(currentMACDHistgram == null || lastMACDHistgram == null){
       return false;
     }
@@ -163,7 +161,7 @@ public class M5MomentumStrategy extends BaseStrategy {
 
   }
 
-  private boolean determineEma20(Double currentAskClose, Double currentEMA20Price, Double lastAskClose, Double lastEMA20Price, long currentTime) {
+  protected boolean determineEma20(Double currentAskClose, Double currentEMA20Price, Double lastAskClose, Double lastEMA20Price, long currentTime) {
     if(currentEMA20Price==null||lastEMA20Price==null){
       return false;
     }

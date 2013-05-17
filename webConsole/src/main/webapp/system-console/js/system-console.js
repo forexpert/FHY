@@ -84,7 +84,7 @@ YAHOO.namespace('ForexInvest.SystemConsole');
                             Dom.removeClass(statusEL, isRunning ? "down" : "up");
                             Dom.addClass(statusEL, isRunning ? "up" : "down");
                             //isRunning ? Dom.addClass(buttonEL, "hide") : Dom.removeClass(buttonEL, "hide");
-                        }
+                        };
                         updateServerELUI(activemqEl, json.isJMSServerRunning);
                         updateServerELUI(mockBrokerServerEl, json.isMockBrokerServerRunning);
                         updateServerELUI(strategyCenterEl, json.isStrategyServerRunning);

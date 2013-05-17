@@ -22,6 +22,7 @@ YAHOO.namespace('ForexInvest.Chart');
                 "</div>";
 
             this.initButtons();
+
         },
 
         initButtons : function(){

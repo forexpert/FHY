@@ -330,4 +330,12 @@ public class StrategyManager {
       }
     }
   }
+
+
+
+  //==========setter and getter============
+
+  public Map<String, BaseStrategy> getStrategyMap() {
+    return strategyMap;
+  }
 }
