@@ -51,7 +51,7 @@ public class PerformanceData {
 
 
 
-  static class EquityRecord{
+  public static class EquityRecord{
     private Long endTime;
     private Double equity;
 

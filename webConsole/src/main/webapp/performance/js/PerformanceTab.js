@@ -80,48 +80,59 @@ YAHOO.namespace('ForexInvest.PerformanceTab');
         },
 
         getTestClientPerformanceData: function(clientId){
-            var drawEquityChart = function(records, chartContainer){
-                google.load("visualization", "1", {packages:["corechart"]});
-                /*google.setOnLoadCallback(drawChart);
-                function drawChart() {*/
-                    var data = google.visualization.arrayToDataTable([
-                        ['Year', 'Sales', 'Expenses'],
-                        ['2004',  1000,      400],
-                        ['2005',  1170,      460],
-                        ['2006',  660,       1120],
-                        ['2007',  1030,      540]
-                    ]);
-
-                    var options = {
-                        title: 'Company Performance'
-                    };
-
-                    var chart = new google.visualization.LineChart(chartContainer);
-                    chart.draw(data, options);
-                /*}*/
-
-            };
             var that = this;
             Connect.asyncRequest('get', '/app/system-console/getTestBrokerClientPerformanceData?testBrokerClientId='+clientId, {
                 success : function (response) {
                     var json = jsonHelper.parse(response.responseText);
                     var baseInfoEL = Selector.query(".performance-container .performance-data .baseInfo", this.container, true);
                     var equityChartEL = Selector.query(".performance-container .performance-data .equityChart", this.container, true);
-                    var closePositionsEL = Selector.query(".performance-container .performance-data .closePositions", this.container, true);
 
                     baseInfoEL.innerHTML = "<p><H1>Client "+ json.testClientName +" Performance Report</H1></p>" +
                         "<p>Test Strategy is " + json.strategyname + " </p>" +
                         "<p>Start Equity: " + json.equityRecords[0].equity + " </p>" +
                         "<p>End Equity: " + json.equityRecords[json.equityRecords.length-1].equity + " </p>";
 
-                    drawEquityChart(json.equityRecords, equityChartEL);
-                    //that.initClosePositionTable(json.closePositions);
+                    YAHOO.ForexInvest.Chart.drawEquityChart(json.equityRecords, equityChartEL);
+                    that.initClosePositionLink(clientId);
                     //that.initEquityChart(json.equityRecords);
 
                 },
                 failure : null,
                 argument : { that : that }
             }, null);
+        },
+
+
+
+        initClosePositionLink: function(clientId){
+            var closePositionsEL = Selector.query(".performance-container .performance-data .closePositions", this.container, true);
+            closePositionsEL.innerHTML = "<a href='" + "/app/system-console/downloadClientPerformanceCSV?testBrokerClientId="+clientId+"' target='_blank'>Download Closed Position CSV file</a>"
+
+            //since browser is hard to display so much position elements , we choose to download and view them in excel
+            /*var myColumnDefs = [
+                {key:"positionId", sortable:true, resizeable:true},
+                {key:"openTime", sortable:true, resizeable:true},
+                {key:"closeTime", sortable:true, resizeable:true},
+                {key:"instrument", sortable:true, resizeable:true},
+                {key:"direction", sortable:true, resizeable:true},
+                {key:"status", sortable:true, resizeable:true},
+                {key:"closeReason", sortable:true, resizeable:true},
+                {key:"amount", sortable:true, resizeable:true},
+                {key:"openPrice", sortable:true, resizeable:true},
+                {key:"closePrice", sortable:true, resizeable:true},
+                {key:"stopLossInPips", sortable:true, resizeable:true},
+                {key:"takeProfitInPips", sortable:true, resizeable:true}
+            ];
+
+            var myDataSource = new YAHOO.util.DataSource(closePositions);
+            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            myDataSource.responseSchema = {
+                fields: ["positionId","openTime","closeTime","instrument","direction","status","closeReason","amount","openPrice","closePrice","stopLossInPips","takeProfitInPips"]
+            };
+
+            this.positionTable = new YAHOO.widget.DataTable(closePositionsEL,
+                myColumnDefs, myDataSource, {caption:"ClosePosition Table"});
+*/
         },
 
         initClientPanel : function (clients) {

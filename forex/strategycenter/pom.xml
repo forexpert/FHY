@@ -75,7 +75,7 @@
         <dependency>
             <groupId>ta-lib</groupId>
             <artifactId>ta-lib</artifactId>
-            <version>0.4</version>
+            <version>0.4.4dc</version>
         </dependency>
     </dependencies>
 </project>

@@ -5,11 +5,20 @@
 .performance-container .performance-data{
     float: left;
     width: 75%;
+    overflow: auto;
+
+    height: 1000px;
+}
+
+.performance-container .performance-data .equityChart{
+    width: 900px;
+    height: 400px;
 }
 
 .performance-container .control{
     float: right;
     width: 25%;
+    overflow: auto;
 }
 
 .performance-container H1{
