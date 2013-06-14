@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * A simpleStrategy just for test purpose
+ *
  */
 public class MAStrategy extends BaseStrategy {
 
