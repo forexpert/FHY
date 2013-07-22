@@ -7,11 +7,13 @@ import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.BrokerType;
 import com.mengruojun.common.domain.enumerate.Direction;
+import com.mengruojun.common.domain.enumerate.KBarAttributeType;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.strategycenter.component.historyBackTesting.HistoryBackTestingProcessor;
 import com.mengruojun.strategycenter.component.strategy.BaseStrategy;
 import com.mengruojun.strategycenter.component.strategy.simple.AntiM5MomentumStrategy;
 import com.mengruojun.strategycenter.component.strategy.simple.M5MomentumStrategy;
+import com.mengruojun.strategycenter.component.strategy.simple.MAStrategy;
 import com.mengruojun.strategycenter.domain.BrokerClient;
 import com.mengruojun.strategycenter.domain.PerformanceData;
 import com.mengruojun.webconsole.utils.FEUtil;
@@ -58,25 +60,50 @@ public class MarketDataController implements InitializingBean {
   private void initStrategy() {
     this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy("M5MomentumStrategy_GBPUSD", new M5MomentumStrategy(Instrument.EURUSD));
     this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy("AntiM5MomentumStrategy_GBPUSD", new AntiM5MomentumStrategy(Instrument.EURUSD));
+
+
+    MAStrategy mas1 = new MAStrategy(Instrument.EURUSD, TimeWindowType.M5, KBarAttributeType.EMA_5, KBarAttributeType.EMA_20);
+    MAStrategy mas2 = new MAStrategy(Instrument.EURUSD, TimeWindowType.M5, KBarAttributeType.EMA_5, KBarAttributeType.EMA_60);
+    MAStrategy mas3 = new MAStrategy(Instrument.EURUSD, TimeWindowType.D1, KBarAttributeType.EMA_5, KBarAttributeType.EMA_20);
+    MAStrategy mas4 = new MAStrategy(Instrument.EURUSD, TimeWindowType.D1, KBarAttributeType.EMA_5, KBarAttributeType.EMA_60);
+    MAStrategy mas5 = new MAStrategy(Instrument.EURUSD, TimeWindowType.H4, KBarAttributeType.EMA_5, KBarAttributeType.EMA_20);
+    MAStrategy mas6 = new MAStrategy(Instrument.EURUSD, TimeWindowType.H4, KBarAttributeType.EMA_5, KBarAttributeType.EMA_60);
+
+
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas1.toString(), mas1);
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas2.toString(), mas2);
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas3.toString(), mas3);
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas4.toString(), mas4);
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas5.toString(), mas5);
+    this.historyBackTestingProcessor.getBackTestingStrategyManager().addStrategy(mas6.toString(), mas6);
+
   }
 
   private void initTestBrokerClient() {
-    BrokerClient testBrokerClient = new BrokerClient(BrokerType.MockBroker, "M5MomentumStrategy_GBPUSD", "M5MomentumStrategy_GBPUSD",
-      200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
-      new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
+ /*   BrokerClient testBrokerClient = new BrokerClient(BrokerType.MockBroker, "M5MomentumStrategy_GBPUSD", "M5MomentumStrategy_GBPUSD",
+            200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
+            new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
 
     BrokerClient testBrokerClient2 = new BrokerClient(BrokerType.MockBroker, "AntiM5MomentumStrategy_GBPUSD", "AntiM5MomentumStrategy_GBPUSD",
-      200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
-      new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
+            200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
+            new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
 
-
-
-
+    BrokerClient testBrokerClient3 = new BrokerClient(BrokerType.MockBroker, "AntiM5MomentumStrategy_GBPUSD", "AntiM5MomentumStrategy_GBPUSD",
+            200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
+            new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());*/
 
     historyBackTestingProcessor.clearClient();
-    historyBackTestingProcessor.addClient(testBrokerClient);
-    historyBackTestingProcessor.addClient(testBrokerClient2);
+
+    for(String strategyName :this.historyBackTestingProcessor.getBackTestingStrategyManager().getStrategyMap().keySet()){
+      BrokerClient tempBrokerClient = new BrokerClient(BrokerType.MockBroker, strategyName, strategyName,
+              200.0, Currency.getInstance("USD"), 10000.0, 10000.0,
+              new ArrayList<Position>(), new ArrayList<Position>(), new ArrayList<Position>());
+      historyBackTestingProcessor.addClient(tempBrokerClient);
+    }
   }
+
+
+
 
   public void addStrategy() {
 
@@ -141,7 +168,6 @@ public class MarketDataController implements InitializingBean {
   }
 
 
-
   @RequestMapping(value = "system-console/downloadClientPerformanceCSV", method = RequestMethod.GET)
   public synchronized String downloadClientPerformanceCSV(HttpServletRequest request, HttpServletResponse response) throws IOException, JSONException, ParseException {
 
@@ -179,9 +205,9 @@ public class MarketDataController implements InitializingBean {
       headerRow.createCell(13).setCellValue("PL in Equity");
 
       int rowCount = 0;
-      int profitNum=0;
-      int lostNum=0;
-      for(Position p : positions){
+      int profitNum = 0;
+      int lostNum = 0;
+      for (Position p : positions) {
         Row row = sheet.createRow(++rowCount);  //increment to account for header row
         row.createCell(0).setCellValue(p.getPositionId());
         row.createCell(1).setCellValue(p.getInstrument().toString());
@@ -197,23 +223,23 @@ public class MarketDataController implements InitializingBean {
         row.createCell(10).setCellValue(p.getStopLossInPips());
         row.createCell(11).setCellValue(p.getTakeProfitInPips());
         row.createCell(12).setCellValue(
-          p.getDirection()== Direction.Short?
-            ((p.getOpenPrice()-p.getClosePrice())/p.getInstrument().getPipsValue()) :
-            ((p.getClosePrice()-p.getOpenPrice())/p.getInstrument().getPipsValue()));
+                p.getDirection() == Direction.Short ?
+                        ((p.getOpenPrice() - p.getClosePrice()) / p.getInstrument().getPipsValue()) :
+                        ((p.getClosePrice() - p.getOpenPrice()) / p.getInstrument().getPipsValue()));
 
         row.createCell(13).setCellValue(
-          p.getDirection()== Direction.Short?
-            ((p.getOpenPrice()-p.getClosePrice())*p.getAmount()*TradingUtils.getGolbalAmountUnit()) :
-            ((p.getClosePrice()-p.getOpenPrice())*p.getAmount()*TradingUtils.getGolbalAmountUnit()));
+                p.getDirection() == Direction.Short ?
+                        ((p.getOpenPrice() - p.getClosePrice()) * p.getAmount() * TradingUtils.getGolbalAmountUnit()) :
+                        ((p.getClosePrice() - p.getOpenPrice()) * p.getAmount() * TradingUtils.getGolbalAmountUnit()));
 
-        if (row.getCell(13).getNumericCellValue() > 0){
+        if (row.getCell(13).getNumericCellValue() > 0) {
           profitNum += 1;
         } else {
           lostNum += 1;
         }
       }
 
-      rowCount +=4;
+      rowCount += 4;
       Row row = sheet.createRow(++rowCount);
       row.createCell(1).setCellValue("Summary");
 
@@ -227,11 +253,11 @@ public class MarketDataController implements InitializingBean {
       PerformanceData pd = targetBroker.getPerformanceData();
       row = sheet.createRow(++rowCount);
       row.createCell(0).setCellValue(targetBroker.getStartBalance());
-      row.createCell(1).setCellValue(pd.getEquityRecords().get(pd.getEquityRecords().size()-1).getEquity());
+      row.createCell(1).setCellValue(pd.getEquityRecords().get(pd.getEquityRecords().size() - 1).getEquity());
       row.createCell(2).setCellValue(targetBroker.getClosedPositions().size());
 
-      String profitPercentage = df1.format(profitNum/(targetBroker.getClosedPositions().size()*1.0) * 100);
-      String lostPercentage = df1.format(lostNum/(targetBroker.getClosedPositions().size()*1.0) * 100);
+      String profitPercentage = df1.format(profitNum / (targetBroker.getClosedPositions().size() * 1.0) * 100);
+      String lostPercentage = df1.format(lostNum / (targetBroker.getClosedPositions().size() * 1.0) * 100);
 
       row.createCell(3).setCellValue(profitNum + " (" + profitPercentage + "%)");
       row.createCell(4).setCellValue(lostNum + " (" + lostPercentage + "%)");
@@ -243,8 +269,8 @@ public class MarketDataController implements InitializingBean {
       headerRow.createCell(0).setCellValue("endTime");
       headerRow.createCell(1).setCellValue("Equity");
       rowCount = 0;
-      for(PerformanceData.EquityRecord er : pd.getEquityRecords()){
-        row =  sheet.createRow(rowCount++);
+      for (PerformanceData.EquityRecord er : pd.getEquityRecords()) {
+        row = sheet.createRow(rowCount++);
         row.createCell(0).setCellValue(sdf.format(new Date(er.getEndTime())));
         row.createCell(1).setCellValue(er.getEquity());
       }

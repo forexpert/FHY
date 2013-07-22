@@ -2,8 +2,10 @@ package com.mengruojun.strategycenter.component.strategy.simple;
 
 import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.common.domain.Instrument;
+import com.mengruojun.common.domain.Position;
 import com.mengruojun.common.domain.TimeWindowType;
 import com.mengruojun.common.domain.enumerate.Direction;
+import com.mengruojun.common.domain.enumerate.KBarAttributeType;
 import com.mengruojun.common.domain.enumerate.TradeCommandType;
 import com.mengruojun.common.utils.TradingUtils;
 import com.mengruojun.jms.domain.TradeCommandMessage;
@@ -18,12 +20,39 @@ import java.util.Map;
 
 /**
  * A simpleStrategy just for test purpose
- *
  */
 public class MAStrategy extends BaseStrategy {
 
-  public MAStrategy() {
+  public MAStrategy(Instrument targetInstrument, TimeWindowType watchingTimeWindowType, KBarAttributeType shortEMATerm, KBarAttributeType longEMATerm) {
+    this.targetInstrument = targetInstrument;
+    this.watchingTimeWindowType = watchingTimeWindowType;
+    this.shortEMATerm = shortEMATerm;
+    this.longEMATerm = longEMATerm;
+  }
 
+  public String toString() {
+    return this.getClass().getSimpleName() + "_" + targetInstrument + "_" + watchingTimeWindowType + "_" + shortEMATerm + "_" + longEMATerm;
+  }
+
+  protected Instrument targetInstrument;
+  TimeWindowType watchingTimeWindowType;
+  KBarAttributeType shortEMATerm;
+  KBarAttributeType longEMATerm;
+
+  public void setTargetInstrument(Instrument targetInstrument) {
+    this.targetInstrument = targetInstrument;
+  }
+
+  public void setWatchingTimeWindowType(TimeWindowType watchingTimeWindowType) {
+    this.watchingTimeWindowType = watchingTimeWindowType;
+  }
+
+  public void setShortEMATerm(KBarAttributeType shortEMATerm) {
+    this.shortEMATerm = shortEMATerm;
+  }
+
+  public void setLongEMATerm(KBarAttributeType longEMATerm) {
+    this.longEMATerm = longEMATerm;
   }
 
   @Override
@@ -35,35 +64,90 @@ public class MAStrategy extends BaseStrategy {
     List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
     Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
 
-    for (Instrument instrument : MarketDataManager.interestInstrumentList) {
-      HistoryDataKBar m1 = MarketDataManager.getKBarByEndTime_OnlySearch(currentTime, instrument, TimeWindowType.M1);
-      HistoryDataKBar m5 = MarketDataManager.getKBarByEndTime_OnlySearch(currentTime, instrument, TimeWindowType.M5);
-      HistoryDataKBar m10 = MarketDataManager.getKBarByEndTime_OnlySearch(currentTime, instrument, TimeWindowType.M10);
-      Direction direction = null;
-      if (m1 == null || m5 == null || m10 == null) return tcmList;
+    Instrument instrument = targetInstrument;
 
-      if (m1.getOhlc().getAskClose() >= m1.getOhlc().getAskOpen()
-              && m5.getOhlc().getAskClose() >= m5.getOhlc().getAskOpen()
-              && m10.getOhlc().getAskClose() >= m10.getOhlc().getAskOpen()
-              ) {
-        direction = Direction.Long;
-      }
-      if (m1.getOhlc().getAskClose() < m1.getOhlc().getAskOpen()
-              && m5.getOhlc().getAskClose() < m5.getOhlc().getAskOpen()
-              && m10.getOhlc().getAskClose() < m10.getOhlc().getAskOpen()
-              ) {
-        direction = Direction.Short;
-      }
-      if (direction != null) {
-        // verify if money is enough
-        if (bc.getOpenPositions().size() < 10 && bc.getLeftMargin(currentPriceMap) > 0) {
-          String positionId = "Test" + bc.getClientId() + "_" + instrument.getCurrency1() + instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime));
-          TradeCommandMessage tcm = this.openPositionAtMarketPriceTCM(currentTime, positionId, instrument,
-                  TradingUtils.getMinAmount(instrument), direction, TradingUtils.getGlobalSLInPips(), TradingUtils.getGlobalTPInPips());
-          tcmList.add(tcm);
+    if (watchingTimeWindowType.canEndWithTime(currentTime)) {
+      tcmList.addAll(closePositionAnalysis(bc, currentTime));
+      tcmList.addAll(openPositionAnalysis(bc, currentTime));
+    }
+
+
+    return tcmList;
+  }
+
+  protected List<TradeCommandMessage> closePositionAnalysis(BrokerClient bc, long currentTime) {
+    Instrument instrument = targetInstrument;
+    Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
+    List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
+
+
+    Double currentEMAShortAskClose = MarketDataManager.getKBarAttributes(currentTime, instrument, watchingTimeWindowType, shortEMATerm);
+    Double currentEMALongAskPrice = MarketDataManager.getKBarAttributes(currentTime, instrument, watchingTimeWindowType, longEMATerm);
+
+    for (Position p : bc.getOpenPositions()) {
+      boolean close = false;
+
+      if (p.getDirection() == Direction.Long) {
+        if (currentEMAShortAskClose < currentEMALongAskPrice) {
+          close = true;
+        }
+      } else {
+        if (currentEMAShortAskClose > currentEMALongAskPrice) {
+          close = true;
         }
       }
+
+      if (close) {// construct close command
+        TradeCommandMessage tcm = this.closePositionAtMarketPriceTCM(currentTime, p.getPositionId(), p.getAmount());
+        tcmList.add(tcm);
+      }
+
+
     }
     return tcmList;
+  }
+
+
+  protected List<TradeCommandMessage> openPositionAnalysis(BrokerClient bc, long currentTime) {
+    Instrument instrument = targetInstrument;
+    Map<Instrument, HistoryDataKBar> currentPriceMap = MarketDataManager.getAllInterestInstrumentS10Bars(currentTime);
+    List<TradeCommandMessage> tcmList = new ArrayList<TradeCommandMessage>();
+
+    Double currentEMAShortAskClose = MarketDataManager.getKBarAttributes(currentTime, instrument, watchingTimeWindowType, shortEMATerm);
+    Double currentEMALongAskPrice = MarketDataManager.getKBarAttributes(currentTime, instrument, watchingTimeWindowType, longEMATerm);
+
+    long lastTime = currentTime - this.watchingTimeWindowType.getTimeInMillis();
+    Double lastEMAShortAskClose = MarketDataManager.getKBarAttributes(lastTime, instrument, watchingTimeWindowType, shortEMATerm);
+    Double lastEMALongAskPrice = MarketDataManager.getKBarAttributes(lastTime, instrument, watchingTimeWindowType, longEMATerm);
+
+    Direction perferDirection = null;
+
+    if (currentEMAShortAskClose!=null && currentEMALongAskPrice!=null &&
+            lastEMAShortAskClose!=null && lastEMALongAskPrice!=null &&
+            currentEMAShortAskClose < currentEMALongAskPrice && lastEMAShortAskClose > lastEMALongAskPrice) {   //sell short
+      perferDirection = Direction.Short;
+    }
+
+    if (currentEMAShortAskClose!=null && currentEMALongAskPrice!=null &&
+            lastEMAShortAskClose!=null && lastEMALongAskPrice!=null &&
+            currentEMAShortAskClose > currentEMALongAskPrice && lastEMAShortAskClose < lastEMALongAskPrice) {   //buy long
+      perferDirection = Direction.Long;
+    }
+
+    if (perferDirection != null) {
+      // verify if money is enough
+      if (bc.getOpenPositions().size() < 5 && bc.getLeftMargin(currentPriceMap) > 0) {
+        String positionId = this.getClass().getSimpleName() + "_" + bc.getClientId() + "_" + instrument.getCurrency1() + instrument.getCurrency2() + "_" + sdf.format(new Date(currentTime));
+        /*TradeCommandMessage tcm1 = this.openPositionAtMarketPriceTCM(currentTime, "HasTP_" + positionId, instrument,
+                TradingUtils.getMinAmount(instrument) * 5, perferDirection, slPips, slPips);*/
+        TradeCommandMessage tcm2 = this.openPositionAtMarketPriceTCM(currentTime, "HasNo_SL_TP_" + positionId, instrument,
+                TradingUtils.getMinAmount(instrument) * 5, perferDirection, 0d, 0d);
+        //tcmList.add(tcm1);
+        tcmList.add(tcm2);
+      }
+    }
+
+    return tcmList;
+
   }
 }

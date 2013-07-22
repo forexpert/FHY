@@ -17,7 +17,7 @@ import java.util.TreeMap;
  */
 public class PropertyCal {
   public static Double cal(KBarAttributeKey key, TreeMap<Long, HistoryDataKBar> openTimeKBars) {
-    TradingUtils.assertStat(openTimeKBars.lastEntry().getValue().getCloseTime().equals(key.getEndTime()));
+    //TradingUtils.assertStat(openTimeKBars.lastEntry() ==null || openTimeKBars.lastEntry().getValue()==null || openTimeKBars.lastEntry().getValue().getCloseTime().equals(key.getEndTime()));
 
 
     return calculatorMap.get(key.getType()).cal(openTimeKBars);
