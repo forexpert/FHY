@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -75,7 +76,7 @@ public class PropertyCalTest extends AbstractTransactionalJUnit4SpringContextTes
     historyBackTestingProcessor.clearClient();
     historyBackTestingProcessor.addClient(testBrokerClient);
   }
-
+  @Ignore
   @Test
   public void testStrategyAndStrategyManager() throws ParseException {
     historyBackTestingProcessor.oneTurnTest(sdf.parse(startTime).getTime(), sdf.parse(endTime).getTime());
