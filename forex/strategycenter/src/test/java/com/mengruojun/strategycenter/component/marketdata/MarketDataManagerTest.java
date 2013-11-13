@@ -49,7 +49,7 @@ public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringCont
   @Before
   public void setUp() {
     loadedTestBars = historyDataKBarDao.getBarsByOpenTimeRange(new Instrument("EUR/USD"),
-            TimeWindowType.S10, 1267401600000L, 1267421590000L + TimeWindowType.S10.getTimeInMillis());
+            TimeWindowType.M1, 1267401600000L, 1267421590000L + TimeWindowType.M1.getTimeInMillis());
 
     expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.H4, 1267416000000L - TimeWindowType.H4.getTimeInMillis(), 1267416000000L,
             new OHLC(1.364, 1.36515, 1.3592, 1.3613, 71003.70,
@@ -71,15 +71,15 @@ public class MarketDataManagerTest extends AbstractTransactionalJUnit4SpringCont
             new OHLC(1.3612, 1.3613, 1.36115, 1.3613, 197.3,
                     1.3611, 1.36115, 1.361, 1.36115, 195.0)));  //OHLCV
 
-    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S30, 1267416000000L - TimeWindowType.S30.getTimeInMillis(), 1267416000000L,
-            new OHLC(1.3613, 1.3613, 1.36125, 1.3613, 120.5,
-                    1.36115, 1.36115, 1.3611, 1.36115, 121.1)));  //OHLCV
-    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S20, 1267416000000L - TimeWindowType.S20.getTimeInMillis(), 1267416000000L,
-            new OHLC(1.36125, 1.3613, 1.36125, 1.3613, 83.7,
-                    1.3611, 1.36115, 1.3611, 1.36115, 62.7)));  //OHLCV
-    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S10, 1267416000000L - TimeWindowType.S10.getTimeInMillis(), 1267416000000L,
-            new OHLC(1.36125, 1.3613, 1.36125, 1.3613, 53.3,
-                    1.3611, 1.36115, 1.3611, 1.36115, 35.4)));  //OHLCV
+//    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S30, 1267416000000L - TimeWindowType.S30.getTimeInMillis(), 1267416000000L,
+//            new OHLC(1.3613, 1.3613, 1.36125, 1.3613, 120.5,
+//                    1.36115, 1.36115, 1.3611, 1.36115, 121.1)));  //OHLCV
+//    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S20, 1267416000000L - TimeWindowType.S20.getTimeInMillis(), 1267416000000L,
+//            new OHLC(1.36125, 1.3613, 1.36125, 1.3613, 83.7,
+//                    1.3611, 1.36115, 1.3611, 1.36115, 62.7)));  //OHLCV
+//    expectedKBarList.add(new HistoryDataKBar(new Instrument("EUR/USD"), TimeWindowType.S10, 1267416000000L - TimeWindowType.S10.getTimeInMillis(), 1267416000000L,
+//            new OHLC(1.36125, 1.3613, 1.36125, 1.3613, 53.3,
+//                    1.3611, 1.36115, 1.3611, 1.36115, 35.4)));  //OHLCV
 
   }
 

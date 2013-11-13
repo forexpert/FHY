@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.*;
+import org.junit.Ignore;
 
 /**
  * We use Dukascopy client to feed the history data. Usually we feed 10s period data, then computing all kinds of period bars,
@@ -36,7 +37,7 @@ public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringCont
   @Before
   public void setUp() {
   }
-
+  //@Ignore
   @Test
   public void testExtendDemoAccount() throws InterruptedException {
     ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).setTest(true);

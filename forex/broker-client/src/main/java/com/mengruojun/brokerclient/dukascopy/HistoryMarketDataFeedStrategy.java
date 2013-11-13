@@ -76,9 +76,9 @@ public class HistoryMarketDataFeedStrategy implements IStrategy {
           public Object call() throws Exception {*/
     try {
 
-      this.getAllHistoryData(Period.TEN_SECS);
-      this.getAllHistoryData(Period.TWENTY_SECS);
-      this.getAllHistoryData(Period.THIRTY_SECS);
+      //this.getAllHistoryData(Period.TEN_SECS);
+      //this.getAllHistoryData(Period.TWENTY_SECS);
+      //this.getAllHistoryData(Period.THIRTY_SECS);
       this.getAllHistoryData(Period.ONE_MIN);
       this.getAllHistoryData(Period.FIVE_MINS);
       this.getAllHistoryData(Period.TEN_MINS);

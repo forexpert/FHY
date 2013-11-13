@@ -45,10 +45,10 @@ public class TradingUtils {
     List<Instrument> list = new ArrayList<Instrument>();
     //list.add(new Instrument(Currency.XAU, Currency.USD));  // exclude XAU/USD
     list.add(new Instrument(Currency.EUR, Currency.USD));
-    list.add(new Instrument(Currency.USD, Currency.JPY));
-    list.add(new Instrument(Currency.AUD, Currency.USD));
-    list.add(new Instrument(Currency.XAG, Currency.USD));
-    list.add(new Instrument(Currency.GBP, Currency.USD));
+    //list.add(new Instrument(Currency.USD, Currency.JPY));
+    //list.add(new Instrument(Currency.AUD, Currency.USD));
+    //list.add(new Instrument(Currency.XAG, Currency.USD));
+    //list.add(new Instrument(Currency.GBP, Currency.USD));
     // Note, if you want to add more interesting instrument, to calculate margin, you should also add currency1/yourAccountBaseCurrency
     return list;
   }

@@ -62,7 +62,7 @@ public abstract class PersistentAttribute<OwnerClass> extends GeneratedIdBaseEnt
         return value;
     }
 
-    private void setValue(String val) {
+    protected void setValue(String val) {
         value = val;
     }
     

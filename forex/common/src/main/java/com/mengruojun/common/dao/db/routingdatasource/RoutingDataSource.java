@@ -7,6 +7,8 @@ package com.mengruojun.common.dao.db.routingdatasource;
  * Time: 4:15 PM
  * To change this template use File | Settings | File Templates.
  */
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 public class RoutingDataSource extends AbstractRoutingDataSource {
@@ -15,5 +17,10 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
    protected Object determineCurrentLookupKey() {
       return RoutingDataSourceContextHolder.getCustomerType();
    }
+
+    @Override
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
 
