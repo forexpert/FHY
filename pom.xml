@@ -102,7 +102,6 @@
         <module>web</module>-->
         <module>forex</module>
         <module>webConsole</module>
-    <module>pure-model-strategy</module>
   </modules>
 
     <repositories>

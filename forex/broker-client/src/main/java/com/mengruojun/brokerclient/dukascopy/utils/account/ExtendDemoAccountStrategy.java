@@ -44,6 +44,9 @@ public class ExtendDemoAccountStrategy implements IStrategy {
   private double[] ma1 = new double[Instrument.values().length];
   private IConsole console;
   Logger logger = Logger.getLogger(this.getClass());
+
+  private String orderLabel ;
+
   private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
 
 
@@ -77,24 +80,24 @@ public class ExtendDemoAccountStrategy implements IStrategy {
 
     if (instrument.equals(Instrument.EURUSD) && period == Period.TEN_SECS) {
       if(isTest){
-        for (IOrder order : engine.getOrders()) {
-          order.close();
-
-          doneFirstTrade = true;
-        }
+        closeOrders();
+        doneFirstTrade = true;
       }
     }
   }
 
-  private void closeOrders(String orderLabel) throws JFException {
+  private void closeOrders() throws JFException {
     IOrder order = engine.getOrder(orderLabel);
-    order.close();
+    if(order !=null && order.getState().equals(IOrder.State.FILLED)){
+      order.close();
+    }
   }
 
   private void doMinimumTrade() throws JFException {
     String label = "extend_" + sdf.format(new Date());
     IOrder order = engine.submitOrder(label, Instrument.EURUSD, IEngine.OrderCommand.SELL, 0.001, 0, 0);
     order.waitForUpdate(2000);
+    orderLabel = label;
   }
 
   public void onMessage(IMessage message) throws JFException {

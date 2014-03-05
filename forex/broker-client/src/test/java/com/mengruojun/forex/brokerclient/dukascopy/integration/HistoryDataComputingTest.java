@@ -7,6 +7,7 @@ import com.mengruojun.common.domain.HistoryDataKBar;
 import com.mengruojun.forex.brokerclient.dukascopy.integration.HistoryMarketDataFeedTestStrategy;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,6 +39,7 @@ public class HistoryDataComputingTest extends AbstractTransactionalJUnit4SpringC
   public void setUp() {
   }
 
+  @Ignore
   @Test
   public void testGetHistoryBarsFromDukascopyServer() throws InterruptedException {
 

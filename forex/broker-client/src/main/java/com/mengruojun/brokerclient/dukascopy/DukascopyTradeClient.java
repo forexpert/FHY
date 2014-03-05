@@ -32,10 +32,15 @@ public class DukascopyTradeClient extends AbstractBrokerClient implements Initia
 
   private IStrategy strategy;
   private List<Instrument> dukascopyInstrumentList = DukascopyUtils.getInterestInstrumentList();
+  private IClient client = null;
+
+  public IClient getClient() {
+    return client;
+  }
 
   private void initClient() throws Exception {
     //get the instance of the IClient interface
-    final IClient client = ClientFactory.getDefaultInstance();
+    client = ClientFactory.getDefaultInstance();
     //set the listener that will receive system events
     client.setSystemListener(new DefaultSystemListenerImpl(client, jnlpUrl, userName, password));
 

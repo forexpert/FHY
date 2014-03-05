@@ -2,12 +2,14 @@ package com.mengruojun.strategycenter.strategy;
 
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class FarmStrategyTest {
   Logger logger = Logger.getLogger(this.getClass());
+  @Ignore
   @Test
   /**
    * Do trades daily. For each day, if getting profit, stop trading; else do trades for 10 times maximally

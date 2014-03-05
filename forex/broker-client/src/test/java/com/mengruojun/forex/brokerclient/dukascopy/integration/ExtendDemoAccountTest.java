@@ -37,7 +37,6 @@ public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringCont
   @Before
   public void setUp() {
   }
-  //@Ignore
   @Test
   public void testExtendDemoAccount() throws InterruptedException {
     ((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).setTest(true);
@@ -53,6 +52,8 @@ public class ExtendDemoAccountTest extends AbstractTransactionalJUnit4SpringCont
         break;
       }
     }
+
+    dukascopyAutoExpandedDemoClient1.getClient().disconnect();
     assertTrue((((ExtendDemoAccountStrategy)dukascopyAutoExpandedDemoClient1.getStrategy()).isDoneFirstTrade()));
 
   }
