@@ -22,7 +22,7 @@ public class Att48Main {
       tourLine.add("node" + (i+1));
     }
     Att48Solution startSolution = new Att48Solution(tourLine);
-    new AnnealModel(1,0.00001,0.9, 1000, new Att48SolutionHelper(), startSolution).start();
+    new AnnealModel(1000,0.001,0.9, 1000, new Att48SolutionHelper(), startSolution).start();
 
   }
 

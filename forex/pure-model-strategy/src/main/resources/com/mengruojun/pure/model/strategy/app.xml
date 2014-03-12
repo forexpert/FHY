@@ -24,8 +24,8 @@
 
     <import resource="classpath:com/mengruojun/common/db/app-common.xml"/>
 
-  <bean id="historyBackTestingThread" class="java.lang.Thread" init-method="start">
+  <!--<bean id="historyBackTestingThread" class="java.lang.Thread" init-method="start">
     <constructor-arg ref="historyBackTestingService" />
-  </bean>
+  </bean>-->
 
 </beans>

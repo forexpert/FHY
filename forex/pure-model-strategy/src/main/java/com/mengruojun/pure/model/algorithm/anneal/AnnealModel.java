@@ -36,7 +36,9 @@ public class AnnealModel {
 
   public void start(){
     double T = startT;
+    Solution bestS = null;
     Solution S = startSolution;
+    bestS = S;
 
     while(T>minT){
       for(int k = 0; k<=maxTimesTryInOneTrun; k++){
@@ -44,6 +46,7 @@ public class AnnealModel {
         double deltaT = annealModelHelper.evaluation(S_) -annealModelHelper.evaluation(S);
         if(deltaT < 0){
           S = S_;
+          bestS = S;
           logger.info("improved to:" + annealModelHelper.evaluation(S_));
         } else{
           if(Math.random() < Math.exp(-deltaT/T)) {
@@ -56,6 +59,8 @@ public class AnnealModel {
 
       T *= decreaseStep;
     }
+
+    logger.info("Best Solution is " + S.toString());
 
   }
 }

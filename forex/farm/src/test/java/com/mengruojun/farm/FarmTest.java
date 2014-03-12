@@ -64,6 +64,22 @@ public class FarmTest{
 
   }
 
+
+  @Test
+  public void assertValueTest2(){
+    DecimalFormat df = new DecimalFormat("####.00w");
+    double currentBalance = 50;
+    double annualSalary = 0 ;
+    double annualAssert_increaseRate = 0.50;
+    int totalYear = 25;
+    logger.info("init Balance is " + df.format(currentBalance));
+    for (int i=0; i<totalYear; i++){
+      currentBalance = currentBalance*(1+annualAssert_increaseRate) + annualSalary;
+      logger.info("At the end of year " + (i+1) + ", The balance is " +  df.format(currentBalance));
+    }
+
+  }
+
   @Test
   public void DateTimeTest(){
     String text = "2013-03-31T22:00:00.000Z";
@@ -140,6 +156,46 @@ public class FarmTest{
     logger.info(locale.getDisplayName());
     logger.info(locale.getDisplayLanguage());
   }
+
+
+
+  @Test
+  public void testOutput(){
+    StringBuffer out = new StringBuffer("");
+    String temp = "emp_location";
+    for(int i=0;i<80;i++){
+      out.append("'");
+      out.append(temp);
+      out.append(i);
+      out.append("'");
+      out.append(",");
+    }
+    logger.info(out.toString());
+
+  }
+
+  @Test
+  public void testOutput1(){
+    StringBuffer out = new StringBuffer("");
+    String temp1 = "<urn:sfobject><urn:type>EmpJob</urn:type><urn:user_id>user9</urn:user_id><eventReasonCode>DTACHBU</eventReasonCode><urn:start_date>2014-03-12</urn:start_date>";
+    String temp2 = "<urn:seq_number>";
+    String temp3 = "</urn:seq_number>";
+    String temp4 = "<urn:job_title>Engineer</urn:job_title>  <urn:departmentCode>Dept 1</urn:departmentCode>  <urn:divisionCode>Div 3</urn:divisionCode>  <urn:locationCode>TESTTT</urn:locationCode>  <urn:businessUnitCode>BU2</urn:businessUnitCode>  <urn:costCenterCode>CC 2</urn:costCenterCode>  <urn:legalEntityCode>ADOBEIND</urn:legalEntityCode>  </urn:sfobject>";
+
+    for(int i=2;i<300;i++){
+      out.append(temp1);
+      out.append(temp2);
+      out.append(i);
+      out.append(temp3);
+      out.append(temp4);
+      out.append("\n\n");
+    }
+    logger.info(out.toString());
+
+  }
+
+
+
 
 
 }
