@@ -4,6 +4,8 @@ import learning.flashget.util.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,8 @@ public class SimpleHttpDownloadClientWithProgressRecord {
         if(currentProgress!=null)logger.info("Downloaded Progress is " + currentProgress);
         if(currentProgress.equals("100%")){
           logger.info("Total download time is " + futureTask.get()/1000 + " seconds");
+          //use 130 secs to download a 689.8 MB file.
+          break;
         }
       }
       Thread.sleep(2000L);
@@ -47,7 +51,7 @@ public class SimpleHttpDownloadClientWithProgressRecord {
 
   private static String getProgress(DownloadTask task,Long totalLength) {
     Long readLength = task.getReadLength().get();
-    return Utils.percentageFormatter(readLength/totalLength);
+    return Utils.percentageFormatter(readLength/(double)totalLength);
   }
 
 }
@@ -86,24 +90,26 @@ class DownloadTask implements Callable<Long> {
     return end -start;
   }
 
+
   private void doDownload(String url){
     InputStream in = null;
     FileOutputStream out = null;
     try {
-      logger.info("Start Download!");
-      out = new FileOutputStream("interview_question.doc");
       HttpURLConnection conn= (HttpURLConnection)new URL(url).openConnection();
       totalLength = getHeadLength(conn);
-
+      logger.info("file size is " + Utils.readableFileSize(totalLength));
+      String fileName = getRemoteFileName(conn);
+      File downloadPath = new File(System.getProperty("user.home") + File.separator +
+              "javatest" + File.separator );
+      if(!downloadPath.exists())downloadPath.mkdirs();
+      out = getOutPutString(fileName);
       in = new BufferedInputStream(conn.getInputStream());
-
       byte[] bbuf = new byte[10240];
       int hasRead = 0;
       while((hasRead = in.read(bbuf))>0){
         readLength.addAndGet(hasRead);
         out.write(bbuf, 0, hasRead);
       }
-      logger.info("Finished!");
     } catch (IOException e) {
       logger.error("", e);
     }finally {
@@ -117,6 +123,14 @@ class DownloadTask implements Callable<Long> {
   }
 
 
+
+  private FileOutputStream getOutPutString(String fileName) throws FileNotFoundException {
+    File downloadPath = new File(System.getProperty("user.home") + File.separator +
+            "javatest" + File.separator );
+    if(!downloadPath.exists())downloadPath.mkdirs();
+    return new FileOutputStream(downloadPath.getAbsolutePath() + File.separator + fileName);
+
+  }
 
   private String getRemoteFileName(HttpURLConnection conn) {
     List values = conn.getHeaderFields().get("Content-Disposition");
@@ -141,8 +155,6 @@ class DownloadTask implements Callable<Long> {
       // just use the first value here.
       String sLength = (String) values.get(0);
       if (sLength != null) {
-        logger.info("file size is " + Utils.readableFileSize(totalLength));
-        logger.info("file size is " + sLength);
         return Long.valueOf(sLength);
       }
     }
