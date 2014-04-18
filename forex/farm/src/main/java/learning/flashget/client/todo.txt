@@ -1,0 +1,8 @@
+function:
+1. download from http server simply
+2. old io
+3. nio(Selector/Channel)
+4. multiple threads download and join the  (folk/join)  (CountDownLatch)
+5. download from Socket sever(RandomAccess)
+6. Dynamic Proxy authentication
+7. AOP authentication
