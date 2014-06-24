@@ -102,7 +102,7 @@
         <module>web</module>-->
         <module>forex</module>
         <module>webConsole</module>
-  </modules>
+    </modules>
 
     <repositories>
         <repository>
