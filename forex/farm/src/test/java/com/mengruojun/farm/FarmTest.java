@@ -196,9 +196,8 @@ public class FarmTest{
 
   @Test
   public void testOutput2(){
-    List<String> stringList = new ArrayList<String>();
-    //stringList.add(new Integer(1));
-    //Thread.currentThread().getState()
+
+      logger.info("12345.jpg".split("\\.")[0]);
   }
 
 
